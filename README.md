@@ -9,7 +9,7 @@ It uses Isaac Lab's existing G1 velocity task and PPO setup; simulation only, no
 policy (iteration 0). Right: the final policy (iteration 1499). Robots that fall are reset in place and keep
 going, see [How to read the clips](#how-to-read-the-clips).*
 
-**Jump to:** [Results](#results-at-a-glance) · [Method](#method-and-architecture) · [Reproducing](#reproducing) · [Limitations](#limitations) · [Credits](#credits) · [GPU-physics check](diagnostics/README.md)
+**Jump to:** [Results](#results-at-a-glance) · [Method](#method-and-architecture) · [Reproducing](#reproducing) · [Limitations](#limitations) · [Credits](#credits-and-licenses) · [GPU-physics check](diagnostics/README.md)
 
 ## Summary
 
