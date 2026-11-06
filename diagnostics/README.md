@@ -19,12 +19,12 @@ What it found (files in this folder):
 - **Not verified:** one MuJoCo-Warp kernel (`_qfrc_constraint_from_grad`) was traced but is absent from the graph dump (likely inside
   a conditional body the dump does not expand); the diagnostic ran with only 16 environments.
 
-Run (from an Isaac Lab 3.0.0 checkout, `export OMNI_KIT_ACCEPT_EULA=YES`):
+Run from an Isaac Lab 3.0.0 checkout (`export OMNI_KIT_ACCEPT_EULA=YES`; `G1LAB` = path of this repository, see the main README):
 
 ```bash
-python /path/to/g1-locomotion-lab/diagnostics/diag_gpu_physics.py --evidence /tmp/g1_diag \
+python "$G1LAB"/diagnostics/diag_gpu_physics.py --evidence /tmp/g1_diag \
   --task Isaac-Velocity-Flat-G1 --checkpoint <run>/model_1499.pt --num_envs 16 --train_env_cfg physics=newton_mjwarp
-python3 -I /path/to/g1-locomotion-lab/diagnostics/analyze_trace.py /tmp/g1_diag
+python3 -I "$G1LAB"/diagnostics/analyze_trace.py /tmp/g1_diag
 ```
 
 (The Chrome trace, 23 MB, and logs are not included. `analyze_trace.py` also needs `traced_kernels.json` and `newton_graph.dot`, which are included.)

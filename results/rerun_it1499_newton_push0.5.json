@@ -1,0 +1,56 @@
+{
+ "stand": {
+  "cmd": [
+   0,
+   0,
+   0
+  ],
+  "new_falls": 0,
+  "survivors": 256,
+  "lin_err": 0.08700791746377945,
+  "yaw_err": 0.20958009362220764
+ },
+ "walk": {
+  "cmd": [
+   0.8,
+   0,
+   0
+  ],
+  "new_falls": 2,
+  "survivors": 254,
+  "lin_err": 0.10745098441839218,
+  "yaw_err": 0.22798912227153778
+ },
+ "turn": {
+  "cmd": [
+   0,
+   0,
+   0.8
+  ],
+  "new_falls": 13,
+  "survivors": 241,
+  "lin_err": 0.12306654453277588,
+  "yaw_err": 0.3739508092403412
+ },
+ "stop": {
+  "cmd": [
+   0,
+   0,
+   0
+  ],
+  "new_falls": 8,
+  "survivors": 233,
+  "lin_err": 0.08916499465703964,
+  "yaw_err": 0.2089764028787613
+ },
+ "N": 256,
+ "steps_per_env": 1200,
+ "wall_s": 11.044747591018677,
+ "env_steps_per_s": 27814.12589725524,
+ "push": [
+  0.5,
+  2.5
+ ],
+ "survive_frac": 0.91015625,
+ "_note": "Rerun of the iteration-1499 evaluation (same command and seed as the published run) during wrapper smoke testing; not bit-for-bit repeatable. wall_s/env_steps_per_s are from a shared GPU and are not a benchmark."
+}

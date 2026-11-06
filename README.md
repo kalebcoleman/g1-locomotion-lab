@@ -3,6 +3,9 @@
 **A simulation research demo for training and evaluating Unitree G1 locomotion in Isaac Lab, with Newton/MJWarp.**
 It uses Isaac Lab's existing G1 velocity task and PPO setup; simulation only, no physical robot.
 
+**Outcome:** trained a simulated G1 walking policy and evaluated 256 robots through a 24-second stand/walk/turn/stop
+test with random pushes; 237 remained standing in the published run (231 and 233 in two reruns), with turning the main failure point (17 of the 19 falls in the published run). One seed, one training run, simulation only.
+
 ![Unitree G1 policies at training iteration 0 (left) and 1499 (right), same scripted commands](media/hero_before_after.gif)
 
 *16 simulated Unitree G1 robots per side, same scripted commands: stand, walk, turn, stop. Left: the untrained
@@ -57,7 +60,11 @@ phases with fixed commands: **stand** (0, 0, 0), **walk** forward 0.8 m/s, **tur
 Random velocity pushes of up to **0.5 m/s** in x and y hit each robot every 2.5 s (the task's own `push_robot`
 event, with a shorter interval than in training, which pushes every 10-15 s). Seed 1, **one run per row**: no
 repeats, no confidence intervals. "Survivors" are environments that never fell (torso contact) in the 24 s.
-Tracking errors are averaged over survivors in the phase (walk: linear-velocity error in m/s; turn: yaw-rate error in rad/s).
+Tracking errors are computed as follows (see `scripts/eval_g1.py`): the first third of each 6 s phase (2 s) is skipped as a
+transient; on every later step the error is averaged over the robots that have not fallen so far and did not terminate on that step
+(linear: norm of the x/y velocity error in m/s; yaw: absolute yaw-rate error in rad/s), and those per-step averages are then averaged over the
+remaining 4 s. The set of robots therefore shrinks over time, so errors are over survivors and are not comparable across
+rows with very different survivor counts. The table reports walk linear error and turn yaw error.
 
 | Newton policy checkpoint | Survivors | Falls stand / walk / turn / stop | Walk lin. err (m/s) | Turn yaw err (rad/s) |
 |---|---|---|---|---|
@@ -78,13 +85,14 @@ What the numbers do and do not say:
 - Between iterations 200 and 350 the policy goes from every robot falling in the stand phase to almost all
   staying up. Iteration 350 survives most often (249) but barely tracks the walk command (0.68 m/s error on a
   0.8 m/s command). By iteration 1499 tracking is much better at 237/256. Survival is not monotonic over
-  iterations, and differences of a few percent are within what one seed cannot resolve.
-- **Most remaining falls happen while turning:** 17 of the 19 falls of the final Newton policy are in the turn
-  phase. The turn yaw error (0.38 rad/s for a 0.8 rad/s command) is also the largest tracking error.
+  iterations, and differences of a few percent are within what one seed cannot resolve (reruns of iteration 1499 gave 231 and 233 of 256, see [Reproducing](#reproducing)).
+- **Most remaining falls happen while turning:** 17 of the 19 falls of the final Newton policy in the published run are in the turn
+  phase (turning also had the most falls in both reruns). The turn yaw error (0.38 rad/s for a 0.8 rad/s command) is also the largest tracking error.
 - **This is one training run and one evaluation per checkpoint** (seed 1). It shows how this policy behaved in
   this test; it is not a general claim about Newton, MuJoCo-Warp or PPO.
-- **Iteration 1499 is the policy I show** because it tracks the commands best, not because it survived the most
-  environments (iteration 350 did).
+- **Iteration 1499 is the policy I show.** I selected it as the final checkpoint for its turning performance (lowest turn
+  yaw error of the Newton checkpoints, 0.38 rad/s) and because it is the end of training, not because it survived the most
+  environments (iteration 350 did). Its walk error (0.107 m/s) is about the same as iteration 1000's (0.104), which is slightly lower.
 - I recorded wall-clock throughput during evaluation, but the GPU was shared with other jobs, so it is **not a
   benchmark** and is not reported here (the raw JSONs carry a note saying the same).
 
@@ -131,8 +139,8 @@ Checked against the code (Isaac Lab 3.0.0 `velocity_env_cfg.py`, `g1/flat_env_cf
 - **Training run:** 1,024 envs x 24 steps x 1,500 iterations = 36,864,000 environment steps, seed 1, about 40 minutes
   wall time (2,375 s) with the Isaac Sim viewer open on a GPU shared with other jobs.
 - **Evaluation:** `scripts/eval_g1.py` takes the training environment config (`--train_env_cfg`, so the task's
-  training-time randomization stays on), overrides the velocity command per phase, and re-enables the push event
-  at 0.5 m/s every 2.5 s.
+  training-time randomization stays on), overrides the velocity command per phase, and sets the task's push event
+  to 0.5 m/s every 2.5 s.
 
 ## Reproducing
 
@@ -142,8 +150,21 @@ NVIDIA driver 595.99.02 (CUDA 13.2). **Hardware:** Intel Xeon w5-3435X, 125 GB R
 Blackwell Max-Q Workstation Edition (98 GB), shared with other jobs. Training is not bit-for-bit repeatable (the
 Isaac Lab config sets `deterministic_mode: not_guaranteed`), so expect similar, not identical, numbers.
 
-Set up Isaac Lab 3.0.0 by following its [installation guide](https://isaac-sim.github.io/IsaacLab/), then
-(`export OMNI_KIT_ACCEPT_EULA=YES`, run from the Isaac Lab checkout):
+**Isaac Lab version:** the Isaac Lab 3.0.0 used here was installed from commit
+[`e3f7d9f`](https://github.com/isaac-sim/IsaacLab/commit/e3f7d9ff1f5d7f8280de3ece9000b7117f66bcf4) (recorded in the installed
+package metadata; the task, rewards, PPO and Newton manager files I compared are byte-identical to that commit, but the checkout
+itself has no `.git` directory, so the rest of the tree is not independently confirmed).
+
+Set up Isaac Lab 3.0.0 by following its [installation guide](https://isaac-sim.github.io/IsaacLab/), clone this repository
+anywhere, and set two variables. All commands below run **from the Isaac Lab checkout** and reference this repository by absolute path:
+
+```bash
+export OMNI_KIT_ACCEPT_EULA=YES
+export G1LAB=/absolute/path/to/g1-locomotion-lab      # this repository
+export ISAACLAB_SRC=/absolute/path/to/IsaacLab         # your Isaac Lab checkout (3.0.0)
+export ISAACLAB_PY=python                              # python of the Isaac Lab environment
+cd "$ISAACLAB_SRC"
+```
 
 ```bash
 # 1. Train (this is the exact command that was run; --viz kit opens the viewer, drop it for a headless run)
@@ -151,12 +172,12 @@ python scripts/reinforcement_learning/train.py --task Isaac-Velocity-Flat-G1 \
     --num_envs 1024 --max_iterations 1500 --seed 1 --viz kit physics=newton_mjwarp
 
 # 2. Evaluate a checkpoint (what produced the table; Lab 3 is headless by default, no --headless flag)
-python /path/to/g1-locomotion-lab/scripts/eval_g1.py --task Isaac-Velocity-Flat-G1 \
+python "$G1LAB/scripts/eval_g1.py" --task Isaac-Velocity-Flat-G1 \
     --checkpoint logs/rsl_rl/g1_flat/<run>/model_1499.pt --num_envs 256 --train_env_cfg \
     --push_vel 0.5 --push_interval 2.5 --out result.json physics=newton_mjwarp
 
-# 3. Or the whole ladder (output goes to results/raw/)
-ISAACLAB_SRC=/path/to/IsaacLab ISAACLAB_PY=python scripts/eval_ladder.sh logs/rsl_rl/g1_flat/<run> \
+# 3. Or the whole ladder (output goes to $G1LAB/results/raw/)
+"$G1LAB/scripts/eval_ladder.sh" logs/rsl_rl/g1_flat/<run> \
     newton_mjwarp 0 50 100 200 350 500 700 1000 1499
 ```
 
@@ -168,9 +189,19 @@ are the ones originally used (`--num_envs 16 --train_env_cfg` for the progressio
 for the single-robot clip), and the Python scripts they call are the originals.
 
 **What has been verified.** `scripts/eval_g1.py`, `scripts/record_g1.py` and `scripts/record_prog.py` are the scripts that
-produced the published numbers and clips. **Unverified:** the shell wrappers `scripts/eval_ladder.sh`,
-`scripts/record_angles.sh` and `scripts/record_progression.sh` were rewritten for this repository and have **not** been
-smoke-tested; `scripts/make_public_media.sh` and `scripts/make_figures.py` were run and produced the files in `media/`.
+produced the published numbers and clips. The three shell wrappers were rewritten for this repository (no absolute paths) and were
+**smoke-tested once** on the lab PC (Isaac Lab 3.0.0 as above) after publication of the first version, with reduced arguments:
+`eval_ladder.sh` on checkpoint 1499 only (ran, wrote a result JSON), `record_angles.sh` with `--angles front` (wrote an 8 s, 960x540 clip,
+0 falls), and `record_progression.sh` with `CKPTS=0,1499` (wrote two 16-robot clips, 120 and 1 terminations). The full-ladder, all-angle and
+9-checkpoint invocations were not re-run. `scripts/make_public_media.sh` and `scripts/make_figures.py` were run and produced the files in `media/`.
+
+**Rerun variation (same checkpoint, same command, same seed).** Two reruns of the iteration-1499 evaluation did **not**
+reproduce the published table exactly. Survivors out of 256: published 237, rerun 1 **231**, rerun 2 **233**. Falls stand/walk/turn/stop:
+published 0 / 2 / 17 / 0, rerun 1 1 / 1 / 23 / 5, rerun 2 0 / 2 / 13 / 8 ([`results/rerun_it1499_newton_push0.5.json`](results/rerun_it1499_newton_push0.5.json) is
+rerun 2; rerun 1's JSON was not kept, its numbers are from the console output). Walk and turn tracking errors were stable (0.107-0.108 m/s, 0.374-0.376 rad/s).
+Turning had the most falls in all three samples (17 of 19, 23 of 30, 13 of 23), but the exact split and the stop-phase count vary.
+Isaac Lab's config sets `deterministic_mode: not_guaranteed`, so a fixed seed does not give an identical run. Treat the published survivor counts as
+one sample (the three samples span 231-237), not exact values.
 
 **Checkpoints:** not included in this repository. Retrain with command 1 (about 40 minutes on the hardware above).
 **Not redistributable here (see NOTICE.md):** the Unitree G1 USD model and other NVIDIA assets (Isaac Lab fetches them at run
@@ -186,10 +217,10 @@ Details and caveats: [`diagnostics/README.md`](diagnostics/README.md).
 ## Limitations
 
 - Simulation only; no new locomotion algorithm, task or robot model, and no physical robot deployment; no sim-to-real work and no claim about a physical G1.
-- One seed, one training run per backend, one evaluation per checkpoint. No confidence intervals.
+- One seed, one training run per backend, one evaluation per checkpoint. No confidence intervals. Reruns of the final checkpoint gave 231 and 233 of 256 instead of 237 (see [Reproducing](#reproducing)), so the evaluation is not exactly repeatable.
 - Flat terrain only. The evaluation is a single scripted 24 s sequence with one push magnitude.
 - Turning is the main weakness of the final policy. Stand-up from a fall is not implemented.
-- I chose the final checkpoint for the videos because it tracks commands best, not because it had the most survivors (iteration 350 did).
+- I show the final checkpoint because it is the end of training and had the lowest turn yaw error, not because it had the most survivors (iteration 350 did) or the lowest walk error (iteration 1000, marginally).
 - Only the Newton/MuJoCo-Warp backend was used for the results here; no cross-backend comparison is made.
 
 ## What someone could build on next
@@ -207,7 +238,7 @@ README.md  LICENSE  NOTICE.md  THIRD_PARTY_LICENSES/ (upstream license texts)
 scripts/   eval_g1.py eval_ladder.sh record_g1.py record_prog.py record_angles.sh record_progression.sh
            export_training_curves.py make_public_media.sh make_figures.py
 diagnostics/ GPU-physics check (script, trace summary, graph dump)
-results/   eval_summary.csv, 9 per-run JSON files, training_curves.csv, training_final_iteration.log
+results/   eval_summary.csv, 9 per-run JSON files, 1 rerun JSON, training_curves.csv, training_final_iteration.log
 configs/   resolved Isaac Lab / rsl_rl configuration of the training run
 media/     hero GIF, chart, architecture diagram, frame montage, one single-robot GIF
 ```
