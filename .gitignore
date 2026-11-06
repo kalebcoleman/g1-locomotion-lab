@@ -1,0 +1,6 @@
+media-raw/
+__pycache__/
+*.pyc
+*.pt
+*.mp4
+results/raw/

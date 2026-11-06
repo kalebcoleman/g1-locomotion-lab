@@ -1,0 +1,56 @@
+{
+ "stand": {
+  "cmd": [
+   0,
+   0,
+   0
+  ],
+  "new_falls": 0,
+  "survivors": 256,
+  "lin_err": 0.08751267194747925,
+  "yaw_err": 0.2107488363981247
+ },
+ "walk": {
+  "cmd": [
+   0.8,
+   0,
+   0
+  ],
+  "new_falls": 2,
+  "survivors": 254,
+  "lin_err": 0.10738620907068253,
+  "yaw_err": 0.2277774065732956
+ },
+ "turn": {
+  "cmd": [
+   0,
+   0,
+   0.8
+  ],
+  "new_falls": 17,
+  "survivors": 237,
+  "lin_err": 0.12473063915967941,
+  "yaw_err": 0.37537434697151184
+ },
+ "stop": {
+  "cmd": [
+   0,
+   0,
+   0
+  ],
+  "new_falls": 0,
+  "survivors": 237,
+  "lin_err": 0.08410437405109406,
+  "yaw_err": 0.20362995564937592
+ },
+ "N": 256,
+ "steps_per_env": 1200,
+ "wall_s": 14.755309820175171,
+ "env_steps_per_s": 20819.623833310536,
+ "push": [
+  0.5,
+  2.5
+ ],
+ "survive_frac": 0.92578125,
+ "_note": "wall_s and env_steps_per_s were measured on a GPU shared with other jobs; they are not a benchmark. null = no surviving env in that phase."
+}

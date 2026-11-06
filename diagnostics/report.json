@@ -1,0 +1,267 @@
+{
+ "configured": {
+  "python": "3.12.16",
+  "warp": "1.17.0",
+  "torch": "2.11.0+cu130",
+  "torch_cuda": "13.0",
+  "sim_device_cfg": "cuda:0",
+  "env_device": "cuda:0",
+  "num_envs": 16,
+  "physics_cfg_class": "NewtonCfg",
+  "physics_class_type": "isaaclab_newton.physics.mjwarp_manager:NewtonMJWarpManager",
+  "solver_cfg": "MJWarpSolverCfg(class_type='isaaclab_newton.physics.mjwarp_manager:NewtonMJWarpManager', solver_type='mujoco_warp', njmax=95, nconmax=10, iterations=100, ls_iterations=50, solver='newton', integrator='implicitfast', use_mujoco_cpu=False, disable_contacts=False, disable_sensors=False, default_actuator_gear=None, actuator_gears=None, update_data_interval=1, save_to_mjcf=None, impratio=1.0, cone='pyramidal', ccd_iterations=35, enable_multiccd=False, ls_parallel=False, use_mujoco_contacts=False, tolerance=1e-06)",
+  "use_cuda_graph": true,
+  "physics_manager_class": "PhysicsManager",
+  "PhysicsManager__device": "cuda:0",
+  "active_manager": "ABCMeta",
+  "sim_dt": 0.005,
+  "decimation": 4,
+  "step_dt": 0.02,
+  "CUDA_VISIBLE_DEVICES": null,
+  "warp_devices": [
+   "cpu",
+   "cuda:0"
+  ],
+  "warp_cuda_device_count": 1,
+  "warp_default_device": "cuda:0",
+  "torch_device_name": "NVIDIA RTX PRO 6000 Blackwell Max-Q Workstation Edition",
+  "torch_cuda_available": true,
+  "newton": "1.6.1",
+  "mujoco_warp": "3.12.0",
+  "mujoco": "3.12.0"
+ },
+ "physics_state": {
+  "solver_class": "newton._src.solvers.mujoco.solver_mujoco.SolverMuJoCo",
+  "solver_device": "cuda:0",
+  "model_device": "cuda:0",
+  "graph_present": false,
+  "graph_type": "NoneType",
+  "all_graphable": false,
+  "num_substeps": 2,
+  "decimation": 1,
+  "needs_collision_pipeline": true,
+  "model.body_q": {
+   "type": "array",
+   "device": "cuda:0",
+   "shape": [
+    704
+   ],
+   "dtype": "<class 'warp._src.types.transformf'>",
+   "ptr": 12918545920
+  },
+  "model.body_qd": {
+   "type": "array",
+   "device": "cuda:0",
+   "shape": [
+    704
+   ],
+   "dtype": "<class 'warp._src.types.spatial_vectorf'>",
+   "ptr": 12918565888
+  },
+  "model.joint_q": {
+   "type": "array",
+   "device": "cuda:0",
+   "shape": [
+    704
+   ],
+   "dtype": "<class 'warp._src.types.float32'>",
+   "ptr": 12918661120
+  },
+  "model.joint_qd": {
+   "type": "array",
+   "device": "cuda:0",
+   "shape": [
+    688
+   ],
+   "dtype": "<class 'warp._src.types.float32'>",
+   "ptr": 12918664192
+  },
+  "model.joint_target_pos": null,
+  "model.body_mass": {
+   "type": "array",
+   "device": "cuda:0",
+   "shape": [
+    704
+   ],
+   "dtype": "<class 'warp._src.types.float32'>",
+   "ptr": 12918488064
+  },
+  "model.joint_X_p": {
+   "type": "array",
+   "device": "cuda:0",
+   "shape": [
+    704
+   ],
+   "dtype": "<class 'warp._src.types.transformf'>",
+   "ptr": 12918606848
+  },
+  "state_0.body_q": {
+   "type": "array",
+   "device": "cuda:0",
+   "shape": [
+    704
+   ],
+   "dtype": "<class 'warp._src.types.transformf'>",
+   "ptr": 12918835200
+  },
+  "state_0.body_qd": {
+   "type": "array",
+   "device": "cuda:0",
+   "shape": [
+    704
+   ],
+   "dtype": "<class 'warp._src.types.spatial_vectorf'>",
+   "ptr": 12918855168
+  },
+  "state_0.joint_q": {
+   "type": "array",
+   "device": "cuda:0",
+   "shape": [
+    704
+   ],
+   "dtype": "<class 'warp._src.types.float32'>",
+   "ptr": 12918888960
+  },
+  "state_0.joint_qd": {
+   "type": "array",
+   "device": "cuda:0",
+   "shape": [
+    688
+   ],
+   "dtype": "<class 'warp._src.types.float32'>",
+   "ptr": 12918892032
+  },
+  "control.joint_f": {
+   "type": "array",
+   "device": "cuda:0",
+   "shape": [
+    688
+   ],
+   "dtype": "<class 'warp._src.types.float32'>",
+   "ptr": 12918964224
+  },
+  "mjw_model_type": "mujoco_warp._src.types.Model",
+  "mjw_data_type": "mujoco_warp._src.types.Data",
+  "mjw_data.qpos": {
+   "type": "array",
+   "device": "cuda:0",
+   "shape": [
+    16,
+    44
+   ],
+   "dtype": "<class 'warp._src.types.float32'>",
+   "ptr": 12919815680
+  },
+  "mjw_data.qvel": {
+   "type": "array",
+   "device": "cuda:0",
+   "shape": [
+    16,
+    43
+   ],
+   "dtype": "<class 'warp._src.types.float32'>",
+   "ptr": 12919818752
+  },
+  "mjw_data.qacc": {
+   "type": "array",
+   "device": "cuda:0",
+   "shape": [
+    16,
+    43
+   ],
+   "dtype": "<class 'warp._src.types.float32'>",
+   "ptr": 12919850496
+  },
+  "mjw_data.xpos": {
+   "type": "array",
+   "device": "cuda:0",
+   "shape": [
+    16,
+    45
+   ],
+   "dtype": "<class 'warp._src.types.vec3f'>",
+   "ptr": 12919853568
+  },
+  "mjw_data.contact": {
+   "type": "Contact",
+   "err": "AttributeError(\"'Contact' object has no attribute 'shape'\")"
+  },
+  "mjw_data.efc": "Constraint(type=array(shape=(16, 95), dtype=int32), id=array(shape=(16, 95), dtype=int32), jtdaj_adr=array(shape=(16, 95), dtype=int32), jtdaj_nrow=array(shape=(16, 95), dtype=int32), jtdaj_nblock=arr",
+  "mjw_data.nworld": "16",
+  "mjw_data.naconmax": "160",
+  "mjw_data.njmax": "95",
+  "mjw_model.nworld": "None",
+  "mjw_model.nv": "43",
+  "mjw_model.nq": "44",
+  "mjw_model.nbody": "45",
+  "mjw_model.ngeom": "4",
+  "mjw_model.dof_damping": {
+   "type": "array",
+   "device": "cuda:0",
+   "shape": [
+    16,
+    43
+   ],
+   "dtype": "<class 'warp._src.types.float32'>",
+   "ptr": 12920444928
+  },
+  "mjw_model.body_mass": {
+   "type": "array",
+   "device": "cuda:0",
+   "shape": [
+    16,
+    45
+   ],
+   "dtype": "<class 'warp._src.types.float32'>",
+   "ptr": 12919352320
+  },
+  "solver_wp_arrays_devices": {
+   "cuda:0": 24
+  },
+  "robot.root_lin_vel_b.proxy_type": "ProxyArray",
+  "robot.root_lin_vel_b": {
+   "type": "array",
+   "device": "cuda:0",
+   "shape": [
+    16
+   ],
+   "dtype": "<class 'warp._src.types.vec3f'>",
+   "ptr": 12920803328
+  },
+  "robot.root_lin_vel_b.torch": {
+   "device": "cuda:0",
+   "data_ptr": 12920803328,
+   "same_memory_as_warp": true
+  }
+ },
+ "policy_tensors": {
+  "obs_policy_device": "cuda:0",
+  "obs_shape": [
+   16,
+   123
+  ],
+  "action_device": "cuda:0",
+  "policy_params_device": "cuda:0",
+  "note": "PyTorch tensors of the RL layer/policy; separate from Warp physics arrays unless a pointer matches"
+ },
+ "graph_after_warmup": {
+  "present": true,
+  "use_graph_flag": true,
+  "dot_file": "newton_graph.dot"
+ },
+ "trace": {
+  "env_steps_traced": 20,
+  "wall_s": 0.48299741744995117,
+  "note": "shared GPU; timing is not a benchmark",
+  "distinct_gpu_kernels": 155,
+  "gpu_kernel_launches": 27400,
+  "gpu_time_us_total": 106261.28500000158,
+  "runtime_api_counts": {
+   "cudaMemcpyAsync": 280,
+   "cudaLaunchKernel": 3920,
+   "cuLaunchKernel": 800,
+   "cudaGraphLaunch": 80,
+   "cudaStreamSynchronize": 60
+  }
+ }
+}
