@@ -75,4 +75,15 @@ def hard_limits_ok(hard_viol_steps, hard_excess_max, steps, p: Params = P):
     return (hard_viol_steps.float() / steps <= p.hard_viol_frac) & (hard_excess_max <= p.hard_excess)
 
 
+POSTURES = ["trunk_off_floor", "seated_upright", "raised_not_upright_fold", "crouch_on_feet", "high_on_feet", "supported_stand_any", "supported_1s", "supported_2s"]
+
+
+def posture_flags(h, up, feet_force, feet_z, trunk_force, speed3d, run_s, step_dt, p: Params = P):
+    """Per-step boolean flags (N, len(POSTURES)) for the intermediate postures on the way to a stand; OR them over the episode to count how many robots reach each one.
+    feet_ok = both feet carry force and are near the floor. fold = pelvis >= 0.35 m with the torso not upright (up < 0.5), the R6 optimum."""
+    feet_ok = (feet_force > p.foot_force).all(-1) & (feet_z < p.foot_z).all(-1)
+    return torch.stack([trunk_force < 1.0, (h >= 0.12) & (up >= 0.7), (h >= 0.35) & (up < 0.5), (h >= 0.35) & (up >= 0.7) & feet_ok, (h >= 0.50) & (up >= 0.7) & feet_ok,
+                        supported_stand(h, up, feet_force, feet_z, speed3d, p), run_s * step_dt >= 1.0, run_s * step_dt >= p.hold_s], -1)
+
+
 CHAIN_REASONS = ["success", "never_handed_over", "implausible_recovery", "timeout_window_incomplete", "fell_after_handover", "insufficient_progress_along_heading", "too_slow"]

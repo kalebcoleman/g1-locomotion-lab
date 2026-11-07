@@ -50,9 +50,15 @@ with launch_simulation(env_cfg, args):
     steps = int(round(K.EPISODE_S / u.step_dt)); t = K.get_tracker(u)
     cat = u._rec_fixed["category"][torch.arange(N, device=dev) % u._rec_fixed["z"].shape[0]]
     t0 = time.time(); hmin_trace = []
+    from g1_recovery import metrics as M
+    _sens = u.scene.sensors["contact_forces"]; _bn = list(_sens.body_names); _feet = [i for i, n in enumerate(_bn) if "ankle_roll" in n]; _tr = [i for i, n in enumerate(_bn) if n in ("pelvis", "torso_link", "pelvis_contour_link", "head_link", "imu_link", "logo_link")]
+    _fb = [r.body_names.index(n) for n in r.body_names if "ankle_roll" in n]; reached = torch.zeros(N, len(M.POSTURES), dtype=torch.bool, device=dev); _first = torch.full((N, len(M.POSTURES)), -1.0, device=dev)
     for s in range(steps):
         with torch.inference_mode():
             obs, _, dones, _ = env.step(policy(obs))
+        _f = torch.linalg.norm(_sens.data.net_forces_w.torch, dim=-1)
+        _pf = M.posture_flags(r.data.root_pos_w.torch[:, 2] - u.scene.env_origins[:, 2], -r.data.projected_gravity_b.torch[:, 2], _f[:, _feet], r.data.body_pos_w.torch[:, _fb, 2] - u.scene.env_origins[:, 2:3], _f[:, _tr].sum(-1), torch.linalg.norm(r.data.root_lin_vel_w.torch, dim=-1), t.run_s, u.step_dt)
+        _first = torch.where(_pf & (_first < 0), torch.full_like(_first, s * u.step_dt), _first); reached |= _pf
     wall = time.time() - t0
     dt = u.step_dt; ok = t.succ
     res = dict(task=args.task, checkpoint=args.checkpoint, num_envs=N, episode_s=K.EPISODE_S, steps=steps, success_hold_s=K.HOLD_S,
@@ -95,6 +101,7 @@ with launch_simulation(env_cfg, args):
         dif = torch.as_tensor(_f["difficulty"], device=dev)[torch.arange(N, device=dev) % len(_f["difficulty"])]; nz = _f["noise"]
         res["by_difficulty_limb_noise_rad"] = {str(round(float(v), 2)): dict(n=int((dif == i).sum()), plausible_v2_rate=float(plaus_v2[dif == i].float().mean()), plausible_v21_rate=float(plaus_v21[dif == i].float().mean()), strict_rate=float(ok_s[dif == i].float().mean()), legacy_rate=float(ok[dif == i].float().mean())) for i, v in enumerate(sorted(set(nz.tolist())))}
     res["pose_set"] = os.path.basename(xa.heldout)
+    res["postures_reached"] = {n: dict(envs=int(reached[:, i].sum()), first_time_s_mean=round(float(_first[:, i][reached[:, i]].mean()), 2) if reached[:, i].any() else None, by_category={CAT: int(reached[:, i][cat == j].sum()) for j, CAT in enumerate(K.CATEGORIES)}) for i, n in enumerate(M.POSTURES)}
     res["per_env"] = dict(strict=ok_s.int().tolist(), plausible_v2=plaus_v2.int().tolist(), plausible_v21=plaus_v21.int().tolist(), vel_viol_frac=[round(float(x), 3) for x in vvf], flight_frac=[round(float(x), 3) for x in (t.flight_steps.float() / steps)],
                           pos_viol_frac=[round(float(x), 3) for x in (t.viol_steps.float() / steps)], hard_viol_frac=[round(float(x), 3) for x in (t.hard_viol_steps.float() / steps)], hard_excess_max=[round(float(x), 3) for x in t.hard_excess_max], soft_excess_max=[round(float(x), 3) for x in t.soft_excess_max], peak_vz=[round(float(x), 2) for x in t.peak_vz], max_h=[round(float(x), 2) for x in t.max_h], best_supp_s=[round(float(x) * dt, 2) for x in t.best_run_s],
                           category=cat.int().tolist(), failure_cause=fc.int().tolist())

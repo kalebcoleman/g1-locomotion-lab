@@ -63,6 +63,16 @@ def test_hard_limit_rule_v21():
     assert M.hard_limits_ok(torch.tensor([48, 8]), T(0.22, 0.083), 500).tolist() == [False, True]
 
 
+def test_posture_flags():
+    f2 = torch.full((1, 2), 50.); z2 = torch.full((1, 2), 0.05); nof = torch.zeros(1, 2); hi = torch.full((1, 2), 0.3); dt = 0.02
+    fl = lambda h, up, ff, fz, tr=100., v=0.1, run=0: M.posture_flags(T(h), T(up), ff, fz, T(tr), T(v), torch.tensor([run]), dt)[0].tolist()
+    assert fl(0.17, 0.98, nof, z2) == [False, True, False, False, False, False, False, False]             # sitting (trunk on floor)
+    assert fl(0.52, -0.97, f2, z2) == [False, False, True, False, False, False, False, False]             # forward fold is never a stand, even on its feet
+    assert fl(0.40, 0.90, f2, z2, tr=0.) == [True, True, False, True, False, False, False, False]         # crouch on feet
+    assert fl(0.80, 0.97, nof, hi, tr=0., v=1.2) == [True, True, False, False, False, False, False, False]  # airborne lunge: high and upright but no feet
+    assert fl(0.70, 0.97, f2, z2, tr=0., run=100) == [True, True, False, True, True, True, True, True]    # 2 s supported stand
+
+
 def _chain(**kw):
     d = dict(handed_over=B(True), plausible_at_handover=B(True), window_complete=B(True), fell_in_window=B(False), along_disp=T(5.0), window_s=10.0)
     d.update(kw); ok, r = M.chain_success(**d); return bool(ok.item()), int(r.item())
