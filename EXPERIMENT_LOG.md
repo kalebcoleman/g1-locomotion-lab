@@ -248,3 +248,7 @@ Limitations: one seed, and a warm-start chain (R7h scratch it650 -> R9h -> R9hc 
 ## HoST port, iteration 300 (05:25; DEV, assist off via `G1-Host-*-Eval-v0`)
 Training: force still 200 N (no decay yet: the decay needs the resetting robots' mean head height above 0.9 m), rescale 1.0, group returns task 184 / 177, target 21 / 16 (supine / prone), so with the force on in training the robots reach the post-task region.
 Assist off: 0 supported stands for either policy. Own family, of 64: supine policy reached seated 64, fold 58, crouch on feet 50, high on feet 18; prone policy 64, 24, 26, 11. Expected this early: HoST trains 12,000 iterations and its force decays only once the robots stand. Next check when the force has decayed or at iteration 1000.
+
+## 07:00 check
+- R9hg from scratch, seeds 4 and 5, iteration ~610: no supported stand in training yet (lying_ever_supported 0). Not evaluated; the seed-3 chain reached stands only after the R7h stage (~iteration 450).
+- HoST port iteration 700, assist off, DEV, own family of 64: supine policy seated 64, crouch 64, high on feet 64, any supported stand 30, 1 s 0; prone policy 64, 64, 60, 26, 0. Training force has started to decay (supine 120 N, prone 160 N; rescale 0.92-0.96). No v3 passes yet.
