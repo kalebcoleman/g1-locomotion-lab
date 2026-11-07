@@ -152,3 +152,68 @@ class G1RecoveryR2EnvCfg(G1RecoveryBaseEnvCfg):
 class G1RecoveryR2EvalEnvCfg(G1RecoveryBaseEnvCfg):
     def __post_init__(self):
         super().__post_init__(); _recipe(self, RewardsR2, False, 0)
+
+
+@configclass
+class G1RecoveryR3EnvCfg(G1RecoveryBaseEnvCfg):
+    """R3 = R2 + assist decay only after a supported stand held >= 1 s, 0.1 per such episode (R1/R2 lost the assist after ~100 iterations because
+    the legacy criterion, which the assist itself satisfies, decayed it by 0.2 per episode)."""
+    def __post_init__(self):
+        super().__post_init__(); _recipe(self, RewardsR2, True, 1); self.assist_decay_on = "supported1s"; self.assist_decay = 0.1
+
+
+@configclass
+class G1RecoveryR3EvalEnvCfg(G1RecoveryBaseEnvCfg):
+    def __post_init__(self):
+        super().__post_init__(); _recipe(self, RewardsR2, False, 0)
+
+
+# ---------------------------------------------------------------------------------------------------------- v13: lying-dominant fixed start mix
+POSE_MIX = [0.05, 0.10, 0.15, 0.30, 0.40]     # P(level): stand, sit bank, mid-rise bank, lying 70-90 deg (noise 0.3), lying 80-90 deg (noise 0.4 = held-out-like)
+
+
+@configclass
+class CurrMix:
+    lying_ever_supported = CurrTerm(func=K.mix_stat, params={"levels": [3, 4], "which": "ever_stood_s"})
+    lying_strict_hold = CurrTerm(func=K.mix_stat, params={"levels": [3, 4], "which": "succ_s"})
+    lying_max_h = CurrTerm(func=K.mix_stat, params={"levels": [3, 4], "which": "max_h"})
+    sit_ever_supported = CurrTerm(func=K.mix_stat, params={"levels": [1, 2], "which": "ever_stood_s"})
+    stand_strict_hold = CurrTerm(func=K.mix_stat, params={"levels": [0], "which": "succ_s"})
+
+
+def _recipe_mix(cfg, assist, scale=None):
+    """R2 rewards + fixed lying-dominant start mix instead of the promote/demote levels (which stayed at the stand/sit levels in every non-exploit run)."""
+    cfg.rewards = RewardsR2(); cfg.curriculum = CurrMix(); cfg.pose_mix = POSE_MIX
+    if assist:
+        from .assist import add_assist
+        add_assist(cfg); cfg.assist_train = True; cfg.assist_decay_on = "supported1s"; cfg.assist_decay = 0.1
+    if scale is not None:
+        cfg.actions.joint_pos.scale = scale
+    return cfg
+
+
+@configclass
+class G1RecoveryR4EnvCfg(G1RecoveryBaseEnvCfg):
+    """R4 = R3 with the fixed lying-dominant start mix (single change vs R3)."""
+    def __post_init__(self):
+        super().__post_init__(); _recipe_mix(self, True)
+
+
+@configclass
+class G1RecoveryR4nEnvCfg(G1RecoveryBaseEnvCfg):
+    """R4n = R4 without any assist (single change vs R4)."""
+    def __post_init__(self):
+        super().__post_init__(); _recipe_mix(self, False)
+
+
+@configclass
+class G1RecoveryR5EnvCfg(G1RecoveryBaseEnvCfg):
+    """R5 = R4 with joint-position action scale 1.0 instead of 0.5 (single change vs R4). Warm start uses an exactly converted checkpoint (tools/rescale_ckpt.py)."""
+    def __post_init__(self):
+        super().__post_init__(); _recipe_mix(self, True, scale=1.0)
+
+
+@configclass
+class G1RecoveryR5EvalEnvCfg(G1RecoveryBaseEnvCfg):
+    def __post_init__(self):
+        super().__post_init__(); _recipe(self, RewardsR2, False, 0); self.actions.joint_pos.scale = 1.0

@@ -67,8 +67,12 @@ def assist_decay(env, env_ids):
     lvl = _level(env)
     if env._assist_fixed or isinstance(env_ids, slice) or len(env_ids) == 0 or env.common_step_counter == 0:
         return lvl.mean()
-    tr = K.get_tracker(env); ok = (tr.ever_stood_s if K.STRICT else tr.ever_stood)[env_ids]
-    lvl[env_ids] = torch.clamp(lvl[env_ids] - DECAY * ok.float(), 0.0, 1.0)
+    tr = K.get_tracker(env); mode = getattr(env.cfg, "assist_decay_on", "legacy")
+    if mode == "supported1s":                       # R3: decay only after a SUPPORTED stand held >= 1 s (50 steps), never for a transient pelvis-height crossing
+        ok = (tr.best_run_s >= 50)[env_ids]
+    else:
+        ok = (tr.ever_stood_s if K.STRICT else tr.ever_stood)[env_ids]
+    lvl[env_ids] = torch.clamp(lvl[env_ids] - getattr(env.cfg, "assist_decay", DECAY) * ok.float(), 0.0, 1.0)
     return lvl.mean()
 
 

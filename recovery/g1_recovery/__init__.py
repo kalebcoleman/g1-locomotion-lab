@@ -16,6 +16,6 @@ except Exception:
     pass
 
 
-for _id, _cls in (("G1-Recovery-R1-v0", "G1RecoveryR1EnvCfg"), ("G1-Recovery-R1-Eval-v0", "G1RecoveryR1EvalEnvCfg"), ("G1-Recovery-R2-v0", "G1RecoveryR2EnvCfg"), ("G1-Recovery-R2-Eval-v0", "G1RecoveryR2EvalEnvCfg")):
+for _id, _cls in (("G1-Recovery-R1-v0", "G1RecoveryR1EnvCfg"), ("G1-Recovery-R1-Eval-v0", "G1RecoveryR1EvalEnvCfg"), ("G1-Recovery-R2-v0", "G1RecoveryR2EnvCfg"), ("G1-Recovery-R2-Eval-v0", "G1RecoveryR2EvalEnvCfg"), ("G1-Recovery-R3-v0", "G1RecoveryR3EnvCfg"), ("G1-Recovery-R3-Eval-v0", "G1RecoveryR3EvalEnvCfg"), ("G1-Recovery-R4-v0", "G1RecoveryR4EnvCfg"), ("G1-Recovery-R4n-v0", "G1RecoveryR4nEnvCfg"), ("G1-Recovery-R5-v0", "G1RecoveryR5EnvCfg"), ("G1-Recovery-R5-Eval-v0", "G1RecoveryR5EvalEnvCfg")):
     gym.register(id=_id, entry_point="isaaclab.envs:ManagerBasedRLEnv", disable_env_checker=True,
                  kwargs={"env_cfg_entry_point": f"{__name__}.lane_a:{_cls}", "rsl_rl_cfg_entry_point": f"{__name__}.agents:RecPPOCfgR", "default_agent": "rsl_rl"})

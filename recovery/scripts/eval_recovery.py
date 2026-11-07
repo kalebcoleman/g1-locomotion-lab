@@ -92,6 +92,9 @@ with launch_simulation(env_cfg, args):
         dif = torch.as_tensor(_f["difficulty"], device=dev)[torch.arange(N, device=dev) % len(_f["difficulty"])]; nz = _f["noise"]
         res["by_difficulty_limb_noise_rad"] = {str(round(float(v), 2)): dict(n=int((dif == i).sum()), plausible_v2_rate=float(plaus_v2[dif == i].float().mean()), strict_rate=float(ok_s[dif == i].float().mean()), legacy_rate=float(ok[dif == i].float().mean())) for i, v in enumerate(sorted(set(nz.tolist())))}
     res["pose_set"] = os.path.basename(xa.heldout)
+    res["per_env"] = dict(strict=ok_s.int().tolist(), plausible_v2=plaus_v2.int().tolist(), vel_viol_frac=[round(float(x), 3) for x in vvf], flight_frac=[round(float(x), 3) for x in (t.flight_steps.float() / steps)],
+                          pos_viol_frac=[round(float(x), 3) for x in (t.viol_steps.float() / steps)], peak_vz=[round(float(x), 2) for x in t.peak_vz], max_h=[round(float(x), 2) for x in t.max_h], best_supp_s=[round(float(x) * dt, 2) for x in t.best_run_s],
+                          category=cat.int().tolist(), failure_cause=fc.int().tolist())
     json.dump(res, open(xa.out, "w"), indent=1)
     print("EVAL_JSON", json.dumps(res), flush=True)
     C.close_env(env)

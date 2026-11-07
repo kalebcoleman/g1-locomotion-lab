@@ -1,0 +1,107 @@
+{
+ "task": "G1-Recovery-A-Assist-v0",
+ "checkpoint": "/home/kacolem8@ad.asu.edu/isaac-workspace/projects/g1-recovery/lanes/a/runs/V12_cont_assist_1200/model_1199.pt",
+ "num_envs": 256,
+ "episode_s": 10.0,
+ "steps": 500,
+ "success_hold_s": 2.0,
+ "success_rate": 0.0,
+ "successes": 0,
+ "recovery_time_s_mean": null,
+ "recovery_time_s_median": null,
+ "longest_stand_s_mean": 0.0,
+ "total_stand_s_mean": 0.0,
+ "joint_limit_violation_step_frac": 0.43080469965934753,
+ "joint_limit_violations_per_step_mean": 0.5619297027587891,
+ "eval_wall_s": 12.91880989074707,
+ "strict_supported_stand": {
+  "definition": "pelvis>=0.60 m, torso tilt<=26 deg, BOTH feet contact force>10 N and feet<0.15 m above floor, pelvis speed<0.6 m/s, held 2 s",
+  "success_rate": 0.0,
+  "successes": 0,
+  "recovery_time_s_mean": null,
+  "longest_stand_s_mean": 0.0,
+  "total_stand_s_mean": 0.0,
+  "envs_ever_supported_stand": 0,
+  "by_category": {
+   "side_a": 0.0,
+   "prone": 0.0,
+   "side_b": 0.0,
+   "supine": 0.0
+  }
+ },
+ "plausibility": {
+  "definition": "PLAUSIBLE recovery = strict supported stand held 2 s AND joint-velocity-limit violations on <=2% of steps AND peak pelvis upward speed <=2.0 m/s",
+  "plausible_successes": 0,
+  "plausible_rate": 0.0,
+  "vel_limit_violation_step_frac_mean": 7.812500371073838e-06,
+  "peak_pelvis_vz_mean": 0.8882603049278259,
+  "peak_pelvis_vz_max": 2.272428035736084,
+  "strict_successes_failing_plausibility": 0,
+  "criteria_version": "v2",
+  "plausible_v2_successes": 0,
+  "plausible_v2_rate": 0.0,
+  "plausible_v2_by_category": {
+   "side_a": 0.0,
+   "prone": 0.0,
+   "side_b": 0.0,
+   "supine": 0.0
+  },
+  "pos_limit_violation_step_frac_mean": 0.4308047294616699,
+  "v2_definition": "strict supported stand (3D speed<0.6) 2 s AND vel-viol<=2% AND flight<=2% AND peak vz<=2.0 AND pos-limit-viol<=10% AND no assist force applied",
+  "flight_step_frac_mean": 0.010882813483476639,
+  "plausible_v1p1_successes": 0,
+  "v1p1_definition": "POST-HOC amendment (added after seeing A8c): plausible AND free-flight (no body in contact with anything) on <=2% of steps"
+ },
+ "failure_causes": {
+  "success": 0,
+  "never_rose": 0,
+  "rose_not_upright": 256,
+  "stood_then_fell": 0,
+  "late_hold_incomplete": 0
+ },
+ "by_category": {
+  "side_a": {
+   "n": 64,
+   "success_rate": 0.0
+  },
+  "prone": {
+   "n": 64,
+   "success_rate": 0.0
+  },
+  "side_b": {
+   "n": 64,
+   "success_rate": 0.0
+  },
+  "supine": {
+   "n": 64,
+   "success_rate": 0.0
+  }
+ },
+ "assist": {
+  "level_env_var": "0",
+  "envs_with_force": 0,
+  "force_steps_mean": 0.0,
+  "force_seconds_mean": 0.0,
+  "impulse_Ns_mean": 0.0,
+  "max_force_N": 0.0,
+  "first_step_mean": null,
+  "last_step_mean": null,
+  "robot_weight_N": null,
+  "note": "force applies only while torso upright (gravity z < -0.8) and pelvis < 0.62 m; unassisted eval = G1R_EVAL_ASSIST unset or 0"
+ },
+ "by_difficulty_limb_noise_rad": {
+  "0.1": {
+   "n": 128,
+   "plausible_v2_rate": 0.0,
+   "strict_rate": 0.0,
+   "legacy_rate": 0.0
+  },
+  "0.4": {
+   "n": 128,
+   "plausible_v2_rate": 0.0,
+   "strict_rate": 0.0,
+   "legacy_rate": 0.0
+  }
+ },
+ "pose_set": "heldout_v2.npz"
+}

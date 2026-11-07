@@ -233,6 +233,22 @@ def standing_mask(env):
     return (m & supported_mask(env)) if STRICT else m
 
 
+def mix_stat(env, env_ids, levels, which):
+    """Curriculum-slot logger (runs at reset, before the tracker is cleared): EMA over finished episodes whose start pose came from `levels`
+    of a tracker statistic (`ever_stood_s`, `succ_s`, or `max_h`). Changes nothing in the environment."""
+    key = "_mix_" + which + "_" + "_".join(map(str, levels))
+    v = getattr(env, key, 0.0)
+    if isinstance(env_ids, slice) or len(env_ids) == 0 or env.common_step_counter == 0:
+        return v
+    m = torch.isin(get_levels(env)[env_ids], torch.tensor(levels, device=env.device))
+    if m.any():
+        x = float(getattr(get_tracker(env), which)[env_ids][m].float().mean())
+        w = min(1.0, 2.5 * float(m.sum()) / env.num_envs)
+        v = (1 - w) * v + w * x
+        setattr(env, key, v)
+    return v
+
+
 def reset_fallen(env, env_ids, fixed_poses: str | None = None):
     """Reset event: put the robot on the ground in a pose drawn for each env's curriculum level (or from the held-out file)."""
     r = env.scene["robot"]; dev = env.device
@@ -253,7 +269,12 @@ def reset_fallen(env, env_ids, fixed_poses: str | None = None):
     else:
         if not hasattr(env, "_rec_gen"):
             env._rec_gen = torch.Generator().manual_seed(int(env.cfg.seed or 0) + 1000003)   # != HELDOUT_SEED stream
-        lv = get_levels(env)[ids]
+        mix = getattr(env.cfg, "pose_mix", None)
+        if mix:                                                  # fixed start-pose mixture (no promotion gate); levels record the source of each episode for logging
+            lv = torch.multinomial(torch.tensor(mix, dtype=torch.float), n, True, generator=env._rec_gen).to(dev)
+            get_levels(env)[ids] = lv
+        else:
+            lv = get_levels(env)[ids]
         amin = torch.tensor(LEVEL_ALPHA_MIN, device=dev)[lv]; amax = torch.tensor(LEVEL_ALPHA_MAX, device=dev)[lv]
         jn = torch.tensor(LEVEL_JOINT_NOISE, device=dev)[lv]
         z, quat, q = sample_poses(n, amin, amax, jn, defq, lim[:, 0], lim[:, 1], mask, env._rec_gen, dev)
