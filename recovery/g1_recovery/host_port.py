@@ -79,7 +79,8 @@ def _H(env):
         h["head_off"] = torch.tensor(HEAD_OFFSET, device=dev)
         h["aux"] = torch.tensor(AUX, device=dev)
         h["force"] = torch.full((env.num_envs,), FORCE0 if getattr(env.cfg, "host_force", True) else 0.0, device=dev)
-        h["rescale"] = torch.ones(env.num_envs, device=dev)
+        # evaluation must use the action rescale the policy was trained at (HoST anneals it 1.0 -> 0.25); G1R_HOST_RESCALE sets it, default 1.0
+        h["rescale"] = torch.full((env.num_envs,), float(os.environ.get("G1R_HOST_RESCALE", "1.0")), device=dev)
         h["last_head"] = torch.zeros(env.num_envs, device=dev)
         env._host = h
     return env._host

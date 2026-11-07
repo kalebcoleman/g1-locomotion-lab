@@ -128,5 +128,5 @@ with launch_simulation(env_cfg, args):
                   f"G {[round(x, 2) for x in rec['group_return']] if rec['group_return'] else None} v {rec['vloss']:.3f} kl {rec['kl']:.4f}", flush=True)
         if it % xa.save_every == 0 or it == it0 + xa.max_iterations - 1:
             torch.save(dict(actor=actor.state_dict(), critics=critics.state_dict(), std=std.data, optimizer=opt.state_dict(), iteration=it, obs_dim=OD, act_dim=AD,
-                            actor_hidden=ACTOR_H, critic_hidden=CRITIC_H, task=args.task, groups=H.GROUPS), os.path.join(xa.out_dir, f"model_{it}.pt"))
+                            actor_hidden=ACTOR_H, critic_hidden=CRITIC_H, task=args.task, groups=H.GROUPS, rescale_mean=float(hst["rescale"].mean()), force_mean=float(hst["force"].mean())), os.path.join(xa.out_dir, f"model_{it}.pt"))
     C.close_env(env)
