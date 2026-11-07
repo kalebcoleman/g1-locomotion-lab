@@ -2,7 +2,7 @@
 
 Written 2026-11-06 for discussing the project with Dr. Zhang. Simulation only (Isaac Lab 3.0.0, Newton/MuJoCo-Warp, Unitree G1). For live job state and the latest results, see `../STATUS.md` and `../EXPERIMENT_LOG.md`.
 
-**Current result:** walking is verified, recovery is not solved. No policy has produced a valid unassisted get-up under criteria v2.1.
+**Current result:** walking is verified, recovery is not solved. No policy has produced a valid unassisted get-up under criteria v2.1 or v3. The closest behaviour is a stable wide straddle (`../EXPERIMENT_LOG.md`).
 
 ## Short version
 
@@ -54,7 +54,7 @@ Two separate numbering schemes both use "v". Say which one you mean.
 
 | Name | What it means |
 |---|---|
-| Criteria v1, v1.1, v2, v2.1 | The rules for counting a success. v2.1 is current (`../EVAL_PROTOCOL.md`). |
+| Criteria v1, v1.1, v2, v2.1, v3 | The rules for counting a success. v3 (v2.1 + Amendment 3) is current (`../EVAL_PROTOCOL.md`). |
 | Training rounds v1–v15 | Batches of experiments, in order. Rounds 1–12 are in `recovery/`; v13–v15 use the R recipes. |
 | Lane A / Lane B | Early approaches: A is task reward, B is HoST-inspired assist force with staged rewards. |
 | A1…A9, B1…B6, V10–V12 | Runs from rounds 1–12. |
@@ -117,7 +117,7 @@ From the run's saved `env.yaml`. The reward manager scales each term by the time
 - **Seeds:** these are single-seed comparisons, and evaluation isn't bit-repeatable.
 - **Earlier results:** A8c's 256/256 is an invalid launch exploit, the 4/256 chain is retracted, and the 2/256 fails v2.
 - **Joint limits:** at iteration 300, R6c's fold was past its soft joint limits on 40% of steps and past its hard limits on 3.3%, above the v2.1 limit of 3%.
-- **Hand-over:** the rule is implemented but not validated under v2.1, because no valid stand exists to hand over from.
+- **Hand-over:** the rule is implemented but not validated under v3, because no valid stand exists to hand over from.
 - **Pose sets:** HELDOUT is saved for the final comparison and TEST is untouched.
 - **Scope:** simulation only, with no physical-robot or novelty claims.
 

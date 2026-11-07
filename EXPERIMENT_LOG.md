@@ -143,3 +143,23 @@ Rising window, R7m it350 strict robots: soft 8-9% of steps, hard about 1%, torqu
 |---|---|---|---|
 | `20261107-001356` | R8w | R8 + stance penalty, scratch | R8 |
 | `20261107-001359` | R8w warm | Same reward, starting from R7m it500 (`init/R7m_stand_it500.pt`, sha256 7c0b249e72f454f8...), fresh optimiser, 500 iterations | Continuing R7m. Separate arm: its critic trained on a different reward |
+
+## Criteria v3 approved, E4 real torque limits (2026-11-07 00:25)
+Kaleb approved Amendment 3 and the real-torque run. Headline is now v3 (`EVAL_PROTOCOL.md`); earlier results keep their labels.
+E4 `20261107-002528` R8t: R8 with real limits, scratch, seed 3, control R8. Hip pitch and yaw 88, hip roll and knee 139, ankle 50, torso 88, shoulder and elbow 25 Nm; fingers 5 Nm (assumption, no published Dex3 value found). Gains, position and velocity limits unchanged. Read back from the simulator (`runs/verify_R8t.log`).
+
+**Walking policy under real limits** (`runs/walk_only_R8t_realtorque.json`, same protocol, 256 robots): walk 256/256, 6.08 m along heading, tracking error 0.088. Turn: 17 falls and 239 at 90 degrees or more, against 6 and 250 with the original limits. The walking policy was not retrained.
+
+**DEV, assist off, no retraining.** v3 pre = v2.1 + 3a + 3c + 3d, before the offline 3b check.
+| checkpoint, limits | v2.1 | v3 pre | strict | persists | torque OK | soft | hard | flight | stance median | rise s |
+|---|---|---|---|---|---|---|---|---|---|---|
+| R7m it500, real | 0 | 0 | 230 | 230 | 256 | 86.7 | 61.8 | 3.43 | 0.91 | 2.99 |
+| R7h it500, real | 0 | 0 | 185 | 185 | 256 | 88.4 | 65.3 | 2.62 | 1.02 | 2.43 |
+| R7m it650, original | 0 | 0 | 256 | 256 | 15 | 90.7 | 61.4 | 2.70 | 0.76 | 1.36 |
+| R7m it650, real | 0 | 0 | 256 | 256 | 256 | 89.7 | 59.3 | 4.24 | 0.75 | 2.45 |
+| **R7h it650, original** | **174** | 0 | 256 | 256 | 74 | 2.7 | 0.5 | 1.67 | 0.89 | 0.84 |
+| R7h it650, real | 13 | 0 | 225 | 225 | 256 | 17.3 | 6.6 | 4.51 | 0.87 | 2.19 |
+R7h it650 passes the old v2.1 on 174/256 but v3 on 0: its stance is 0.89 m, and 182 of 256 robots exceed Unitree's torque limits on more than 3% of steps. Under real limits it stays up but mostly fails v2.1 (flight, position limits). Audit in `results/audit_R7h_it650.json`.
+
+## Candidate R9h (launched 00:34), not a controlled comparison
+`20261107-003416` R9h: R7h's height reward + supported stand bonus + stance penalty + real torque limits, warm from R7h it650 (`init/R7h_stand_it650.pt`, sha256 bd9aff4d44a64dd8...), fresh optimiser, 500 iterations. A direct attempt at v3, changing several things at once; only DEV under v3 can judge it, and it can't attribute any effect to one change. Baseline: R7h it650 under real limits, table above.

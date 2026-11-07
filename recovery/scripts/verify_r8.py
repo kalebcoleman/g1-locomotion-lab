@@ -18,6 +18,8 @@ with launch_simulation(env_cfg, args):
     C.apply_env_overrides(args, env_cfg); env_cfg.seed = 1; env_cfg.episode_length_s = 20.0
     env = RslRlVecEnvWrapper(C.create_isaaclab_env(args.task, env_cfg, args, convert_marl_to_single_agent=False), clip_actions=agent_cfg.clip_actions)
     u = env.unwrapped; r = u.scene["robot"]; runner = create_rsl_rl_runner(env, agent_cfg); runner.load(args.checkpoint, map_location=agent_cfg.device); policy = runner.get_inference_policy(device=u.device)
+    _el = getattr(r.data, "joint_effort_limits", None); _el = (_el.torch if hasattr(_el, "torch") else _el)
+    print("EFFORT_JSON", json.dumps({n: round(float(_el[0, i]), 2) for i, n in enumerate(r.joint_names)}), "actuator_read_back", json.dumps({k: [round(float(x), 1) for x in a.effort_limit[0].tolist()][:5] for k, a in r.actuators.items()}), flush=True)
     obs, _ = env.reset(); term = u.action_manager.get_term("joint_pos"); rows = []; targ_err = []; tau_settle = []; tau_after = []
     up0 = -r.data.projected_gravity_b.torch[:, 2]
     # body-frame gravity direction right after reset tells the family: prone means the robot's front faces down (+x body axis points down)
@@ -30,6 +32,6 @@ with launch_simulation(env_cfg, args):
         if s % 50 == 49:
             sup = K.standing_mask(u) & K.supported_mask(u); fs = A.feet_load_share(u); pr = A.prop_force(u); bonus = A.standing_bonus_supported(u); leg = K.standing_mask(u)
             rows.append(dict(step=s + 1, stand_mask=int(leg.sum()), supported=int(sup.sum()), bonus_max_when_unsupported=float(bonus[~sup].max()) if (~sup).any() else 0.0, feet_share_mean=round(float(fs.mean()), 3), feet_share_when_supported=round(float(fs[sup].mean()), 3) if sup.any() else None, feet_share_max=round(float(fs.max()), 3), prop_mean=round(float(pr.mean()), 3), prop_nonzero=int((pr > 0).sum()), prop_max=round(float(pr.max()), 3), stance_pen_mean=round(float(A.stance_excess(u).mean()), 3), stance_pen_supported=round(float(A.stance_excess(u)[sup].mean()), 3) if sup.any() else None))
-    print("VERIFY_JSON", json.dumps(dict(task=args.task, settle_steps=getattr(term.cfg, "settle_steps", 0), first30_target_minus_q_at_last_substep_max=round(max(targ_err), 4) if targ_err else None, tau_mean_of_env_max_first30=round(sum(tau_settle) / len(tau_settle), 2), tau_mean_of_env_max_after=round(sum(tau_after) / len(tau_after), 2),
+    print("VERIFY_JSON", json.dumps(dict(task=args.task, tau_peak_over_ratio=None, settle_steps=getattr(term.cfg, "settle_steps", 0), first30_target_minus_q_at_last_substep_max=round(max(targ_err), 4) if targ_err else None, tau_mean_of_env_max_first30=round(sum(tau_settle) / len(tau_settle), 2), tau_mean_of_env_max_after=round(sum(tau_after) / len(tau_after), 2),
           gravity_body_x_mean_at_reset=round(float(g0[:, 0].mean()), 3), gravity_body_y_abs_mean=round(float(g0[:, 1].abs().mean()), 3), rows=rows)), flush=True)
     C.close_env(env)

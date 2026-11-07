@@ -7,7 +7,7 @@ import sys, json, argparse
 import numpy as np
 import mujoco
 
-ap = argparse.ArgumentParser(); ap.add_argument("trace"); ap.add_argument("out"); ap.add_argument("--which", default="v21"); ap.add_argument("--depth", type=float, default=0.02)
+ap = argparse.ArgumentParser(); ap.add_argument("trace"); ap.add_argument("out"); ap.add_argument("--which", default="v21"); ap.add_argument("--depth", type=float, default=0.02); ap.add_argument("--max_robots", type=int, default=0)
 a = ap.parse_args(); d = np.load(a.trace, allow_pickle=False)
 names = [str(x) for x in d["body_names"]]; gb = [str(x) for x in d["geom_body"]]; gt = d["geom_type"]; gs = d["geom_scale"]; gx = d["geom_xform"]; vo = d["geom_vert_off"]; fo = d["geom_face_off"]; V = d["geom_verts"]; F = d["geom_faces"]
 spec = mujoco.MjSpec(); keep = []
@@ -54,6 +54,7 @@ def qrot(q, v):
     u = q[:3]; return v + 2 * np.cross(u, np.cross(u, v) + q[3] * v)
 
 ids = np.where(d[a.which].astype(bool))[0] if a.which != "all" else np.arange(d["body_p"].shape[1])
+ids = ids[:a.max_robots] if a.max_robots else ids
 bp = d["body_p"]; bq = d["body_q"]; idx = {n: k for k, n in enumerate(names)}; res = {}; pair_hits = {}
 for env in ids:
     worst = 0.0; frames = 0

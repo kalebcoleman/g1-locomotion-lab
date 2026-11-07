@@ -434,3 +434,39 @@ class G1RecoveryR8wEnvCfg(G1RecoveryBaseEnvCfg):
     """E5: R8 + stance-width penalty."""
     def __post_init__(self):
         super().__post_init__(); _r8(self, RewardsR8w)
+
+
+# Unitree's published actuator limits (unitree_rl_lab, BSD-3, G1 29-DoF), see metrics.REAL_TORQUE_LIMITS. No published Dex3 values were found: fingers get 5 Nm, Unitree's smallest listed G1 arm actuator (assumption; the real hand is likely weaker).
+_REAL_EFFORT = dict(legs={".*_hip_yaw_joint": 88.0, ".*_hip_roll_joint": 139.0, ".*_hip_pitch_joint": 88.0, ".*_knee_joint": 139.0, "torso_joint": 88.0}, feet=50.0,
+                    arms={".*_shoulder_.*": 25.0, ".*_elbow_.*": 25.0, ".*_(zero|one|two|three|four|five|six)_joint": 5.0})
+
+
+def real_torque_limits(cfg):
+    """Cap every actuator at the real limit; gains, position and velocity limits unchanged. The actuator dict is copied so the shared G1_CFG stays untouched."""
+    import copy
+    act = copy.deepcopy(cfg.scene.robot.actuators)
+    for k, v in _REAL_EFFORT.items():
+        act[k].joint_effort_limit = v
+    cfg.scene.robot.actuators = act
+    return cfg
+
+
+@configclass
+class G1RecoveryR8tEnvCfg(G1RecoveryBaseEnvCfg):
+    """E4: R8 with Unitree's real torque limits (ankles rise from 20 to 50 Nm; everything else falls from 300 Nm)."""
+    def __post_init__(self):
+        super().__post_init__(); _r8(self, RewardsR8); real_torque_limits(self)
+
+
+@configclass
+class RewardsR9h(RewardsR7h):
+    """R7h height reward + stand bonus on the feet-supported mask + stance-width penalty. A candidate combining several changes, not a controlled single change."""
+    stand = RewTerm(func=standing_bonus_supported, weight=5.0)
+    stance = RewTerm(func=stance_excess, weight=-5.0)
+
+
+@configclass
+class G1RecoveryR9hEnvCfg(G1RecoveryBaseEnvCfg):
+    """Direct attempt at criteria v3: RewardsR9h with Unitree's real torque limits, intended to warm-start from R7h."""
+    def __post_init__(self):
+        super().__post_init__(); _r8(self, RewardsR9h); real_torque_limits(self)

@@ -20,6 +20,7 @@ with launch_simulation(env_cfg, args):
     agent_cfg = P.cli_args.update_rsl_rl_cfg(agent_cfg, args); agent_cfg = handle_deprecated_rsl_rl_cfg(agent_cfg, check_rsl_rl_version())
     C.apply_env_overrides(args, env_cfg); env_cfg.seed = 1; env_cfg.episode_length_s = 60.0
     cm = env_cfg.commands.base_velocity; cm.heading_command = False; cm.rel_standing_envs = 0.0; cm.resampling_time_range = (1e6, 1e6); cm.debug_vis = False
+    if is_rec: env_cfg.pose_mix = None      # walking test: level-0 standing start, whatever the task's training start mix
     if not is_rec:
         if xa.push > 0 and env_cfg.events.push_robot is not None:
             env_cfg.events.push_robot.interval_range_s = (2.5, 2.5); env_cfg.events.push_robot.params["velocity_range"] = {"x": (-xa.push, xa.push), "y": (-xa.push, xa.push)}

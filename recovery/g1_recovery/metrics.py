@@ -20,8 +20,8 @@ class Params:
     hard_viol_frac: float = 0.03     # v2.1: steps with any body joint past its HARD limit (walking reference 1.5%)
     hard_excess: float = 0.10        # v2.1: max excursion past a hard limit, rad (walking reference p99 0.083, max 0.105)
     torque_over_frac: float = 0.03   # Amendment 3a: steps with any body joint above Unitree's published torque limit
-    persist_frac: float = 0.90       # Amendment 3c (proposed): supported on at least this share of the final second
-    stance_max: float = 0.60         # Amendment 3d (proposed): mean distance between the feet over the 2 s hold, m
+    persist_frac: float = 0.90       # Amendment 3c: supported on at least this share of the final second
+    stance_max: float = 0.60         # Amendment 3d: mean distance between the feet over the 2 s hold, m
     walk_window_s: float = 10.0
     walk_dist: float = 3.0           # m along the commanded heading within the window
     walk_speed: float = 0.5          # m/s mean along heading
@@ -60,12 +60,12 @@ def torque_ok(over_steps, steps, p: Params = P):
 
 
 def persists(supported_tail_frac, p: Params = P):
-    """Amendment 3c (proposed): still in the supported stand during the final second of the episode."""
+    """Amendment 3c: still in the supported stand during the final second of the episode."""
     return supported_tail_frac >= p.persist_frac
 
 
 def stance_ok(stance_hold_mean, p: Params = P):
-    """Amendment 3d (proposed): the counted hold is not a wide straddle."""
+    """Amendment 3d: the counted hold is not a wide straddle."""
     return stance_hold_mean <= p.stance_max
 
 
