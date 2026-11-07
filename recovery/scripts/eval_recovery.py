@@ -68,9 +68,14 @@ with launch_simulation(env_cfg, args):
         longest_stand_s_mean=float((t.best_run_s.float() * dt).mean()), total_stand_s_mean=float((t.total_stand_s.float() * dt).mean()),
         envs_ever_supported_stand=int(t.ever_stood_s.sum()), by_category={CAT: float(ok_s[cat == i].float().mean()) for i, CAT in enumerate(K.CATEGORIES)})
     vvf = t.vel_viol_steps.float() / steps; plaus = t.succ_s & (vvf <= 0.02) & (t.peak_vz <= 2.0)
+    from g1_recovery import metrics as M
+    assist_on = (u._assist_log["force_steps"] > 0) if hasattr(u, "_assist_log") else None
+    plaus_v2 = M.plausible_recovery(t.succ_s, t.vel_viol_steps, t.flight_steps, t.viol_steps, t.peak_vz, steps, assist_on)
     res["plausibility"] = dict(definition="PLAUSIBLE recovery = strict supported stand held 2 s AND joint-velocity-limit violations on <=2% of steps AND peak pelvis upward speed <=2.0 m/s",
         plausible_successes=int(plaus.sum()), plausible_rate=float(plaus.float().mean()), vel_limit_violation_step_frac_mean=float(vvf.mean()), peak_pelvis_vz_mean=float(t.peak_vz.mean()), peak_pelvis_vz_max=float(t.peak_vz.max()),
         strict_successes_failing_plausibility=int((t.succ_s & ~plaus).sum()),
+        criteria_version=K.CRITERIA_VERSION, plausible_v2_successes=int(plaus_v2.sum()), plausible_v2_rate=float(plaus_v2.float().mean()), plausible_v2_by_category={CAT: float(plaus_v2[cat == i].float().mean()) for i, CAT in enumerate(K.CATEGORIES)},
+        pos_limit_violation_step_frac_mean=float((t.viol_steps.float() / steps).mean()), v2_definition="strict supported stand (3D speed<0.6) 2 s AND vel-viol<=2% AND flight<=2% AND peak vz<=2.0 AND pos-limit-viol<=10% AND no assist force applied",
         flight_step_frac_mean=float((t.flight_steps.float() / steps).mean()),
         plausible_v1p1_successes=int((plaus & (t.flight_steps.float() / steps <= 0.02)).sum()), v1p1_definition="POST-HOC amendment (added after seeing A8c): plausible AND free-flight (no body in contact with anything) on <=2% of steps")
     fc = t.failure_cause()
@@ -82,6 +87,11 @@ with launch_simulation(env_cfg, args):
                              impulse_Ns_mean=float(L["impulse"].mean()), max_force_N=float(L["max_force"].max()), first_step_mean=float(L["first"][af > 0].mean()) if (af > 0).any() else None,
                              last_step_mean=float(L["last"][af > 0].mean()) if (af > 0).any() else None, robot_weight_N=getattr(u, "_robot_weight", None),
                              note="force applies only while torso upright (gravity z < -0.8) and pelvis < 0.62 m; unassisted eval = G1R_EVAL_ASSIST unset or 0")
+    _f = np.load(xa.heldout)
+    if "difficulty" in _f.files:
+        dif = torch.as_tensor(_f["difficulty"], device=dev)[torch.arange(N, device=dev) % len(_f["difficulty"])]; nz = _f["noise"]
+        res["by_difficulty_limb_noise_rad"] = {str(round(float(v), 2)): dict(n=int((dif == i).sum()), plausible_v2_rate=float(plaus_v2[dif == i].float().mean()), strict_rate=float(ok_s[dif == i].float().mean()), legacy_rate=float(ok[dif == i].float().mean())) for i, v in enumerate(sorted(set(nz.tolist())))}
+    res["pose_set"] = os.path.basename(xa.heldout)
     json.dump(res, open(xa.out, "w"), indent=1)
     print("EVAL_JSON", json.dumps(res), flush=True)
     C.close_env(env)

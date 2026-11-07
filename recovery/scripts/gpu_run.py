@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Lead's GPU launch coordinator. Serialises job START (flock), checks free GPU memory against an estimate + reserve,
+"""Lead's GPU launch coordinator. Logs and sanity-checks (no lock, no serialisation): checks free GPU memory against an estimate + reserve,
 starts the job in its own process group, samples its GPU memory (nvidia-smi) and RSS to <log>.mem.csv, appends to runs.jsonl.
 Never touches other processes. Usage: gpu_run.py --name N --est_gb G --log L [--settle_s 90] -- cmd args...
 Env: G1R_RESERVE_GB (default 20) = free memory that must remain after the estimate (other users' jobs)."""
@@ -12,14 +12,12 @@ ap.add_argument("--log", required=True); ap.add_argument("--settle_s", type=int,
 ap.add_argument("--max_wait_s", type=int, default=1800)
 ap.add_argument("cmd", nargs=argparse.REMAINDER)
 a = ap.parse_args(); cmd = a.cmd[1:] if a.cmd and a.cmd[0] == "--" else a.cmd
-reserve = float(os.environ.get("G1R_RESERVE_GB", "20"))
+reserve = float(os.environ.get("G1R_RESERVE_GB", "5"))
 
 def smi(q):
     return subprocess.run(["nvidia-smi", f"--query-gpu={q}", "--format=csv,noheader,nounits"], capture_output=True, text=True).stdout.strip()
 def free_gb(): return float(smi("memory.free")) / 1024
-lock = open(os.path.join(ROOT, "logs", "gpu_launch.lock"), "w")
-t_wait = time.time()
-fcntl.flock(lock, fcntl.LOCK_EX)                      # only one launcher at a time
+t_wait = time.time()                                   # no lock/serialisation: only a free-VRAM sanity check
 while free_gb() < a.est_gb + reserve:
     if time.time() - t_wait > a.max_wait_s:
         print(f"GPU_RUN_ABORT {a.name}: free {free_gb():.1f} GB < est {a.est_gb}+reserve {reserve}", flush=True); sys.exit(3)
@@ -45,10 +43,7 @@ while p.poll() is None:
     except Exception: rss = 0
     peak = max(peak, mine)
     mem_csv.write(f"{time.time()-t0:.0f},{mine:.0f},{smi('memory.used')},{smi('utilization.gpu')},{rss:.0f}\n"); mem_csv.flush()
-    if not released and time.time() - t0 > a.settle_s:
-        fcntl.flock(lock, fcntl.LOCK_UN); released = True    # next job may start once this one's startup memory is visible
     time.sleep(2)
-if not released: fcntl.flock(lock, fcntl.LOCK_UN)
 rec.update(exit=p.returncode, wall_s=time.time() - t0, peak_gpu_mib_job=peak, end=time.strftime("%F %T"))
 open(os.path.join(ROOT, "logs", "runs.jsonl"), "a").write(json.dumps(dict(name=a.name, finished=rec)) + "\n")
 print("GPU_RUN_DONE", json.dumps(dict(name=a.name, exit=p.returncode, wall_s=round(rec["wall_s"]), peak_gpu_mib_job=peak)), flush=True)

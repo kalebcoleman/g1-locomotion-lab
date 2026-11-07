@@ -54,42 +54,55 @@ with launch_simulation(env_cfg, args):
         pi = torch.tensor([int(v) for v in xa.pose_indices.split(",")], device=dev)
         u._rec_fixed = {k: v[pi] for k, v in u._rec_fixed.items()}
     obs, _ = env.reset(); t = K.get_tracker(u); r = u.scene["robot"]
+    from g1_recovery import metrics as M
     term = u.command_manager.get_term("base_velocity")
     cat = u._rec_fixed["category"][torch.arange(N, device=dev) % u._rec_fixed["z"].shape[0]]
-    steps = int(round(xa.total_s / u.step_dt)); HO = xa.handover_steps if xa.handover_steps is not None else t.hold_steps_needed
-    switched = torch.zeros(N, dtype=torch.bool, device=dev); sw_step = torch.full((N,), -1, device=dev, dtype=torch.long)
-    p0 = torch.zeros(N, 2, device=dev); fell_after = torch.zeros(N, dtype=torch.bool, device=dev); minh_after = torch.full((N,), 9.0, device=dev)
-    vx_sum = torch.zeros(N, device=dev); n_after = torch.zeros(N, device=dev)
+    dt = u.step_dt; steps = int(round(xa.total_s / dt)); WIN = int(round(M.P.walk_window_s / dt))
+    HO = xa.handover_steps if xa.handover_steps is not None else t.hold_steps_needed
+    z = lambda dt_=torch.float32: torch.zeros(N, device=dev, dtype=dt_)
+    switched = z(torch.bool); sw_step = torch.full((N,), -1, device=dev, dtype=torch.long); plaus_ho = z(torch.bool)
+    p0 = torch.zeros(N, 2, device=dev); heading = torch.zeros(N, 2, device=dev); p1 = torch.zeros(N, 2, device=dev)
+    fell_win = z(torch.bool); win_done = z(torch.bool); trk_err = z(); trk_n = z(); fwd_sum = z(); speed_hist_n = z()
+    org = u.scene.env_origins[:, :2]
     for s in range(steps):
-        sw_now = (t.run >= HO) & ~switched
+        sw_now = (t.run_s >= HO) & ~switched                      # SUPPORTED stand held HO steps (feet on floor), never the legacy tracker
         if sw_now.any():
-            p0[sw_now] = (r.data.root_pos_w.torch[sw_now, :2] - u.scene.env_origins[sw_now, :2]); sw_step[sw_now] = s
-        switched |= sw_now
+            idx = torch.nonzero(sw_now).squeeze(-1)
+            q = r.data.root_quat_w.torch[idx]                       # (x,y,z,w); heading = body x axis projected on the floor
+            hx = 1 - 2 * (q[:, 1] ** 2 + q[:, 2] ** 2); hy = 2 * (q[:, 0] * q[:, 1] + q[:, 3] * q[:, 2])
+            heading[idx] = torch.stack([hx, hy], -1); p0[idx] = r.data.root_pos_w.torch[idx, :2] - org[idx]; sw_step[idx] = s
+            asa = (u._assist_log["force_steps"][idx] > 0) if hasattr(u, "_assist_log") else None
+            plaus_ho[idx] = M.plausible_recovery(torch.ones(len(idx), dtype=torch.bool, device=dev), t.vel_viol_steps[idx], t.flight_steps[idx], t.viol_steps[idx], t.peak_vz[idx], s + 1, asa)
+            switched |= sw_now
+        inwin = switched & ((s - sw_step) < WIN)
         term.vel_command_b[:] = 0.0
         term.vel_command_b[switched, 0] = xa.fwd
         with torch.inference_mode():
             a_rec = rec_pol(obs); a_walk = walk_pol(obs)
             obs, _, _, _ = env.step(torch.where(switched[:, None], a_walk, a_rec))
-        h, up = (r.data.root_pos_w.torch[:, 2] - u.scene.env_origins[:, 2], -r.data.projected_gravity_b.torch[:, 2])
-        minh_after = torch.where(switched, torch.minimum(minh_after, h), minh_after)
-        fell_after |= switched & ((h < 0.45) | (up < 0.5))
-        vx_sum += torch.where(switched, r.data.root_lin_vel_b.torch[:, 0], torch.zeros_like(h)); n_after += switched.float()
-    h, up = (r.data.root_pos_w.torch[:, 2] - u.scene.env_origins[:, 2], -r.data.projected_gravity_b.torch[:, 2])
-    disp = torch.linalg.norm((r.data.root_pos_w.torch[:, :2] - u.scene.env_origins[:, :2]) - p0, dim=1)
-    standing_end = (h >= K.SUCCESS_H) & (up >= K.SUCCESS_TILT_COS)
-    walked = switched & ~fell_after & standing_end & (disp >= 1.0)
-    dt = u.step_dt; fc = t.failure_cause()
-    sel_idx = (pi.cpu().tolist() if xa.pose_indices else list(range(N)))
-    res = dict(success_pose_indices=[sel_idx[i] for i in torch.nonzero(walked).squeeze(-1).tolist()], recovered_pose_indices=[sel_idx[i] for i in torch.nonzero(t.succ).squeeze(-1).tolist()], handover_steps=int(HO), handover_rule="consecutive standing steps before the walking policy takes over (no reset/teleport; same physics state)", task=args.task, checkpoint=args.checkpoint, walk_checkpoint=xa.walk_checkpoint, num_envs=N, total_s=xa.total_s, fwd_cmd=xa.fwd,
-               stage1_recovered=int(t.succ.sum()), stage1_rate=float(t.succ.float().mean()),
-               stage2_handover_then_no_fall=int((switched & ~fell_after).sum()),
-               stage3_chain_success=int(walked.sum()), chain_success_rate=float(walked.float().mean()),
-               fell_after_handover=int((switched & fell_after).sum()),
+        h = r.data.root_pos_w.torch[:, 2] - u.scene.env_origins[:, 2]; up = -r.data.projected_gravity_b.torch[:, 2]
+        fell_win |= inwin & M.fell(h, up)
+        vb = r.data.root_lin_vel_b.torch[:, 0]
+        trk_err += torch.where(inwin, (vb - xa.fwd).abs(), z()); trk_n += inwin.float()
+        end_now = switched & ((s + 1 - sw_step) == WIN) & ~win_done
+        if end_now.any():
+            p1[end_now] = (r.data.root_pos_w.torch[:, :2] - org)[end_now]; win_done |= end_now
+    along, lateral = M.heading_progress(p0, p1, heading)
+    ok, reason = M.chain_success(switched, plaus_ho, win_done, fell_win, torch.where(win_done, along, z()), M.P.walk_window_s)
+    fc = t.failure_cause(); sel_idx = (pi.cpu().tolist() if xa.pose_indices else list(range(N)))
+    hist = {n: int((reason == i).sum()) for i, n in enumerate(M.CHAIN_REASONS)}
+    res = dict(criteria_version=K.CRITERIA_VERSION, protocol="EVAL_PROTOCOL.md v2 (chain)", task=args.task, checkpoint=args.checkpoint, walk_checkpoint=xa.walk_checkpoint, num_envs=N, total_s=xa.total_s,
+               handover_rule=f"{HO} consecutive SUPPORTED-stand steps ({HO*dt:.2f} s); one-way switch, no switch back", walking_window_s=M.P.walk_window_s, fwd_cmd=xa.fwd,
+               success_pose_indices=[sel_idx[i] for i in torch.nonzero(ok).squeeze(-1).tolist()], attempts=N,
+               stage1_supported_handovers=int(switched.sum()), stage1_plausible_handovers=int((switched & plaus_ho).sum()),
+               chain_successes=int(ok.sum()), chain_success_rate=float(ok.float().mean()), failure_reasons=hist,
+               falls_after_handover=int((switched & fell_win).sum()),
+               along_heading_disp_m_mean=float(along[win_done].mean()) if win_done.any() else None, lateral_disp_m_mean=float(lateral[win_done].mean()) if win_done.any() else None,
+               fwd_speed_along_heading_mean=float((along[win_done] / M.P.walk_window_s).mean()) if win_done.any() else None,
+               fwd_cmd_tracking_abs_err_mean=float((trk_err[switched] / trk_n[switched].clamp(min=1)).mean()) if switched.any() else None,
                handover_time_s_mean=float((sw_step[switched].float() * dt).mean()) if switched.any() else None,
-               walk_displacement_m_mean=float(disp[switched].mean()) if switched.any() else None,
-               walk_fwd_speed_mean=float((vx_sum[switched] / n_after[switched].clamp(min=1)).mean()) if switched.any() else None,
-               recovery_failure_causes={n: int((fc == i).sum()) for i, n in enumerate(K.Tracker.FAIL)},
-               chain_by_category={c: dict(n=int((cat == i).sum()), chain_success_rate=float(walked[cat == i].float().mean())) for i, c in enumerate(K.CATEGORIES)},
-               note="walking policy trained on the minimal-collision G1; here applied to the full-collision G1 (same joints/actuators)")
+               recovery_failure_causes_legacy={n: int((fc == i).sum()) for i, n in enumerate(K.Tracker.FAIL)},
+               by_category={c: dict(n=int((cat == i).sum()), chain_success_rate=float(ok[cat == i].float().mean())) for i, c in enumerate(K.CATEGORIES)},
+               note="walking policy trained on the minimal-collision G1, applied here to the full-collision G1 (same joints/actuators); no assist in chain; no reset after t=0")
     json.dump(res, open(xa.out, "w"), indent=1); print("CHAIN_JSON", json.dumps(res), flush=True)
     C.close_env(env)

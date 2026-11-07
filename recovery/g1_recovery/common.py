@@ -72,6 +72,23 @@ def make_heldout(default_q, q_lo, q_hi, noise_mask, device="cpu", path=None):
     return d
 
 
+def make_set(seed, default_q, q_lo, q_hi, noise_mask, noise_levels=(0.1, 0.4), n_per=32, path=None):
+    """Evaluation set v2: 4 fall directions x len(noise_levels) limb-noise levels x n_per poses (default 4*2*32 = 256), alpha in [80,90] deg.
+    Arrays: z, quat, q, category (direction 0..3), difficulty (index into noise_levels), noise (rad)."""
+    gen = torch.Generator().manual_seed(seed); cats, diffs, zs, quats, qs = [], [], [], [], []
+    for d in range(4):
+        for li, nl in enumerate(noise_levels):
+            n = n_per
+            phi = (d * 90.0 + (torch.rand(n, generator=gen) * 2 - 1) * 15.0) * math.pi / 180.0
+            z, quat, q = sample_poses(n, torch.full((n,), 80.0), torch.full((n,), 90.0), torch.full((n,), float(nl)), default_q.cpu(), q_lo.cpu(), q_hi.cpu(), noise_mask.cpu(), gen, "cpu", phi=phi)
+            cats += [d] * n; diffs += [li] * n; zs.append(z); quats.append(quat); qs.append(q)
+    perm = torch.randperm(len(cats), generator=gen)       # shuffle so any prefix of poses mixes all families
+    arr = lambda v: torch.cat(v)[perm].numpy()
+    d_ = dict(z=arr(zs), quat=arr(quats), q=arr(qs), category=torch.tensor(cats)[perm].numpy(), difficulty=torch.tensor(diffs)[perm].numpy(), noise=torch.tensor([noise_levels[i] for i in diffs])[perm].numpy(), seed=seed)
+    if path: np.savez(path, **d_)
+    return d_
+
+
 class Tracker:
     """Per-env running recovery metrics, updated every env step by the `track_recovery` termination term."""
     FAIL = ["success", "never_rose", "rose_not_upright", "stood_then_fell", "late_hold_incomplete"]
@@ -175,6 +192,7 @@ def _robot_h_up(env):
     return h, up
 
 
+CRITERIA_VERSION = os.environ.get("G1R_CRITERIA", "v2")     # v1: pelvis speed = xy only (all results before 2026-11-06 21:30); v2: 3D speed, position-limit validity (see EVAL_PROTOCOL.md)
 STRICT = os.environ.get("G1R_STRICT", "0") == "1"   # training reward/curriculum use the feet-supported stand criterion
 
 
@@ -187,7 +205,8 @@ def supported_mask(env):
         env._feet_body = [r.body_names.index(n) for n in r.body_names if "ankle_roll" in n]
     f = torch.linalg.norm(env.scene.sensors["contact_forces"].data.net_forces_w.torch[:, env._feet_idx], dim=-1)
     fz = r.data.body_pos_w.torch[:, env._feet_body, 2] - env.scene.env_origins[:, 2:3]
-    spd = torch.linalg.norm(r.data.root_lin_vel_w.torch[:, :2], dim=-1)
+    v = r.data.root_lin_vel_w.torch
+    spd = torch.linalg.norm(v if CRITERIA_VERSION == "v2" else v[:, :2], dim=-1)
     return (f > SUPPORT_FORCE_N).all(-1) & (fz < SUPPORT_FOOT_Z).all(-1) & (spd < SUPPORT_PELVIS_SPEED)
 
 
