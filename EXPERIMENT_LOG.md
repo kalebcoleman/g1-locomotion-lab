@@ -241,3 +241,6 @@ DEV (selection set), v3 before 3b with ground-only flight: 94, 95, 97 / 256 (thr
 By family, out of 64: prone 47-52 (73-81%), side_a 29-35 (45-55%), supine 27-33 (42-52%), side_b 15-19 (23-30%). **The 50% is an average across families; it does not hold for side_b or supine.**
 HELDOUT is easier than DEV in limb noise: half its poses have 0.1 rad instead of 0.4 rad.
 Limitations: one seed, and a warm-start chain (R7h scratch it650 -> R9h -> R9hc -> R9hg), so nothing yet about seed robustness. TEST untouched. Not yet chained to walking.
+
+## Seed replication (launched 04:20): the R9hg recipe from scratch, seeds 4 and 5
+`20261107-042047` (seed 4), `20261107-042048` (seed 5): `G1-Recovery-R9hg-v0` from random weights, 16384 envs, 1500 iterations. This tests the recipe itself, not the seed-3 warm-start chain (R7h -> R9h -> R9hc -> R9hg) that produced the candidate. If these fail, the candidate's result depends on that chain, and an exact chain replication on new seeds is the next step.
