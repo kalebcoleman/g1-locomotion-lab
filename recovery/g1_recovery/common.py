@@ -101,15 +101,15 @@ class Tracker:
             step=z(torch.int32), run=z(torch.int32), run_start=z(torch.int32), best_run=z(torch.int32), total_stand=z(torch.int32),
             max_h=z(), succ=z(torch.bool), succ_start=torch.full((n,), -1, device=device, dtype=torch.int32),
             ever_stood=z(torch.bool), viol_steps=z(torch.int32), viol_joint_steps=z(torch.int32),
-            stand_now=z(torch.bool), last_h=z(), last_up=z(), vel_viol_steps=z(torch.int32), peak_vz=z(), flight_steps=z(torch.int32),
+            stand_now=z(torch.bool), last_h=z(), last_up=z(), vel_viol_steps=z(torch.int32), peak_vz=z(), flight_steps=z(torch.int32), hard_viol_steps=z(torch.int32), hard_excess_max=z(), soft_excess_max=z(),
             run_s=z(torch.int32), best_run_s=z(torch.int32), total_stand_s=z(torch.int32), run_start_s=z(torch.int32), succ_s=z(torch.bool),
             succ_start_s=torch.full((n,), -1, device=device, dtype=torch.int32), ever_stood_s=z(torch.bool), stand_now_s=z(torch.bool)).items()]
         self.reset_all()
 
     def reset(self, ids):
-        for k in ["step", "run", "run_start", "best_run", "total_stand", "viol_steps", "viol_joint_steps", "run_s", "best_run_s", "total_stand_s", "run_start_s", "vel_viol_steps", "flight_steps"]:
+        for k in ["step", "run", "run_start", "best_run", "total_stand", "viol_steps", "viol_joint_steps", "run_s", "best_run_s", "total_stand_s", "run_start_s", "vel_viol_steps", "flight_steps", "hard_viol_steps"]:
             getattr(self, k)[ids] = 0
-        for k in ["max_h", "last_h", "last_up", "peak_vz"]:
+        for k in ["max_h", "last_h", "last_up", "peak_vz", "hard_excess_max", "soft_excess_max"]:
             getattr(self, k)[ids] = 0.0
         for k in ["succ", "ever_stood", "stand_now", "succ_s", "ever_stood_s", "stand_now_s"]:
             getattr(self, k)[ids] = False
@@ -218,6 +218,13 @@ def track_recovery(env, env_ids=None):
     if not hasattr(env, "_body_jmask"):   # finger joints are excluded: their default pose lies outside their soft limits
         env._body_jmask = torch.tensor([not is_hand_joint(n) for n in r.joint_names], device=env.device)
     viol = (((q < lim[..., 0]) | (q > lim[..., 1])) & env._body_jmask).sum(-1)
+    tr_ = get_tracker(env)
+    sx = (torch.maximum(lim[..., 0] - q, q - lim[..., 1]).clamp(min=0) * env._body_jmask).max(-1).values
+    tr_.soft_excess_max = torch.maximum(tr_.soft_excess_max, sx)
+    if hasattr(r.data, "joint_pos_limits"):        # hard (mechanical) limits; the solver treats them as compliant, so joints can pass them
+        hl = r.data.joint_pos_limits.torch
+        hx = (torch.maximum(hl[..., 0] - q, q - hl[..., 1]).clamp(min=0) * env._body_jmask).max(-1).values
+        tr_.hard_viol_steps += (hx > 0).int(); tr_.hard_excess_max = torch.maximum(tr_.hard_excess_max, hx)
     supported = supported_mask(env)
     if not hasattr(env, "_vel_lim"):
         env._vel_lim = r.data.soft_joint_vel_limits.torch[0].clone()

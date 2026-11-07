@@ -72,7 +72,7 @@ with launch_simulation(env_cfg, args):
             hx = 1 - 2 * (q[:, 1] ** 2 + q[:, 2] ** 2); hy = 2 * (q[:, 0] * q[:, 1] + q[:, 3] * q[:, 2])
             heading[idx] = torch.stack([hx, hy], -1); p0[idx] = r.data.root_pos_w.torch[idx, :2] - org[idx]; sw_step[idx] = s
             asa = (u._assist_log["force_steps"][idx] > 0) if hasattr(u, "_assist_log") else None
-            plaus_ho[idx] = M.plausible_recovery(torch.ones(len(idx), dtype=torch.bool, device=dev), t.vel_viol_steps[idx], t.flight_steps[idx], t.viol_steps[idx], t.peak_vz[idx], s + 1, asa)
+            plaus_ho[idx] = M.plausible_recovery(torch.ones(len(idx), dtype=torch.bool, device=dev), t.vel_viol_steps[idx], t.flight_steps[idx], t.viol_steps[idx], t.peak_vz[idx], s + 1, asa) & M.hard_limits_ok(t.hard_viol_steps[idx], t.hard_excess_max[idx], s + 1)
             switched |= sw_now
         inwin = switched & ((s - sw_step) < WIN)
         term.vel_command_b[:] = 0.0
@@ -91,7 +91,7 @@ with launch_simulation(env_cfg, args):
     ok, reason = M.chain_success(switched, plaus_ho, win_done, fell_win, torch.where(win_done, along, z()), M.P.walk_window_s)
     fc = t.failure_cause(); sel_idx = (pi.cpu().tolist() if xa.pose_indices else list(range(N)))
     hist = {n: int((reason == i).sum()) for i, n in enumerate(M.CHAIN_REASONS)}
-    res = dict(criteria_version=K.CRITERIA_VERSION, protocol="EVAL_PROTOCOL.md v2 (chain)", task=args.task, checkpoint=args.checkpoint, walk_checkpoint=xa.walk_checkpoint, num_envs=N, total_s=xa.total_s,
+    res = dict(criteria_version=K.CRITERIA_VERSION, protocol="EVAL_PROTOCOL.md v2.1 (chain)", task=args.task, checkpoint=args.checkpoint, walk_checkpoint=xa.walk_checkpoint, num_envs=N, total_s=xa.total_s,
                handover_rule=f"{HO} consecutive SUPPORTED-stand steps ({HO*dt:.2f} s); one-way switch, no switch back", walking_window_s=M.P.walk_window_s, fwd_cmd=xa.fwd,
                success_pose_indices=[sel_idx[i] for i in torch.nonzero(ok).squeeze(-1).tolist()], attempts=N,
                stage1_supported_handovers=int(switched.sum()), stage1_plausible_handovers=int((switched & plaus_ho).sum()),

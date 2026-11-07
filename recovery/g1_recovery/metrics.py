@@ -17,6 +17,8 @@ class Params:
     peak_vz: float = 2.0             # m/s peak pelvis upward speed
     flight_frac: float = 0.02        # free-flight steps
     pos_viol_frac: float = 0.10      # joint-POSITION-limit-violating steps (v2 addition)
+    hard_viol_frac: float = 0.03     # v2.1: steps with any body joint past its HARD limit (walking reference 1.5%)
+    hard_excess: float = 0.10        # v2.1: max excursion past a hard limit, rad (walking reference p99 0.083, max 0.105)
     walk_window_s: float = 10.0
     walk_dist: float = 3.0           # m along the commanded heading within the window
     walk_speed: float = 0.5          # m/s mean along heading
@@ -66,6 +68,11 @@ def chain_success(handed_over, plausible_at_handover, window_complete, fell_in_w
     reason = torch.where((along_disp < p.walk_dist) & (reason == 0), torch.full_like(reason, 5), reason)             # too little progress along heading
     reason = torch.where((mean_speed < p.walk_speed) & (reason == 0), torch.full_like(reason, 6), reason)            # too slow
     return reason == 0, reason
+
+
+def hard_limits_ok(hard_viol_steps, hard_excess_max, steps, p: Params = P):
+    """v2.1 addition: excursions past HARD joint limits stay near what the walking gait itself produces in this (compliant-limit) solver."""
+    return (hard_viol_steps.float() / steps <= p.hard_viol_frac) & (hard_excess_max <= p.hard_excess)
 
 
 CHAIN_REASONS = ["success", "never_handed_over", "implausible_recovery", "timeout_window_incomplete", "fell_after_handover", "insufficient_progress_along_heading", "too_slow"]

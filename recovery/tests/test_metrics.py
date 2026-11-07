@@ -56,6 +56,13 @@ def test_heading_rotated():
     assert abs(along.item() - 3.5) < 1e-5
 
 
+def test_hard_limit_rule_v21():
+    out = M.hard_limits_ok(torch.tensor([0, 15, 16, 0]), T(0.0, 0.1, 0.0, 0.11), 500)     # 15/500 = 3% allowed, 16/500 not; 0.10 rad allowed, 0.11 not
+    assert out.tolist() == [True, True, False, False]
+    # the sit-up policy's measured behaviour (9.5% of steps, 0.22 rad) must fail; the walking reference (1.5%, 0.083) must pass
+    assert M.hard_limits_ok(torch.tensor([48, 8]), T(0.22, 0.083), 500).tolist() == [False, True]
+
+
 def _chain(**kw):
     d = dict(handed_over=B(True), plausible_at_handover=B(True), window_complete=B(True), fell_in_window=B(False), along_disp=T(5.0), window_s=10.0)
     d.update(kw); ok, r = M.chain_success(**d); return bool(ok.item()), int(r.item())

@@ -71,11 +71,14 @@ with launch_simulation(env_cfg, args):
     from g1_recovery import metrics as M
     assist_on = (u._assist_log["force_steps"] > 0) if hasattr(u, "_assist_log") else None
     plaus_v2 = M.plausible_recovery(t.succ_s, t.vel_viol_steps, t.flight_steps, t.viol_steps, t.peak_vz, steps, assist_on)
+    plaus_v21 = plaus_v2 & M.hard_limits_ok(t.hard_viol_steps, t.hard_excess_max, steps)
     res["plausibility"] = dict(definition="PLAUSIBLE recovery = strict supported stand held 2 s AND joint-velocity-limit violations on <=2% of steps AND peak pelvis upward speed <=2.0 m/s",
         plausible_successes=int(plaus.sum()), plausible_rate=float(plaus.float().mean()), vel_limit_violation_step_frac_mean=float(vvf.mean()), peak_pelvis_vz_mean=float(t.peak_vz.mean()), peak_pelvis_vz_max=float(t.peak_vz.max()),
         strict_successes_failing_plausibility=int((t.succ_s & ~plaus).sum()),
+        plausible_v21_successes=int(plaus_v21.sum()), plausible_v21_rate=float(plaus_v21.float().mean()), plausible_v21_by_category={CAT: float(plaus_v21[cat == i].float().mean()) for i, CAT in enumerate(K.CATEGORIES)}, v21_definition="v2 AND past-hard-limit on <=3% of steps AND hard excess <=0.10 rad",
         criteria_version=K.CRITERIA_VERSION, plausible_v2_successes=int(plaus_v2.sum()), plausible_v2_rate=float(plaus_v2.float().mean()), plausible_v2_by_category={CAT: float(plaus_v2[cat == i].float().mean()) for i, CAT in enumerate(K.CATEGORIES)},
         pos_limit_violation_step_frac_mean=float((t.viol_steps.float() / steps).mean()), v2_definition="strict supported stand (3D speed<0.6) 2 s AND vel-viol<=2% AND flight<=2% AND peak vz<=2.0 AND pos-limit-viol<=10% AND no assist force applied",
+        hard_limit_step_frac_mean=float((t.hard_viol_steps.float() / steps).mean()), hard_excess_rad_mean_of_env_max=float(t.hard_excess_max.mean()), hard_excess_rad_max=float(t.hard_excess_max.max()), soft_excess_rad_mean_of_env_max=float(t.soft_excess_max.mean()),
         flight_step_frac_mean=float((t.flight_steps.float() / steps).mean()),
         plausible_v1p1_successes=int((plaus & (t.flight_steps.float() / steps <= 0.02)).sum()), v1p1_definition="POST-HOC amendment (added after seeing A8c): plausible AND free-flight (no body in contact with anything) on <=2% of steps")
     fc = t.failure_cause()
@@ -90,10 +93,10 @@ with launch_simulation(env_cfg, args):
     _f = np.load(xa.heldout)
     if "difficulty" in _f.files:
         dif = torch.as_tensor(_f["difficulty"], device=dev)[torch.arange(N, device=dev) % len(_f["difficulty"])]; nz = _f["noise"]
-        res["by_difficulty_limb_noise_rad"] = {str(round(float(v), 2)): dict(n=int((dif == i).sum()), plausible_v2_rate=float(plaus_v2[dif == i].float().mean()), strict_rate=float(ok_s[dif == i].float().mean()), legacy_rate=float(ok[dif == i].float().mean())) for i, v in enumerate(sorted(set(nz.tolist())))}
+        res["by_difficulty_limb_noise_rad"] = {str(round(float(v), 2)): dict(n=int((dif == i).sum()), plausible_v2_rate=float(plaus_v2[dif == i].float().mean()), plausible_v21_rate=float(plaus_v21[dif == i].float().mean()), strict_rate=float(ok_s[dif == i].float().mean()), legacy_rate=float(ok[dif == i].float().mean())) for i, v in enumerate(sorted(set(nz.tolist())))}
     res["pose_set"] = os.path.basename(xa.heldout)
-    res["per_env"] = dict(strict=ok_s.int().tolist(), plausible_v2=plaus_v2.int().tolist(), vel_viol_frac=[round(float(x), 3) for x in vvf], flight_frac=[round(float(x), 3) for x in (t.flight_steps.float() / steps)],
-                          pos_viol_frac=[round(float(x), 3) for x in (t.viol_steps.float() / steps)], peak_vz=[round(float(x), 2) for x in t.peak_vz], max_h=[round(float(x), 2) for x in t.max_h], best_supp_s=[round(float(x) * dt, 2) for x in t.best_run_s],
+    res["per_env"] = dict(strict=ok_s.int().tolist(), plausible_v2=plaus_v2.int().tolist(), plausible_v21=plaus_v21.int().tolist(), vel_viol_frac=[round(float(x), 3) for x in vvf], flight_frac=[round(float(x), 3) for x in (t.flight_steps.float() / steps)],
+                          pos_viol_frac=[round(float(x), 3) for x in (t.viol_steps.float() / steps)], hard_viol_frac=[round(float(x), 3) for x in (t.hard_viol_steps.float() / steps)], hard_excess_max=[round(float(x), 3) for x in t.hard_excess_max], soft_excess_max=[round(float(x), 3) for x in t.soft_excess_max], peak_vz=[round(float(x), 2) for x in t.peak_vz], max_h=[round(float(x), 2) for x in t.max_h], best_supp_s=[round(float(x) * dt, 2) for x in t.best_run_s],
                           category=cat.int().tolist(), failure_cause=fc.int().tolist())
     json.dump(res, open(xa.out, "w"), indent=1)
     print("EVAL_JSON", json.dumps(res), flush=True)

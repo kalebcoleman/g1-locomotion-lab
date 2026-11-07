@@ -1,4 +1,4 @@
-# Evaluation protocol v2 (frozen 2026-11-06 21:25 MST, before further optimisation). Supersedes `recovery/CRITERIA.md` v1 + Amendment 1 for NEW results; all earlier results keep their original definitions (v1) and are never re-labelled.
+# Evaluation protocol v2.1 (v2 frozen 2026-11-06 21:25 MST, before further optimisation). Supersedes `recovery/CRITERIA.md` v1 + Amendment 1 for NEW results; all earlier results keep their original definitions (v1) and are never re-labelled.
 Simulator: Isaac Lab 3.0.0, `physics=newton_mjwarp`, 50 Hz, full-collision G1 (`G1_CFG`), no pushes in recovery evaluation, observation noise/randomisation as in the task config, seed 1 for env construction.
 
 ## Pose sets (`recovery/sets/`)
@@ -18,6 +18,8 @@ One 10 s episode from the pose, no reset/teleport after t=0. All must hold:
 5. No assistance: the assist hook applied zero force during the episode (`assist.force_steps == 0`); assist-on numbers are reported separately and never as the headline.
 Always reported next to it: legacy count (pelvis+upright only), strict count (supported stand only), recovery time (start of the successful hold), longest/total supported-stand time, per-direction/difficulty rates, failure causes, contact forces, actuator effort.
 
+**Amendment v2.1 (frozen 2026-11-06, before ANY v2-valid recovery existed, so it cannot favour a result): hard-limit excursions.** Limits in this solver are compliant, so joints can pass them; meeting the soft-limit rule (item 4) does not mean no violation. Added item 6: any body joint past its HARD limit on <= 3% of steps AND max excursion past a hard limit <= 0.10 rad. Anchored to a measured reference: the walking policy (21 s settle+walk+turn, 256 envs, `results/walk_ref_limits.json`) has 1.5% of steps, excess p99 0.083 rad, max 0.105 rad; the Lane A v1 sit-up policy has 9.5% and up to 0.22 rad and must fail. **Headline metric from now on: `plausible_v21`.** v2 is still reported alongside. Earlier results keep their definitions.
+
 ## Stage 2: chain, recovery -> walking (`scripts/eval_chain.py`, `metrics.chain_success`)
 Episode 20 s. The recovery policy acts until it has held a SUPPORTED stand for the hand-over rule (default **100 consecutive supported steps = 2 s**; shorter rules are exploratory and labelled). One-way switch to the existing walking policy (published run, iteration 1499) with command vx = 0.8 m/s (yaw 0). No switch back. Success requires:
 - plausible recovery at hand-over (Stage 1 items 2-5 evaluated on the episode so far; assist inactive),
@@ -35,4 +37,4 @@ One uncut episode, physics always active, no reset/teleport/hidden support; dist
 Each final candidate: >= 3 independent evaluations (the evaluation is not bit-repeatable: one checkpoint scored 3-8/256) on HELDOUT; robustness claims need >= 3 independently trained seeds; report mean and range, attempts and successes. Training budgets for method comparisons are matched in transitions; wall time/throughput are reported separately (shared GPU).
 
 ## Tests
-`recovery/tests/test_metrics.py` (11 tests: both-feet requirement, airborne lunge, 3D speed, threshold edges, plausibility flags, position-limit violation, heading projection, chain edges/reasons) must pass before any result is trusted.
+`recovery/tests/test_metrics.py` (12 tests: both-feet requirement, airborne lunge, 3D speed, threshold edges, plausibility flags, position-limit violation, heading projection, chain edges/reasons) must pass before any result is trusted.

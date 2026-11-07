@@ -32,10 +32,14 @@ with launch_simulation(env_cfg, args):
     obs, _ = env.reset(); term = u.command_manager.get_term("base_velocity"); org = u.scene.env_origins[:, :2]
     S, W, TURN = int(3 / dt), int(10 / dt), int(8 / dt)
     fell = torch.zeros(N, dtype=torch.bool, device=dev); trk = torch.zeros(N, device=dev)
+    _names = list(r.joint_names); _body = torch.tensor([not K.is_hand_joint(n) for n in _names], device=dev); _soft = r.data.soft_joint_pos_limits.torch[0]; _hard = r.data.joint_pos_limits.torch[0]
+    _st = dict(n=0, soft=torch.zeros(N, device=dev), hard=torch.zeros(N, device=dev), hmax=torch.zeros(N, device=dev), smax=torch.zeros(N, device=dev), hj=torch.zeros(len(_names), device=dev), sj=torch.zeros(len(_names), device=dev))
     def stepcmd(vx, wz):
         global obs
         term.vel_command_b[:] = 0.0; term.vel_command_b[:, 0] = vx; term.vel_command_b[:, 2] = wz
         with torch.inference_mode(): obs, _, dn, _ = env.step(pol(obs))
+        q = r.data.joint_pos.torch; sx = torch.maximum(_soft[:, 0] - q, q - _soft[:, 1]).clamp(min=0) * _body; hx = torch.maximum(_hard[:, 0] - q, q - _hard[:, 1]).clamp(min=0) * _body
+        _st["n"] += 1; _st["soft"] += (sx.max(-1).values > 0).float(); _st["hard"] += (hx.max(-1).values > 0).float(); _st["hmax"] = torch.maximum(_st["hmax"], hx.max(-1).values); _st["smax"] = torch.maximum(_st["smax"], sx.max(-1).values); _st["hj"] += (hx > 0).float().mean(0); _st["sj"] += (sx > 0).float().mean(0)
         h = r.data.root_pos_w.torch[:, 2] - u.scene.env_origins[:, 2]; up = -r.data.projected_gravity_b.torch[:, 2]
         return M.fell(h, up)
     for _ in range(S): fell |= stepcmd(0.0, 0.0)
@@ -53,4 +57,7 @@ with launch_simulation(env_cfg, args):
                fell_in_settle=int(fell.sum()), fell_in_walk=int(fell_w.sum()), fell_in_turn=int(fell_t.sum()), walk_successes=int(ok_walk.sum()), walk_success_rate=float(ok_walk.float().mean()),
                along_disp_m_mean=float(along.mean()), along_disp_m_p10=float(along.quantile(0.1)), lateral_m_mean=float(lat.mean()), fwd_tracking_abs_err_mean=float((trk / W).mean()),
                turn_yaw_rad_mean=float(yaw_sum.mean()), turn_yaw_target_rad=xa.yaw * 8.0, turn_success_ge_90deg=int(((yaw_sum.abs() >= math.pi / 2) & ~fell_t).sum()))
+    _top = lambda v: {_names[i]: round(float(v[i] / _st["n"]), 4) for i in torch.argsort(v, descending=True)[:5].tolist()}
+    res["joint_limits"] = dict(soft_step_frac_any_joint_mean=float((_st["soft"] / _st["n"]).mean()), soft_excess_rad_mean_of_env_max=float(_st["smax"].mean()), soft_excess_rad_max=float(_st["smax"].max()), soft_top=_top(_st["sj"]),
+                               hard_step_frac_any_joint_mean=float((_st["hard"] / _st["n"]).mean()), hard_excess_rad_mean_of_env_max=float(_st["hmax"].mean()), hard_excess_rad_p99=float(_st["hmax"].quantile(0.99)), hard_excess_rad_max=float(_st["hmax"].max()), hard_top=_top(_st["hj"]))
     json.dump(res, open(xa.out, "w"), indent=1); print("WALK_JSON", json.dumps(res), flush=True); C.close_env(env)

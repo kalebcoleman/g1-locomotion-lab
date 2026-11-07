@@ -1,0 +1,43 @@
+{
+ "task": "G1-Recovery-A-v0",
+ "robot_model": "full-collision g1.usd",
+ "checkpoint": "/home/kacolem8@ad.asu.edu/isaac-workspace/projects/g1-locomotion-lab-integrated/checkpoints/walking_newton_it1499.pt",
+ "num_envs": 256,
+ "pushes_m_s": 0.0,
+ "protocol": "3 s settle (zero cmd), 10 s walk vx=0.80, 8 s turn wz=0.80; walk ok = no fall AND >=3 m along heading AND >=0.5 m/s",
+ "fell_in_settle": 0,
+ "fell_in_walk": 0,
+ "fell_in_turn": 11,
+ "walk_successes": 256,
+ "walk_success_rate": 1.0,
+ "along_disp_m_mean": 6.3681745529174805,
+ "along_disp_m_p10": 5.905584335327148,
+ "lateral_m_mean": -2.6255664825439453,
+ "fwd_tracking_abs_err_mean": 0.09300721436738968,
+ "turn_yaw_rad_mean": 3.9831573963165283,
+ "turn_yaw_target_rad": 6.4,
+ "turn_success_ge_90deg": 245,
+ "joint_limits": {
+  "soft_step_frac_any_joint_mean": 0.03468006104230881,
+  "soft_excess_rad_mean_of_env_max": 0.08776317536830902,
+  "soft_excess_rad_max": 0.2489699125289917,
+  "soft_top": {
+   "left_ankle_pitch_joint": 0.0179,
+   "right_ankle_pitch_joint": 0.0169,
+   "right_ankle_roll_joint": 0.0022,
+   "left_knee_joint": 0.0012,
+   "left_ankle_roll_joint": 0.0004
+  },
+  "hard_step_frac_any_joint_mean": 0.01530878059566021,
+  "hard_excess_rad_mean_of_env_max": 0.014404099434614182,
+  "hard_excess_rad_p99": 0.08292514830827713,
+  "hard_excess_rad_max": 0.10498026013374329,
+  "hard_top": {
+   "left_ankle_pitch_joint": 0.0129,
+   "right_ankle_pitch_joint": 0.0026,
+   "left_knee_joint": 0.0007,
+   "left_ankle_roll_joint": 0.0003,
+   "right_ankle_roll_joint": 0.0002
+  }
+ }
+}

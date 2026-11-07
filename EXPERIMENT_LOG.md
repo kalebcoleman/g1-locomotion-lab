@@ -48,3 +48,9 @@ Selection rule: successive halving on `Curriculum/lying_ever_supported`, `lying_
 
 ## Throughput
 1 job: ~160 k/s (while two 4096-env jobs ran). 3 jobs: ~300 k/s combined (~100 k each). 6 jobs: ~43 k/s each (~260-300 k/s combined). Combined throughput saturates near 300 k/s at the GPU's 300 W cap, so more than ~3 jobs only divides it. VRAM ~7.7 GB per 16384-env job.
+
+## Action-scale verification (2026-11-06; requested by Kaleb), `results/actdiag_*.json`, on real simulated DEV-set states
+- Mean equivalence of the scale-1.0 checkpoint (`laneA_v1_situp_it999_scale1p0.pt`) vs the original at scale 0.5: joint-target difference max 2.4e-6 rad, mean 3e-7 rad. Confirmed at t=0 only; R5's training then diverges by design.
+- Distribution (both, same in rad): target offset |mean| 0.25 rad, p99 1.6 rad. Raw |a| at scale 0.5: mean 0.49, p99 3.21, max 10.56; at scale 1.0: mean 0.25, p99 1.6, max 5.06. Output layer is linear and `clip_actions` is null, so the network itself never saturates; the effective saturation is joint targets beyond limits: 1.7% of joint-steps beyond soft, 1.0% beyond hard, up to 2.66 rad beyond soft (right elbow).
+- **Correction:** I had claimed a deep knee tuck was out of reach because it needs a mean action near 3.4 at scale 0.5. Raw actions already reach p99 3.2 and max 10.6, so reach of the MEAN is not the bottleneck. R5 tests only doubled exploration noise (0.16 -> 0.32 rad) plus any learning-dynamics effect of the rescaled output. To re-check on R5's trained checkpoints with `scripts/diag_actions.py`.
+- Sit-up policy past HARD limits on 9.5% of steps (any joint), up to 0.22 rad (hip pitch); soft 16.5%. Led to criteria v2.1.
