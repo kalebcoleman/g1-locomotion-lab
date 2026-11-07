@@ -1,0 +1,41 @@
+                          Learning iteration 1499/1500                           
+
+                            Total steps: 36864000 
+                       Steps per second: 15466 
+                        Collection time: 1.401s 
+                          Learning time: 0.188s 
+                        Mean value loss: 0.0075
+                    Mean surrogate loss: -0.0057
+                      Mean entropy loss: 38.1209
+                            Mean reward: 12.18
+                    Mean episode length: 971.01
+                        Mean action std: 0.94
+    Episode_Reward/track_lin_vel_xy_exp: 0.8828
+     Episode_Reward/track_ang_vel_z_exp: 0.3960
+            Episode_Reward/lin_vel_z_l2: -0.0077
+           Episode_Reward/ang_vel_xy_l2: -0.0249
+          Episode_Reward/dof_torques_l2: -0.0091
+              Episode_Reward/dof_acc_l2: -0.0201
+          Episode_Reward/action_rate_l2: -0.3677
+           Episode_Reward/feet_air_time: 0.0239
+     Episode_Reward/flat_orientation_l2: -0.0072
+          Episode_Reward/dof_pos_limits: -0.0061
+     Episode_Reward/termination_penalty: 0.0000
+              Episode_Reward/feet_slide: -0.0228
+     Episode_Reward/joint_deviation_hip: -0.0220
+    Episode_Reward/joint_deviation_arms: -0.1004
+ Episode_Reward/joint_deviation_fingers: -0.0672
+   Episode_Reward/joint_deviation_torso: -0.0063
+                   Metrics/success_rate: 1.0000
+     Metrics/base_velocity/error_vel_xy: 0.1619
+    Metrics/base_velocity/error_vel_yaw: 0.6620
+           Episode_Termination/time_out: 0.9671
+       Episode_Termination/base_contact: 0.0329
+--------------------------------------------------------------------------------
+                         Iteration time: 1.59s
+                           Time elapsed: 0:39:00
+                                    ETA: 0:00:00
+
+Training time: 2375.06 seconds
+[INFO]: SimulationContext cleared
+[2414.448s] Simulation App Shutting Down

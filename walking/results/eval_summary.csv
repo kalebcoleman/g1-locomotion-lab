@@ -1,0 +1,10 @@
+id,description,num_envs,survivors,falls_stand,falls_walk,falls_turn,falls_stop,walk_lin_err_mps,turn_yaw_err_radps
+newton_policy_it0000_on_newton,"Newton-trained, iteration 0, evaluated on Newton",256,0,256,0,0,0,,
+newton_policy_it0050_on_newton,"Newton-trained, iteration 50, evaluated on Newton",256,0,256,0,0,0,,
+newton_policy_it0100_on_newton,"Newton-trained, iteration 100, evaluated on Newton",256,0,256,0,0,0,,
+newton_policy_it0200_on_newton,"Newton-trained, iteration 200, evaluated on Newton",256,0,256,0,0,0,,
+newton_policy_it0350_on_newton,"Newton-trained, iteration 350, evaluated on Newton",256,249,5,0,1,1,0.682,0.92
+newton_policy_it0500_on_newton,"Newton-trained, iteration 500, evaluated on Newton",256,235,18,1,1,1,0.426,0.867
+newton_policy_it0700_on_newton,"Newton-trained, iteration 700, evaluated on Newton",256,231,6,4,7,8,0.146,0.711
+newton_policy_it1000_on_newton,"Newton-trained, iteration 1000, evaluated on Newton",256,225,5,6,7,13,0.104,0.771
+newton_policy_it1499_on_newton,"Newton-trained, iteration 1499, evaluated on Newton",256,237,0,2,17,0,0.107,0.375

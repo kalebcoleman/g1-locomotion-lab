@@ -1,0 +1,251 @@
+{
+ "graph_node_kinds": {
+  "MEMCPY": 7,
+  "KERNEL": 244,
+  "MEM_ALLOC": 60,
+  "MEM_FREE": 60,
+  "CONDITIONAL": 2
+ },
+ "graph_kernel_nodes": 244,
+ "graph_distinct_kernels": 85,
+ "graph_kernels_found_in_trace": 83,
+ "graph_kernels_not_in_trace": [
+  "_Z20memtile_value_kernelIiEvPT_S0_m",
+  "set_conditional_if_handle_kernel"
+ ],
+ "trace_warp_kernels_distinct": 95,
+ "trace_warp_kernels_not_in_graph": [
+  "_qfrc_constraint_from_grad_4e7e88b1_cuda_kernel_forward",
+  "compute_implicit_actuator_batch_25c8943e_cuda_kernel_forward",
+  "copy_from_newton_kernel_53c6608c_cuda_kernel_forward",
+  "get_body_com_acc_from_body_com_vel_ordered_5ec3c72d_cuda_kernel_forward",
+  "get_joint_acc_from_joint_vel_2ab71688_cuda_kernel_forward",
+  "projected_gravity_b_kernel_59062a57_cuda_kernel_forward",
+  "quat_apply_inverse_1D_kernel_411f1020_cuda_kernel_forward",
+  "root_heading_w_fad61337_cuda_kernel_forward",
+  "update_contact_sensor_kernel_7e4412e0_cuda_kernel_forward",
+  "update_outdated_envs_kernel_937ac92b_cuda_kernel_forward",
+  "update_timestamp_kernel_71be0a73_cuda_kernel_forward",
+  "write_2d_float_with_indices_c8fc99ca_cuda_kernel_forward"
+ ],
+ "trace_warp_launches": 19600,
+ "trace_warp_gpu_us": 97728.03100000035,
+ "trace_nonwarp_kernels_distinct": 60,
+ "trace_nonwarp_launches": 7800,
+ "trace_nonwarp_gpu_us": 8533.254000001234,
+ "graph_kernels_gpu_us_in_trace": 96310.0870000007,
+ "graph_kernel_launches_in_trace": 18720,
+ "sample_graph_kernels": [
+  "compute_shape_aabbs",
+  "_nxn_broadphase_precomputed_pairs",
+  "create_narrow_phase_primitive_kernel__locals__narrow_phase_primitive_kernel",
+  "create_narrow_phase_kernel_gjk_mpr__locals__narrow_phase_kernel_gjk_mpr",
+  "verify_narrow_phase_buffers",
+  "apply_mjc_control_kernel",
+  "apply_mjc_qfrc_kernel",
+  "apply_mjc_body_f_kernel",
+  "apply_mjc_free_joint_f_to_body_f_kernel",
+  "convert_warp_coords_to_mj_kernel",
+  "_Z20memtile_value_kernelIiEvPT_S0_m",
+  "convert_newton_contacts_to_mjwarp_kernel",
+  "_snapshot_nacon_count",
+  "_kinematics_branch",
+  "_compute_body_matrices",
+  "_compute_body_inertial_frames",
+  "_geom_local_to_global",
+  "_subtree_com_init",
+  "_subtree_com_acc",
+  "_subtree_div",
+  "_cinert",
+  "_cdof",
+  "_crb_accumulate",
+  "_M",
+  "_zero_constraint_counts",
+  "_friction_dof__locals__kernel",
+  "_limit_slide_hinge__locals__kernel",
+  "_efc_contact_init__locals__kernel",
+  "_efc_contact_jac_sparse__locals__kernel",
+  "_efc_contact_update__locals__kernel",
+  "_transmission",
+  "_actuator_velocity",
+  "_comvel_root",
+  "_comvel_branch",
+  "_spring_damper_dof_passive",
+  "_gravity_force",
+  "_qfrc_passive",
+  "_cacc_world",
+  "_cacc_branch",
+  "_cfrc"
+ ],
+ "top_graph_kernels_by_gpu_time": [
+  [
+   "_tile_cholesky_factorize_solve_block__locals__kernel",
+   320,
+   14594.5
+  ],
+  [
+   "create_eval_articulation_fk_tile__locals__eval_articulation_fk_tile",
+   160,
+   7348.6
+  ],
+  [
+   "_crb_accumulate",
+   1920,
+   5936.7
+  ],
+  [
+   "_linesearch_jv_fused_kernel__locals__kernel",
+   160,
+   4043.2
+  ],
+  [
+   "_cfrc_backward",
+   1920,
+   3993.1
+  ],
+  [
+   "create_narrow_phase_kernel_gjk_mpr__locals__narrow_phase_kernel_gjk_mpr",
+   80,
+   3824.6
+  ],
+  [
+   "_next_position",
+   160,
+   3739.5
+  ],
+  [
+   "_limit_slide_hinge__locals__kernel",
+   160,
+   3726.2
+  ],
+  [
+   "_kinematics_branch",
+   160,
+   3074.5
+  ],
+  [
+   "convert_warp_coords_to_mj_kernel",
+   160,
+   3028.2
+  ],
+  [
+   "_subtree_com_acc",
+   1920,
+   2928.6
+  ],
+  [
+   "_update_gradient_cholesky_blocked__locals__kernel",
+   160,
+   2770.3
+  ],
+  [
+   "_efc_contact_jac_sparse__locals__kernel",
+   160,
+   2559.3
+  ],
+  [
+   "_comvel_branch",
+   160,
+   1765.1
+  ],
+  [
+   "_apply_ft",
+   160,
+   1736.7
+  ]
+ ],
+ "top_nonwarp_kernels": [
+  [
+   "Memset (Unknown)",
+   1520,
+   1071.4
+  ],
+  [
+   "void at::native::index_elementwise_kernel<128, 4, at::native::gpu_index_kernel<at::native:",
+   380,
+   657.0
+  ],
+  [
+   "memset32",
+   640,
+   593.7
+  ],
+  [
+   "memcpy32_post",
+   560,
+   487.3
+  ],
+  [
+   "void at::native::vectorized_elementwise_kernel<4, at::native::CUDAFunctor_add<float>, std:",
+   360,
+   423.1
+  ],
+  [
+   "void at::native::reduce_kernel<512, 1, at::native::ReduceOp<float, at::native::func_wrappe",
+   240,
+   382.1
+  ],
+  [
+   "set_conditional_if_handle_kernel",
+   320,
+   359.1
+  ],
+  [
+   "void memtile_value_kernel<int>(int*, int, unsigned long)",
+   480,
+   353.5
+  ]
+ ],
+ "trace_warp_kernels_not_in_graph_top": [
+  [
+   "update_contact_sensor_kernel",
+   80,
+   282.7
+  ],
+  [
+   "_qfrc_constraint_from_grad",
+   160,
+   166.6
+  ],
+  [
+   "compute_implicit_actuator_batch",
+   80,
+   160.5
+  ],
+  [
+   "get_body_com_acc_from_body_com_vel_ordered",
+   80,
+   150.1
+  ],
+  [
+   "copy_from_newton_kernel",
+   80,
+   147.0
+  ],
+  [
+   "update_timestamp_kernel",
+   80,
+   109.7
+  ],
+  [
+   "get_joint_acc_from_joint_vel",
+   80,
+   100.0
+  ],
+  [
+   "write_2d_float_with_indices",
+   80,
+   97.8
+  ],
+  [
+   "update_outdated_envs_kernel",
+   80,
+   97.1
+  ],
+  [
+   "quat_apply_inverse_1D_kernel",
+   40,
+   45.1
+  ]
+ ]
+}
