@@ -361,6 +361,22 @@ class RewardsR8f(RewardsR8):
     prop = RewTerm(func=prop_force, weight=-2.0)
 
 
+def stance_excess(env, free=0.45, full=0.90, pelvis_h=0.40):
+    """Distance between the feet above `free` m, scaled to 1 at `full` m, once the pelvis is above `pelvis_h` (lying and early rising stay free)."""
+    r = env.scene["robot"]
+    if not hasattr(env, "_st_feet"):
+        env._st_feet = [r.body_names.index("left_ankle_roll_link"), r.body_names.index("right_ankle_roll_link")]
+    p = r.data.body_pos_w.torch[:, env._st_feet, :2]; d = torch.linalg.norm(p[:, 0] - p[:, 1], dim=-1)
+    h = r.data.root_pos_w.torch[:, 2] - env.scene.env_origins[:, 2]
+    return (h > pelvis_h).float() * torch.clamp((d - free) / (full - free), 0.0, 1.0)
+
+
+@configclass
+class RewardsR8w(RewardsR8):
+    """E5: R8 + stance-width penalty (single change vs R8)."""
+    stance = RewTerm(func=stance_excess, weight=-5.0)
+
+
 class SettleJointPositionAction(JointPositionAction):
     """For the first `settle_steps` control steps of an episode the target follows the measured joint position: stiffness does no work and only joint damping acts, so the robot settles passively under gravity."""
 
@@ -411,3 +427,10 @@ class G1RecoveryR8pEnvCfg(G1RecoveryBaseEnvCfg):
     """E2: R8, prone family only (phi 90 +- 30 deg), 30-step passive settle."""
     def __post_init__(self):
         super().__post_init__(); _r8(self, RewardsR8, phi_deg=(90.0, 30.0), settle=30)
+
+
+@configclass
+class G1RecoveryR8wEnvCfg(G1RecoveryBaseEnvCfg):
+    """E5: R8 + stance-width penalty."""
+    def __post_init__(self):
+        super().__post_init__(); _r8(self, RewardsR8w)

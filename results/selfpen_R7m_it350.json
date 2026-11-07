@@ -1,0 +1,137 @@
+{
+ "which": "v21",
+ "robots": 22,
+ "depth_threshold_m": 0.02,
+ "pairs_checked": 603,
+ "sampled_hz": 10,
+ "robots_clean": 10,
+ "robots_le_3pct_frames": 22,
+ "max_depth_p50": 0.0234,
+ "top_pairs": {
+  "left_ankle_roll_link|left_four_link": 8,
+  "right_hip_pitch_link|right_palm_link": 4,
+  "right_one_link|right_hip_pitch_link": 3,
+  "left_ankle_roll_link|left_three_link": 2,
+  "right_hip_pitch_link|right_elbow_roll_link": 2,
+  "right_hip_roll_link|right_palm_link": 2,
+  "right_hip_roll_link|right_three_link": 2,
+  "right_one_link|right_hip_roll_link": 2,
+  "right_hip_roll_link|right_two_link": 2,
+  "left_one_link|left_hip_roll_link": 1,
+  "left_hip_roll_link|left_elbow_roll_link": 1,
+  "left_hip_roll_link|left_palm_link": 1
+ },
+ "per_env": {
+  "4": {
+   "max_depth_m": 0.0053,
+   "frames_over_depth": 0,
+   "frac_frames": 0.0
+  },
+  "5": {
+   "max_depth_m": 0.0133,
+   "frames_over_depth": 0,
+   "frac_frames": 0.0
+  },
+  "13": {
+   "max_depth_m": 0.0511,
+   "frames_over_depth": 1,
+   "frac_frames": 0.01
+  },
+  "18": {
+   "max_depth_m": 0.024,
+   "frames_over_depth": 2,
+   "frac_frames": 0.02
+  },
+  "25": {
+   "max_depth_m": 0.0481,
+   "frames_over_depth": 2,
+   "frac_frames": 0.02
+  },
+  "53": {
+   "max_depth_m": 0.0465,
+   "frames_over_depth": 1,
+   "frac_frames": 0.01
+  },
+  "73": {
+   "max_depth_m": 0.0355,
+   "frames_over_depth": 1,
+   "frac_frames": 0.01
+  },
+  "94": {
+   "max_depth_m": 0.0442,
+   "frames_over_depth": 1,
+   "frac_frames": 0.01
+  },
+  "105": {
+   "max_depth_m": 0.0234,
+   "frames_over_depth": 1,
+   "frac_frames": 0.01
+  },
+  "106": {
+   "max_depth_m": 0.0398,
+   "frames_over_depth": 1,
+   "frac_frames": 0.01
+  },
+  "113": {
+   "max_depth_m": -0.0,
+   "frames_over_depth": 0,
+   "frac_frames": 0.0
+  },
+  "125": {
+   "max_depth_m": 0.0234,
+   "frames_over_depth": 3,
+   "frac_frames": 0.03
+  },
+  "129": {
+   "max_depth_m": 0.0039,
+   "frames_over_depth": 0,
+   "frac_frames": 0.0
+  },
+  "133": {
+   "max_depth_m": 0.0004,
+   "frames_over_depth": 0,
+   "frac_frames": 0.0
+  },
+  "141": {
+   "max_depth_m": 0.0187,
+   "frames_over_depth": 0,
+   "frac_frames": 0.0
+  },
+  "160": {
+   "max_depth_m": 0.027,
+   "frames_over_depth": 1,
+   "frac_frames": 0.01
+  },
+  "185": {
+   "max_depth_m": 0.008,
+   "frames_over_depth": 0,
+   "frac_frames": 0.0
+  },
+  "201": {
+   "max_depth_m": 0.0197,
+   "frames_over_depth": 0,
+   "frac_frames": 0.0
+  },
+  "210": {
+   "max_depth_m": 0.0007,
+   "frames_over_depth": 0,
+   "frac_frames": 0.0
+  },
+  "236": {
+   "max_depth_m": -0.0,
+   "frames_over_depth": 0,
+   "frac_frames": 0.0
+  },
+  "241": {
+   "max_depth_m": 0.0544,
+   "frames_over_depth": 1,
+   "frac_frames": 0.01
+  },
+  "242": {
+   "max_depth_m": 0.0245,
+   "frames_over_depth": 3,
+   "frac_frames": 0.03
+  }
+ },
+ "note": "Convex-hull upper bound on depth, sampled at 10 Hz; fast crossings can be missed."
+}

@@ -1,5 +1,5 @@
 # G1 Locomotion Lab (integrated, PRIVATE, local only): STATUS
-_Updated 2026-11-07 00:00 MST._ Nothing here has been pushed; the public repo `g1-locomotion-lab` is unchanged and must not receive private content without Kaleb's review.
+_Updated 2026-11-07 00:16 MST._ Nothing here has been pushed; the public repo `g1-locomotion-lab` is unchanged and must not receive private content without Kaleb's review.
 
 ## Goal
 Simulated Unitree G1 (Isaac Lab 3.0.0, Newton/MJWarp): walk -> fall -> recover unassisted -> stable stand -> resume walking/turning. Targets: >=50% plausible unassisted recoveries on a fixed held-out set; >=50% recovery->walking chains; stretch: continuous walk->push->fall->recover->walk/turn. These are goals, not results.
@@ -10,11 +10,13 @@ Simulated Unitree G1 (Isaac Lab 3.0.0, Newton/MJWarp): walk -> fall -> recover u
 - Evaluator fixed (it used the legacy stand tracker, 1 m Euclidean displacement, no heading/speed/plausibility): `recovery/g1_recovery/metrics.py` + 13 passing tests; protocol v2, then v2.1 (hard-limit excursions, headline metric `plausible_v21`), frozen in `EVAL_PROTOCOL.md` (DEV/HELDOUT/TEST sets in `recovery/sets/`; position-limit validity added).
 - **Recovery:** NO plausible unassisted recovery under protocol v2. The earlier "2/256" (V11) fails v2 (joint position limits violated on 51% of steps); the seed-3 replicate has 0 supported stands on HELDOUT_v2 (assist off or on). A8c's 256/256 and A6's 4/256 chain are rejected (launch exploit).
 
-## Running (Isaac MCP, 16384 envs, seed 3, no assist; monitor: `python3 recovery/scripts/mon.py 215641 2252 2352`)
+## Running (Isaac MCP, 16384 envs, seed 3, no assist; monitor: `python3 recovery/scripts/mon.py 2252 2352 0013`)
 - v15, unchanged: `20261106-215641` R6c control; `-225219` R7u; `-225220` R7h; `-225222` R7m; `-225224` R7u warm.
+- v16 addition: `20261107-001356` R8w (E5 stance penalty, scratch); `-001359` R8w warm from R7m it500. R6c finished at iteration 1000.
 - v16, from the independent review: `20261106-235212` R8 control; `-235213` R8f (E1); `-235215` R8s (E2 supine); `-235216` R8p (E2 prone).
 Check rule for v16: DEV at iteration 300 with video, then audit any pass with `diag_trace.py` + `audit_trace.py`. HELDOUT only for the final comparison (3 evaluations each); TEST untouched.
 **Best verified result: no valid get-up.** R7m iteration 350 passes v2.1 on 21-29 of 256 DEV poses but is not counted: wide straddle (feet 0.88 m apart), drops to a kneel at about 8 s, torque above Unitree's limits, none supine, and iteration 400 scores 0. Details in `EXPERIMENT_LOG.md`.
+**Closest behaviour:** R7m and R7h iteration 500 hold a stable wide straddle from all directions (strict 255 and 256 of 256) but score 0 under v2.1, with an ankle roll at its hard stop on 75-83% of steps. Not counted.
 **Pending approval:** Amendment 3 draft in `EVAL_PROTOCOL.md`.
 
 ## Notes
@@ -26,7 +28,7 @@ Check rule for v16: DEV at iteration 300 with video, then audit any pass with `d
 - `docs/figures/recovery_system_dark.png`, `docs/figures/network_architecture_dark.png` (sources: `docs/*_diagram.html`).
 
 ## Next
-1. Finish Amendment 3 re-evaluation of existing checkpoints (`results/a3_*`, `results/selfpen_*`).
+1. R8w warm: DEV after 100 new iterations; is the stance narrowing, and does it hold a stand?
 2. v16 DEV check at iteration 300; compare E1 and E2 with R8, per direction.
 3. E3 after stable supported stands; E4 (real torque limits) if approved; two more seeds for any winner.
 4. Stage 2 chain only after a stand passes the agreed criteria.

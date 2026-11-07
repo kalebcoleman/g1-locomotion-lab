@@ -111,3 +111,35 @@ Reviewer claims confirmed in code before acting: R1-R7 stand bonus uses the pelv
 Deviations from the review: control is R8 (with the stand fix), not an exact R7m replicate; the running R7m serves as R8's control. E2 changes two things together, as specified. Settle sets the target to the measured joint position instead of zero action, because zero action would drive stiffly to the default pose; target updates at 50 Hz, so stiffness isn't fully off (mean of per-robot largest joint torque over the 30 steps: 11 Nm, against 32-68 Nm afterwards).
 Verified on simulator states (`recovery/scripts/verify_r8.py`, `runs/verify_R8*.log`): family sampling (gravity along body x -0.94 supine, +0.94 prone), feet share 0.997 during supported stands, stand bonus 0 when unsupported, prop force 0 during those stands.
 Queued: E3 exploration schedule after stable supported stands. Proposed, not started: E4 train with Unitree's real torque limits, because nothing can pass 3a at scale while the model allows 300 Nm; E5 a stance-width term if the straddle returns.
+
+## Amendment 3 re-evaluation (2026-11-07 00:07, DEV, assist off; `results/a3_*`, `results/selfpen_R7m_it350.json`)
+Headline stays v2.1. Columns: v2.1, strict 2 s, v2.1 + torque (3a), v2.1 + all draft clauses, strict + still supported in the final second, robots within torque limits, soft %, hard %, rising-window seconds.
+| checkpoint | v2.1 | strict | +3a | all | strict + persists | torque OK | soft | hard | rise s |
+|---|---|---|---|---|---|---|---|---|---|
+| R7m it350 run 1 | 24 | 73 | 0 | 0 | 3 | 6 | 5.9 | 1.88 | 4.94 |
+| R7m it350 run 2 | 28 | 67 | 0 | 0 | 2 | 6 | 6.0 | 1.87 | 5.03 |
+| R7m it350 run 3 | 18 | 74 | 0 | 0 | 7 | 6 | 6.2 | 1.98 | 5.17 |
+| R7m it300 | 0 | 0 | 0 | 0 | 0 | 0 | 10.8 | 2.18 | - |
+| R7m it400 | 0 | 2 | 0 | 0 | 0 | 25 | 36.0 | 14.89 | 4.97 |
+| R7m it450 | 0 | 161 | 0 | 0 | 84 | 20 | 58.0 | 25.78 | 2.80 |
+| R7m it500 | 0 | 255 | 0 | 0 | 255 | 2 | 93.6 | 75.89 | 1.46 |
+| R7h it400 | 0 | 0 | 0 | 0 | 0 | 0 | 62.8 | 37.41 | - |
+| R7h it450 | 0 | 251 | 0 | 0 | 127 | 0 | 88.5 | 83.78 | 1.79 |
+| R7h it500 | 0 | 256 | 0 | 0 | 256 | 29 | 94.5 | 83.17 | 1.08 |
+| R7u it300 | 0 | 0 | 0 | 0 | 0 | 0 | 41.1 | 7.21 | - |
+| R7u warm it650 | 0 | 0 | 0 | 0 | 0 | 0 | 56.2 | 1.20 | - |
+| R6c it300 | 0 | 0 | 0 | 0 | 0 | 71 | 22.2 | 0.91 | - |
+| R6c it750 | 0 | 0 | 0 | 0 | 0 | 1 | 0.3 | 0.04 | - |
+| V11 assist it599 | 0 | 2 | 0 | 0 | 2 | 0 | 52.7 | 34.63 | 5.51 |
+R7m it350 across five evaluations: v2.1 18-29, strict 67-76.
+Self-penetration screen, a later R7m it350 trace: 22 of 22 v2.1 robots pass 3b (over 2 cm on at most 3% of frames), 10 have none; median worst depth 2.3 cm; most frequent pairs are ankle against fingers and hip against palm. Upper bound at 10 Hz.
+Rising window, R7m it350 strict robots: soft 8-9% of steps, hard about 1%, torque above Unitree's limits on about 15% (run-level means over 5 s, against about 10% over the whole episode).
+
+**R7m and R7h at iteration 500: a stable straddle, v2.1 = 0 (`media/20261107_001_*`, `runs/traces/R7[hm]_it500.npz`).** Strict supported stand on 255/256 and 256/256, all four directions, rising in about 1-1.5 s, still up at the end, no contact except the feet, pelvis 0.70 and 0.67 m, up 0.95 and 0.98, speed under 0.05 m/s. It fails v2.1 because one ankle roll sits at its hard stop (+-0.262 rad) on 75-83% of steps, 0.011-0.017 rad past it (95th percentile). The stance is why: feet 0.72 and 0.89 m apart at the end, so the foot lies flat only with the ankle at its stop. Also fails 3a and 3d; it passes 3c. Not counted, and the criteria are not being relaxed for it. It's the closest behaviour so far.
+
+## v16 addition (launched 00:13): E5 stance-width penalty, because the straddle returned
+`stance_excess`: distance between the feet above 0.45 m, scaled to 1 at 0.90 m, above 0.40 m pelvis height; weight -5. Hypothesis: the wide stance is the cheapest stable stand, and narrowing it also removes the ankle-roll stop. Failure modes: refuses to rise, or returns to the fold (the fast splay is its route up). Verified on real states from R7m it500: penalty 0.75-0.98 during supported stands, so it does act on this behaviour.
+| job | task | change | control |
+|---|---|---|---|
+| `20261107-001356` | R8w | R8 + stance penalty, scratch | R8 |
+| `20261107-001359` | R8w warm | Same reward, starting from R7m it500 (`init/R7m_stand_it500.pt`, sha256 7c0b249e72f454f8...), fresh optimiser, 500 iterations | Continuing R7m. Separate arm: its critic trained on a different reward |

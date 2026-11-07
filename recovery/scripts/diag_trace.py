@@ -47,7 +47,7 @@ with launch_simulation(env_cfg, args):
     body_j = torch.tensor([not K.is_hand_joint(n) for n in r.joint_names], device=dev)
     org = u.scene.env_origins
     tr = {k: [] for k in ["h", "up", "spd", "vz", "foot_z_max", "stance", "soft_ex", "hard_ex", "tau_ratio", "supp", "x", "y", "tau_over"] + ["f_" + g for g in G]}
-    body_p, body_q = [], []; tau_max = torch.zeros(N, len(r.joint_names), device=dev); tau_over_j = torch.zeros(N, len(r.joint_names), device=dev)
+    body_p, body_q = [], []; tau_max = torch.zeros(N, len(r.joint_names), device=dev); tau_over_j = torch.zeros(N, len(r.joint_names), device=dev); hard_j = torch.zeros(N, len(r.joint_names), device=dev); hard_ex_j = torch.zeros(N, len(r.joint_names), device=dev); q_end = None
     for s in range(steps):
         with torch.inference_mode():
             obs, _, _, _ = env.step(policy(obs))
@@ -57,6 +57,7 @@ with launch_simulation(env_cfg, args):
         tau = r.data.applied_torque.torch.abs(); ratio = tau / lim_real
         over = (ratio > 1.0) & body_j
         tau_max = torch.maximum(tau_max, tau); tau_over_j += over.float()
+        _hx = torch.maximum(hl[..., 0] - q, q - hl[..., 1]).clamp(min=0) * body_j; hard_j += (_hx > 0).float(); hard_ex_j = torch.maximum(hard_ex_j, _hx); q_end = q.clone()
         tr["h"].append(h); tr["up"].append(up); tr["spd"].append(torch.linalg.norm(v, dim=-1)); tr["vz"].append(v[:, 2])
         tr["foot_z_max"].append((pf[:, :, 2] - org[:, 2:3]).max(-1).values); tr["stance"].append(torch.linalg.norm(pf[:, 0, :2] - pf[:, 1, :2], dim=-1))
         tr["soft_ex"].append((torch.maximum(sl[..., 0] - q, q - sl[..., 1]).clamp(min=0) * body_j).max(-1).values)
@@ -74,7 +75,7 @@ with launch_simulation(env_cfg, args):
     out = {k: torch.stack(v, 0).float().cpu().numpy().astype(np.float32) for k, v in tr.items()}
     out.update(strict=t.succ_s.cpu().numpy(), v2=v2.cpu().numpy(), v21=v21.cpu().numpy(), succ_start_s=t.succ_start_s.cpu().numpy(), assist_force_steps=(u._assist_log["force_steps"].cpu().numpy() if af is not None else np.zeros(N)),
                vel_frac=(t.vel_viol_steps.float() / n_steps).cpu().numpy(), flight_frac=(t.flight_steps.float() / n_steps).cpu().numpy(), soft_frac=(t.viol_steps.float() / n_steps).cpu().numpy(),
-               hard_frac=(t.hard_viol_steps.float() / n_steps).cpu().numpy(), hard_excess=t.hard_excess_max.cpu().numpy(), peak_vz=t.peak_vz.cpu().numpy(), tau_max=tau_max.cpu().numpy(), tau_over_frac_j=(tau_over_j / n_steps).cpu().numpy(),
+               hard_frac=(t.hard_viol_steps.float() / n_steps).cpu().numpy(), hard_excess=t.hard_excess_max.cpu().numpy(), peak_vz=t.peak_vz.cpu().numpy(), tau_max=tau_max.cpu().numpy(), tau_over_frac_j=(tau_over_j / n_steps).cpu().numpy(), hard_frac_j=(hard_j / n_steps).cpu().numpy(), hard_ex_j=hard_ex_j.cpu().numpy(), q_end=q_end.cpu().numpy(), hard_lo=r.data.joint_pos_limits.torch[0, :, 0].cpu().numpy(), hard_hi=r.data.joint_pos_limits.torch[0, :, 1].cpu().numpy(),
                body_p=np.stack(body_p).astype(np.float32), body_q=np.stack(body_q).astype(np.float32), category=u._rec_fixed["category"][torch.arange(N, device=dev) % u._rec_fixed["z"].shape[0]].cpu().numpy(), dt=u.step_dt,
                joint_names=np.array(r.joint_names), body_names=np.array(r.body_names), lim_real=lim_real.cpu().numpy())
     # collision geometry of one robot, for the offline self-penetration check
