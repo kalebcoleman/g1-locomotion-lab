@@ -1,7 +1,10 @@
 <!doctype html>
 <html><head><meta charset="utf-8"><title>G1 recovery system</title>
 <style>
-  svg{width:100%;height:auto;display:block;font-family:var(--font-sans,system-ui,sans-serif)}
+  :root{--background:#0a0a0b;--foreground:#f4f4f5;--muted-foreground:#a1a1aa;--card:#121214;--border:#2e2e33;--chart-1:#3f73e6;--success:#1fb57f;--destructive:#ef4444;--warning:#f59e0b;--font-sans:Inter,'Helvetica Neue',Arial,system-ui,sans-serif}
+  html,body{margin:0;background:var(--background);color:var(--foreground);font-family:var(--font-sans)}
+  body{padding:20px}
+    svg{width:100%;height:auto;display:block;font-family:var(--font-sans,system-ui,sans-serif)}
   .box{fill:var(--card,#fff);stroke:var(--border,#bbb);stroke-width:1.2}
   .ours{fill:var(--card,#fff);stroke:var(--chart-1,#2a78d6);stroke-width:2}
   .up{fill:var(--card,#fff);stroke:var(--muted-foreground,#777);stroke-width:1.2;stroke-dasharray:4 3}
@@ -13,7 +16,6 @@
   .al{fill:var(--muted-foreground,#555);font-size:11px}
   .chip{font-size:11px;font-weight:600}
   .ok{fill:var(--success,#1a7f37)} .no{fill:var(--destructive,#c0392b)} .wait{fill:var(--warning,#b7791f)}
-  .l1{fill:var(--chart-1,#2a78d6);opacity:.16}.l2{fill:var(--chart-1,#2a78d6);opacity:.3}
   h3{font-size:13px;font-weight:600;margin:0 0 6px}
 </style></head><body>
 <svg viewBox="0 0 720 860" role="img" aria-label="Recovery system: simulation, observations, recovery and walking policies, hand-over rule, joint targets; PPO training loop; evaluation">
@@ -49,11 +51,10 @@
 
 <path class="a" d="M320,242 H400"/>
 <text class="al" x="326" y="236">one-way</text>
-<rect class="box" x="225" y="292" width="270" height="52" rx="8"/>
-<text class="t" x="360" y="312" text-anchor="middle">Hand-over rule</text>
+<rect class="box" x="205" y="292" width="310" height="52" rx="8"/>
+<text class="t" x="360" y="312" text-anchor="middle">Hand-over rule <tspan class="chip wait">(not validated yet)</tspan></text>
 <text class="s" x="360" y="330" text-anchor="middle">supported stand held 2 s, measured in the simulator</text>
 <path d="M360,292 V246" stroke="var(--foreground,#111)" stroke-width="1" stroke-dasharray="3 3" fill="none"/>
-<text class="chip wait" x="505" y="322">Not validated yet</text>
 
 <path class="a" d="M170,278 V358 H300"/><path class="a" d="M550,278 V358 H420"/>
 <rect class="up" x="300" y="346" width="120" height="30" rx="6"/>
@@ -125,21 +126,4 @@
 <path class="a" d="M220,754 H240"/><path class="a" d="M520,754 H540"/>
 </svg>
 
-<h3 style="margin-top:18px">Network architecture (fully connected, ELU activation; actor and critic share no weights)</h3>
-<svg viewBox="0 0 720 150" role="img" aria-label="Actor 123 to 256 to 128 to 128 to 37; critic 123 to 256 to 128 to 128 to 1">
-<text class="t" x="0" y="20">Actor (policy)</text><text class="s" x="110" y="20">85,962 parameters</text>
-<g><rect class="box" x="0" y="30" width="96" height="40" rx="6"/><text class="s" x="48" y="55" text-anchor="middle">input 123</text>
-<rect class="ours" x="124" y="30" width="96" height="40" rx="6"/><text class="s" x="172" y="55" text-anchor="middle">256</text>
-<rect class="ours" x="248" y="30" width="96" height="40" rx="6"/><text class="s" x="296" y="55" text-anchor="middle">128</text>
-<rect class="ours" x="372" y="30" width="96" height="40" rx="6"/><text class="s" x="420" y="55" text-anchor="middle">128</text>
-<rect class="box" x="496" y="30" width="224" height="40" rx="6"/><text class="s" x="608" y="55" text-anchor="middle">37 action means + 37 learned noise levels</text>
-<path class="a" d="M96,50 H124"/><path class="a" d="M220,50 H248"/><path class="a" d="M344,50 H372"/><path class="a" d="M468,50 H496"/></g>
-<text class="t" x="0" y="96">Critic (value)</text><text class="s" x="110" y="96">81,281 parameters; used in training only</text>
-<g><rect class="box" x="0" y="106" width="96" height="40" rx="6"/><text class="s" x="48" y="131" text-anchor="middle">input 123</text>
-<rect class="ours" x="124" y="106" width="96" height="40" rx="6"/><text class="s" x="172" y="131" text-anchor="middle">256</text>
-<rect class="ours" x="248" y="106" width="96" height="40" rx="6"/><text class="s" x="296" y="131" text-anchor="middle">128</text>
-<rect class="ours" x="372" y="106" width="96" height="40" rx="6"/><text class="s" x="420" y="131" text-anchor="middle">128</text>
-<rect class="box" x="496" y="106" width="224" height="40" rx="6"/><text class="s" x="608" y="131" text-anchor="middle">1 value estimate</text>
-<path class="a" d="M96,126 H124"/><path class="a" d="M220,126 H248"/><path class="a" d="M344,126 H372"/><path class="a" d="M468,126 H496"/></g>
-</svg>
 </body></html>

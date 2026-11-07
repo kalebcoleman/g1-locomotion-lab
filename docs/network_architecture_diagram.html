@@ -1,0 +1,39 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>G1 policy networks</title>
+<style>
+  :root{--background:#0a0a0b;--foreground:#f4f4f5;--muted-foreground:#a1a1aa;--card:#121214;--border:#2e2e33;--chart-1:#3f73e6;--success:#1fb57f;--destructive:#ef4444;--warning:#f59e0b;--font-sans:Inter,'Helvetica Neue',Arial,system-ui,sans-serif}
+  html,body{margin:0;background:var(--background);color:var(--foreground);font-family:var(--font-sans)}
+  body{padding:20px}
+    svg{width:100%;height:auto;display:block;font-family:var(--font-sans,system-ui,sans-serif)}
+  .box{fill:var(--card,#fff);stroke:var(--border,#bbb);stroke-width:1.2}
+  .ours{fill:var(--card,#fff);stroke:var(--chart-1,#2a78d6);stroke-width:2}
+  .up{fill:var(--card,#fff);stroke:var(--muted-foreground,#777);stroke-width:1.2;stroke-dasharray:4 3}
+  .zone{fill:none;stroke:var(--border,#bbb);stroke-width:1;stroke-dasharray:2 4}
+  .t{fill:var(--foreground,#111);font-size:13px;font-weight:600}
+  .s{fill:var(--muted-foreground,#555);font-size:11.5px}
+  .z{fill:var(--muted-foreground,#555);font-size:11.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+  .a{stroke:var(--foreground,#111);stroke-width:1.4;fill:none;marker-end:url(#h)}
+  .al{fill:var(--muted-foreground,#555);font-size:11px}
+  .chip{font-size:11px;font-weight:600}
+  .ok{fill:var(--success,#1a7f37)} .no{fill:var(--destructive,#c0392b)} .wait{fill:var(--warning,#b7791f)}
+  h3{font-size:13px;font-weight:600;margin:0 0 6px}
+</style></head><body>
+<h3 style="margin-top:0">Network architecture (fully connected, ELU activation; actor and critic share no weights)</h3>
+<svg viewBox="0 0 720 150" role="img" aria-label="Actor 123 to 256 to 128 to 128 to 37; critic 123 to 256 to 128 to 128 to 1">
+<defs><marker id="h" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="var(--foreground,#111)"/></marker></defs>
+<text class="t" x="0" y="20">Actor (policy)</text><text class="s" x="110" y="20">85,962 parameters</text>
+<g><rect class="box" x="0" y="30" width="96" height="40" rx="6"/><text class="s" x="48" y="55" text-anchor="middle">input 123</text>
+<rect class="ours" x="124" y="30" width="96" height="40" rx="6"/><text class="s" x="172" y="55" text-anchor="middle">256</text>
+<rect class="ours" x="248" y="30" width="96" height="40" rx="6"/><text class="s" x="296" y="55" text-anchor="middle">128</text>
+<rect class="ours" x="372" y="30" width="96" height="40" rx="6"/><text class="s" x="420" y="55" text-anchor="middle">128</text>
+<rect class="box" x="496" y="30" width="224" height="40" rx="6"/><text class="s" x="608" y="55" text-anchor="middle">37 action means + 37 learned noise levels</text>
+<path class="a" d="M96,50 H124"/><path class="a" d="M220,50 H248"/><path class="a" d="M344,50 H372"/><path class="a" d="M468,50 H496"/></g>
+<text class="t" x="0" y="96">Critic (value)</text><text class="s" x="110" y="96">81,281 parameters; used in training only</text>
+<g><rect class="box" x="0" y="106" width="96" height="40" rx="6"/><text class="s" x="48" y="131" text-anchor="middle">input 123</text>
+<rect class="ours" x="124" y="106" width="96" height="40" rx="6"/><text class="s" x="172" y="131" text-anchor="middle">256</text>
+<rect class="ours" x="248" y="106" width="96" height="40" rx="6"/><text class="s" x="296" y="131" text-anchor="middle">128</text>
+<rect class="ours" x="372" y="106" width="96" height="40" rx="6"/><text class="s" x="420" y="131" text-anchor="middle">128</text>
+<rect class="box" x="496" y="106" width="224" height="40" rx="6"/><text class="s" x="608" y="131" text-anchor="middle">1 value estimate</text>
+<path class="a" d="M96,126 H124"/><path class="a" d="M220,126 H248"/><path class="a" d="M344,126 H372"/><path class="a" d="M468,126 H496"/></g>
+</svg>
+</body></html>
