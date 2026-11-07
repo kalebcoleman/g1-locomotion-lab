@@ -181,7 +181,7 @@ def get_bank(env):
 
 def get_levels(env):
     if not hasattr(env, "_rec_level"):
-        env._rec_level = torch.full((env.num_envs,), int(os.environ.get("G1R_START_LEVEL", "0")), device=env.device, dtype=torch.long)
+        env._rec_level = torch.full((env.num_envs,), int(getattr(env.cfg, "start_level", None) if getattr(env.cfg, "start_level", None) is not None else os.environ.get("G1R_START_LEVEL", "0")), device=env.device, dtype=torch.long)
     return env._rec_level
 
 

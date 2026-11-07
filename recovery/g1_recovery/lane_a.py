@@ -104,3 +104,51 @@ class G1RecoveryAAssistEnvCfg(G1RecoveryAEnvCfg):
         super().__post_init__()
         from .assist import add_assist
         add_assist(self)
+
+
+# ---------------------------------------------------------------------------------------------------------- baked recipes (no env vars; usable from `isaaclab__train`)
+@configclass
+class RewardsR1(RewardsA):
+    """R1 = the V11 recipe: Lane A task rewards + joint-velocity-limit penalty (10) + no-launch penalties (pelvis speed above 1 m/s, free flight; 5 each)."""
+    dof_vel_limits = RewTerm(func=mdp.joint_vel_limits, weight=-10.0, params={"soft_ratio": 0.9, "asset_cfg": _BODY})
+    launch_speed = RewTerm(func=pelvis_speed_excess, weight=-5.0)
+    flight = RewTerm(func=free_flight, weight=-5.0)
+
+
+@configclass
+class RewardsR2(RewardsR1):
+    """R2 = R1 + a strong joint-POSITION-limit penalty on body joints only (the V11/V12 policies sat at position limits on 40-50% of steps; hands excluded:
+    their default pose is outside their soft limits, so the old all-joints term was a constant offset)."""
+    dof_limits = None
+    dof_limits_body = RewTerm(func=mdp.joint_pos_limits, weight=-10.0, params={"asset_cfg": _BODY})
+
+
+def _recipe(cfg, rewards, assist_train, start_level):
+    from .assist import add_assist
+    cfg.rewards = rewards(); cfg.curriculum = CurrA(); add_assist(cfg)
+    cfg.assist_train = assist_train; cfg.start_level = start_level
+    return cfg
+
+
+@configclass
+class G1RecoveryR1EnvCfg(G1RecoveryBaseEnvCfg):
+    def __post_init__(self):
+        super().__post_init__(); _recipe(self, RewardsR1, True, 1)
+
+
+@configclass
+class G1RecoveryR1EvalEnvCfg(G1RecoveryBaseEnvCfg):
+    def __post_init__(self):
+        super().__post_init__(); _recipe(self, RewardsR1, False, 0)
+
+
+@configclass
+class G1RecoveryR2EnvCfg(G1RecoveryBaseEnvCfg):
+    def __post_init__(self):
+        super().__post_init__(); _recipe(self, RewardsR2, True, 1)
+
+
+@configclass
+class G1RecoveryR2EvalEnvCfg(G1RecoveryBaseEnvCfg):
+    def __post_init__(self):
+        super().__post_init__(); _recipe(self, RewardsR2, False, 0)

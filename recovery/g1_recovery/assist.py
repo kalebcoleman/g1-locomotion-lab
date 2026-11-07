@@ -26,7 +26,7 @@ TORSO = "torso_link"
 def _level(env):
     if not hasattr(env, "_assist_level"):
         init = 0.0
-        if os.environ.get("G1R_ASSIST_TRAIN", "0") == "1":
+        if os.environ.get("G1R_ASSIST_TRAIN", "0") == "1" or getattr(env.cfg, "assist_train", False):
             init = 1.0
         if os.environ.get("G1R_EVAL_ASSIST") is not None:
             init = float(os.environ["G1R_EVAL_ASSIST"])

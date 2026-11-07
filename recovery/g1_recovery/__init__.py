@@ -14,3 +14,8 @@ try:
                          "rsl_rl_cfg_entry_point": f"{__name__}.agents:RecPPOCfgB", "default_agent": "rsl_rl"})
 except Exception:
     pass
+
+
+for _id, _cls in (("G1-Recovery-R1-v0", "G1RecoveryR1EnvCfg"), ("G1-Recovery-R1-Eval-v0", "G1RecoveryR1EvalEnvCfg"), ("G1-Recovery-R2-v0", "G1RecoveryR2EnvCfg"), ("G1-Recovery-R2-Eval-v0", "G1RecoveryR2EvalEnvCfg")):
+    gym.register(id=_id, entry_point="isaaclab.envs:ManagerBasedRLEnv", disable_env_checker=True,
+                 kwargs={"env_cfg_entry_point": f"{__name__}.lane_a:{_cls}", "rsl_rl_cfg_entry_point": f"{__name__}.agents:RecPPOCfgR", "default_agent": "rsl_rl"})

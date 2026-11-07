@@ -21,3 +21,12 @@ class RecPPOCfgA(RecPPOCfg):
 @configclass
 class RecPPOCfgB(RecPPOCfg):
     lane = "b"
+
+
+@configclass
+class RecPPOCfgR(RecPPOCfg):
+    """Recipe agent: fixed learning rate 3e-4 (adaptive 1e-3 eroded warm-started policies), otherwise Isaac Lab's G1 flat PPO."""
+    lane = "r"
+    def __post_init__(self):
+        super().__post_init__()
+        self.algorithm.learning_rate = 3.0e-4; self.algorithm.schedule = "fixed"
