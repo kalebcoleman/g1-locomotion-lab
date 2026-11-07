@@ -231,6 +231,14 @@ Details and caveats: [`diagnostics/README.md`](diagnostics/README.md).
 - A controlled backend comparison: same seed, same iteration budget, same GPU load, idle machine for timing.
 - Train on rough terrain and test larger pushes.
 
+## Fall recovery (work in progress)
+
+Getting the same G1 up from lying on the ground, unassisted, so it can hand over to the walking policy. Videos, pictures and the system architecture are in [recovery/README.md](recovery/README.md).
+
+![Best recovery policy so far](recovery/media/20261107_03_R9hg_it1100_close_sheet.png)
+
+Best so far (2026-11-07): 127-129 of 256 held-out lying poses (49.6-50.4%) pass the full validity criteria (supported 2 s stand, no launch or flight, joint, torque and self-penetration limits, normal stance, still standing at the end, no assist), over three evaluations. One seed; uneven across fall directions (side B about 27%); the hand-over to walking is not tested yet.
+
 ## Repository layout
 
 ```
@@ -241,6 +249,7 @@ diagnostics/ GPU-physics check (script, trace summary, graph dump)
 results/   eval_summary.csv, 9 per-run JSON files, 1 rerun JSON, training_curves.csv, training_final_iteration.log
 configs/   resolved Isaac Lab / rsl_rl configuration of the training run
 media/     hero GIF, chart, architecture diagram, frame montage, one single-robot GIF
+recovery/  fall-recovery videos, contact sheets, plots and architecture (work in progress)
 ```
 
 ## Credits and licenses
