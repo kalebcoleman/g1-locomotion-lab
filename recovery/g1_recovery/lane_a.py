@@ -470,3 +470,28 @@ class G1RecoveryR9hEnvCfg(G1RecoveryBaseEnvCfg):
     """Direct attempt at criteria v3: RewardsR9h with Unitree's real torque limits, intended to warm-start from R7h."""
     def __post_init__(self):
         super().__post_init__(); _r8(self, RewardsR9h); real_torque_limits(self)
+
+
+def self_collisions_on(cfg, nconmax=160):
+    """Enable self-collision in Newton (the evaluator's 3b check found limbs passing through the body when it is off). The spawn config is copied so the shared G1_CFG stays untouched."""
+    import copy
+    from isaaclab_newton.sim.schemas.schemas_cfg import NewtonArticulationCfg
+    sp = copy.deepcopy(cfg.scene.robot.spawn)
+    sp.articulation_props = [NewtonArticulationCfg(self_collision_enabled=True) if isinstance(a, NewtonArticulationCfg) else a for a in sp.articulation_props]
+    cfg.scene.robot.spawn = sp
+    cfg.sim.physics.newton_mjwarp.solver_cfg.nconmax = nconmax
+    return cfg
+
+
+@configclass
+class G1RecoveryR9hcEnvCfg(G1RecoveryBaseEnvCfg):
+    """R9h with self-collision on (single change vs R9h), intended to warm-start from R9h."""
+    def __post_init__(self):
+        super().__post_init__(); _r8(self, RewardsR9h); real_torque_limits(self); self_collisions_on(self)
+
+
+@configclass
+class G1RecoveryR8wcEnvCfg(G1RecoveryBaseEnvCfg):
+    """R8w with real torque limits and self-collision on, intended to warm-start from R8w warm (two changes vs R8w)."""
+    def __post_init__(self):
+        super().__post_init__(); _r8(self, RewardsR8w); real_torque_limits(self); self_collisions_on(self)

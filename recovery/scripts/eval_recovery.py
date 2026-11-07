@@ -55,7 +55,7 @@ with launch_simulation(env_cfg, args):
     _fb = [r.body_names.index(n) for n in r.body_names if "ankle_roll" in n]; reached = torch.zeros(N, len(M.POSTURES), dtype=torch.bool, device=dev); _first = torch.full((N, len(M.POSTURES)), -1.0, device=dev)
     # Amendment 3 and rising-window measurements (additive; the v2.1 verdicts above them are unchanged)
     _lim = torch.tensor([M.real_torque_limit(n) for n in r.joint_names], device=dev); _bj = torch.isfinite(_lim); _org = u.scene.env_origins
-    _A = {k: [] for k in ["supp", "stance", "soft", "hard", "over"]}; _tmax = torch.zeros(N, device=dev)
+    _A = {k: [] for k in ["supp", "stance", "soft", "hard", "over", "air_last", "air_all"]}; _tmax = torch.zeros(N, device=dev)
     for s in range(steps):
         with torch.inference_mode():
             obs, _, dones, _ = env.step(policy(obs))
@@ -66,6 +66,8 @@ with launch_simulation(env_cfg, args):
         _pfeet = r.data.body_pos_w.torch[:, _fb, :2]; _A["stance"].append(torch.linalg.norm(_pfeet[:, 0] - _pfeet[:, 1], dim=-1)); _A["supp"].append(_pf[:, M.POSTURES.index("supported_stand_any")])
         _A["soft"].append(((torch.maximum(_sl[..., 0] - _q, _q - _sl[..., 1]) > 0) & _bj).any(-1)); _A["hard"].append(((torch.maximum(_hl[..., 0] - _q, _q - _hl[..., 1]) > 0) & _bj).any(-1)); _A["over"].append(((_ratio > 1.0) & _bj).any(-1))
         _tmax = torch.maximum(_tmax, (_ratio * _bj).max(-1).values)
+        _fh = torch.linalg.norm(_sens.data.net_forces_w_history.torch, dim=-1).sum(-1)    # (N, history) total contact force over the last physics substeps
+        _A["air_last"].append(_fh[:, 0] < 1.0); _A["air_all"].append((_fh < 1.0).all(-1))
     wall = time.time() - t0
     dt = u.step_dt; ok = t.succ
     res = dict(task=args.task, checkpoint=args.checkpoint, num_envs=N, episode_s=K.EPISODE_S, steps=steps, success_hold_s=K.HOLD_S,
@@ -114,16 +116,20 @@ with launch_simulation(env_cfg, args):
     _rise = torch.arange(steps, device=dev)[:, None] < _hs[None]; _rn = _rise.sum(0).clamp(min=1).float()    # steps from reset to the start of the counted hold
     _rf = {k: (_B[k] & _rise).sum(0).float() / _rn for k in ["soft", "hard", "over"]}
     a3a = plaus_v21 & _tq; a3full = a3a & _per & _st
+    # Proposed Amendment 4 (measurement): flight = no contact on ANY of the last physics substeps (sensor history), instead of the single latest substep
+    _air_all = _B["air_all"].sum(0).float() / steps; _air_last = _B["air_last"].sum(0).float() / steps
+    _v2_a4 = M.plausible_recovery(t.succ_s, t.vel_viol_steps, (_B["air_all"].sum(0)), t.viol_steps, t.peak_vz, steps, assist_on)
+    _v3_a4 = _v2_a4 & M.hard_limits_ok(t.hard_viol_steps, t.hard_excess_max, steps) & _tq & _per & _st
     _sv = lambda m, v: [round(float(x), 3) for x in v[m]] if m.any() else []
     res["amendment3"] = dict(status="Approved 2026-11-07: criteria v3 = v2.1 + 3a torque + 3c persistence + 3d stance here, and 3b self-penetration offline (selfpen_check.py). A v3 pass needs plausible_v3_before_selfpen and 3b.", real_limits=dict(M.REAL_TORQUE_LIMITS),
-        v21_and_torque=int(a3a.sum()), v21_torque_persist_stance=int(a3full.sum()), plausible_v3_before_selfpen=int(a3full.sum()), plausible_v3_before_selfpen_by_category={CAT: int(a3full[cat == i].sum()) for i, CAT in enumerate(K.CATEGORIES)}, v21_persist=int((plaus_v21 & _per).sum()), v21_stance=int((plaus_v21 & _st).sum()), strict_persist=int((t.succ_s & _per).sum()),
+        v21_and_torque=int(a3a.sum()), v21_torque_persist_stance=int(a3full.sum()), plausible_v3_before_selfpen=int(a3full.sum()), proposed_a4_flight_history=dict(history_len=int(_sens.data.net_forces_w_history.torch.shape[1]), flight_frac_latest_substep_mean=float(_air_last.mean()), flight_frac_all_substeps_mean=float(_air_all.mean()), v3_before_selfpen_with_a4=int(_v3_a4.sum()), v3_with_a4_by_category={CAT: int(_v3_a4[cat == i].sum()) for i, CAT in enumerate(K.CATEGORIES)}), plausible_v3_before_selfpen_by_category={CAT: int(a3full[cat == i].sum()) for i, CAT in enumerate(K.CATEGORIES)}, v21_persist=int((plaus_v21 & _per).sum()), v21_stance=int((plaus_v21 & _st).sum()), strict_persist=int((t.succ_s & _per).sum()),
         torque_ok_robots=int(_tq.sum()), torque_over_step_frac_mean=float((_over_steps.float() / steps).mean()), torque_ratio_max=float(_tmax.max()), torque_ratio_max_mean=float(_tmax.mean()), still_supported_final_s=int(_per.sum()),
         stance_hold_m_of_strict=_sv(t.succ_s, _stance)[:256], by_category_v21_torque={CAT: int(a3a[cat == i].sum()) for i, CAT in enumerate(K.CATEGORIES)},
         rise_window_of_strict=dict(seconds_mean=float((_rn[t.succ_s] * dt).mean()) if t.succ_s.any() else None, soft_frac_mean=float(_rf["soft"][t.succ_s].mean()) if t.succ_s.any() else None, hard_frac_mean=float(_rf["hard"][t.succ_s].mean()) if t.succ_s.any() else None, torque_over_frac_mean=float(_rf["over"][t.succ_s].mean()) if t.succ_s.any() else None,
                                   soft_le_10pct=int((_rf["soft"][t.succ_s] <= 0.10).sum()), hard_le_3pct=int((_rf["hard"][t.succ_s] <= 0.03).sum())))
     res["pose_set"] = os.path.basename(xa.heldout)
     res["postures_reached"] = {n: dict(envs=int(reached[:, i].sum()), first_time_s_mean=round(float(_first[:, i][reached[:, i]].mean()), 2) if reached[:, i].any() else None, by_category={CAT: int(reached[:, i][cat == j].sum()) for j, CAT in enumerate(K.CATEGORIES)}) for i, n in enumerate(M.POSTURES)}
-    res["per_env"] = dict(strict=ok_s.int().tolist(), v3_before_selfpen=a3full.int().tolist(), torque_over_frac=[round(float(x), 3) for x in (_over_steps.float() / steps)], persist_tail=[round(float(x), 3) for x in _tail], stance_hold=[round(float(x), 3) for x in _stance], plausible_v2=plaus_v2.int().tolist(), plausible_v21=plaus_v21.int().tolist(), vel_viol_frac=[round(float(x), 3) for x in vvf], flight_frac=[round(float(x), 3) for x in (t.flight_steps.float() / steps)],
+    res["per_env"] = dict(strict=ok_s.int().tolist(), v3_before_selfpen=a3full.int().tolist(), v3_a4_before_selfpen=_v3_a4.int().tolist(), flight_frac_all_substeps=[round(float(x), 3) for x in _air_all], torque_over_frac=[round(float(x), 3) for x in (_over_steps.float() / steps)], persist_tail=[round(float(x), 3) for x in _tail], stance_hold=[round(float(x), 3) for x in _stance], plausible_v2=plaus_v2.int().tolist(), plausible_v21=plaus_v21.int().tolist(), vel_viol_frac=[round(float(x), 3) for x in vvf], flight_frac=[round(float(x), 3) for x in (t.flight_steps.float() / steps)],
                           pos_viol_frac=[round(float(x), 3) for x in (t.viol_steps.float() / steps)], hard_viol_frac=[round(float(x), 3) for x in (t.hard_viol_steps.float() / steps)], hard_excess_max=[round(float(x), 3) for x in t.hard_excess_max], soft_excess_max=[round(float(x), 3) for x in t.soft_excess_max], peak_vz=[round(float(x), 2) for x in t.peak_vz], max_h=[round(float(x), 2) for x in t.max_h], best_supp_s=[round(float(x) * dt, 2) for x in t.best_run_s],
                           category=cat.int().tolist(), failure_cause=fc.int().tolist())
     json.dump(res, open(xa.out, "w"), indent=1)

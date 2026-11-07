@@ -1,0 +1,267 @@
+{
+ "which": "strict",
+ "robots": 48,
+ "depth_threshold_m": 0.02,
+ "pairs_checked": 603,
+ "sampled_hz": 10,
+ "robots_clean": 0,
+ "robots_le_3pct_frames": 0,
+ "max_depth_p50": 0.0689,
+ "top_pairs": {
+  "right_hip_roll_link|left_three_link": 3837,
+  "right_hip_pitch_link|left_four_link": 3730,
+  "right_hip_roll_link|left_palm_link": 3502,
+  "right_hip_roll_link|left_four_link": 3049,
+  "right_hip_pitch_link|left_three_link": 2895,
+  "torso_link|left_shoulder_yaw_link": 1967,
+  "left_shoulder_yaw_link|logo_link": 923,
+  "torso_link|left_two_link": 282,
+  "pelvis|left_two_link": 178,
+  "pelvis|left_six_link": 128,
+  "left_one_link|pelvis": 125,
+  "pelvis|left_five_link": 125
+ },
+ "per_env": {
+  "0": {
+   "max_depth_m": 0.1204,
+   "frames_over_depth": 96,
+   "frac_frames": 0.96
+  },
+  "1": {
+   "max_depth_m": 0.0763,
+   "frames_over_depth": 96,
+   "frac_frames": 0.96
+  },
+  "2": {
+   "max_depth_m": 0.0564,
+   "frames_over_depth": 92,
+   "frac_frames": 0.92
+  },
+  "3": {
+   "max_depth_m": 0.0618,
+   "frames_over_depth": 95,
+   "frac_frames": 0.95
+  },
+  "4": {
+   "max_depth_m": 0.05,
+   "frames_over_depth": 91,
+   "frac_frames": 0.91
+  },
+  "5": {
+   "max_depth_m": 0.0633,
+   "frames_over_depth": 94,
+   "frac_frames": 0.94
+  },
+  "6": {
+   "max_depth_m": 0.0918,
+   "frames_over_depth": 75,
+   "frac_frames": 0.75
+  },
+  "7": {
+   "max_depth_m": 0.0684,
+   "frames_over_depth": 78,
+   "frac_frames": 0.78
+  },
+  "8": {
+   "max_depth_m": 0.0671,
+   "frames_over_depth": 95,
+   "frac_frames": 0.95
+  },
+  "9": {
+   "max_depth_m": 0.0567,
+   "frames_over_depth": 94,
+   "frac_frames": 0.94
+  },
+  "10": {
+   "max_depth_m": 0.0688,
+   "frames_over_depth": 91,
+   "frac_frames": 0.91
+  },
+  "11": {
+   "max_depth_m": 0.0594,
+   "frames_over_depth": 92,
+   "frac_frames": 0.92
+  },
+  "12": {
+   "max_depth_m": 0.0565,
+   "frames_over_depth": 94,
+   "frac_frames": 0.94
+  },
+  "13": {
+   "max_depth_m": 0.0796,
+   "frames_over_depth": 96,
+   "frac_frames": 0.96
+  },
+  "14": {
+   "max_depth_m": 0.0937,
+   "frames_over_depth": 76,
+   "frac_frames": 0.76
+  },
+  "15": {
+   "max_depth_m": 0.0628,
+   "frames_over_depth": 71,
+   "frac_frames": 0.71
+  },
+  "16": {
+   "max_depth_m": 0.084,
+   "frames_over_depth": 95,
+   "frac_frames": 0.95
+  },
+  "17": {
+   "max_depth_m": 0.0618,
+   "frames_over_depth": 95,
+   "frac_frames": 0.95
+  },
+  "18": {
+   "max_depth_m": 0.0586,
+   "frames_over_depth": 92,
+   "frac_frames": 0.92
+  },
+  "19": {
+   "max_depth_m": 0.1057,
+   "frames_over_depth": 92,
+   "frac_frames": 0.92
+  },
+  "20": {
+   "max_depth_m": 0.0691,
+   "frames_over_depth": 95,
+   "frac_frames": 0.95
+  },
+  "21": {
+   "max_depth_m": 0.0786,
+   "frames_over_depth": 94,
+   "frac_frames": 0.94
+  },
+  "22": {
+   "max_depth_m": 0.0861,
+   "frames_over_depth": 86,
+   "frac_frames": 0.86
+  },
+  "23": {
+   "max_depth_m": 0.1162,
+   "frames_over_depth": 95,
+   "frac_frames": 0.95
+  },
+  "24": {
+   "max_depth_m": 0.1039,
+   "frames_over_depth": 95,
+   "frac_frames": 0.95
+  },
+  "25": {
+   "max_depth_m": 0.0781,
+   "frames_over_depth": 95,
+   "frac_frames": 0.95
+  },
+  "26": {
+   "max_depth_m": 0.0604,
+   "frames_over_depth": 94,
+   "frac_frames": 0.94
+  },
+  "27": {
+   "max_depth_m": 0.0733,
+   "frames_over_depth": 94,
+   "frac_frames": 0.94
+  },
+  "28": {
+   "max_depth_m": 0.0616,
+   "frames_over_depth": 96,
+   "frac_frames": 0.96
+  },
+  "29": {
+   "max_depth_m": 0.0725,
+   "frames_over_depth": 96,
+   "frac_frames": 0.96
+  },
+  "30": {
+   "max_depth_m": 0.0607,
+   "frames_over_depth": 94,
+   "frac_frames": 0.94
+  },
+  "31": {
+   "max_depth_m": 0.0627,
+   "frames_over_depth": 94,
+   "frac_frames": 0.94
+  },
+  "32": {
+   "max_depth_m": 0.0636,
+   "frames_over_depth": 94,
+   "frac_frames": 0.94
+  },
+  "33": {
+   "max_depth_m": 0.072,
+   "frames_over_depth": 95,
+   "frac_frames": 0.95
+  },
+  "34": {
+   "max_depth_m": 0.0643,
+   "frames_over_depth": 95,
+   "frac_frames": 0.95
+  },
+  "35": {
+   "max_depth_m": 0.0616,
+   "frames_over_depth": 94,
+   "frac_frames": 0.94
+  },
+  "36": {
+   "max_depth_m": 0.0543,
+   "frames_over_depth": 95,
+   "frac_frames": 0.95
+  },
+  "37": {
+   "max_depth_m": 0.0743,
+   "frames_over_depth": 88,
+   "frac_frames": 0.88
+  },
+  "38": {
+   "max_depth_m": 0.0588,
+   "frames_over_depth": 94,
+   "frac_frames": 0.94
+  },
+  "39": {
+   "max_depth_m": 0.061,
+   "frames_over_depth": 97,
+   "frac_frames": 0.97
+  },
+  "40": {
+   "max_depth_m": 0.081,
+   "frames_over_depth": 97,
+   "frac_frames": 0.97
+  },
+  "41": {
+   "max_depth_m": 0.075,
+   "frames_over_depth": 96,
+   "frac_frames": 0.96
+  },
+  "42": {
+   "max_depth_m": 0.0668,
+   "frames_over_depth": 94,
+   "frac_frames": 0.94
+  },
+  "43": {
+   "max_depth_m": 0.0739,
+   "frames_over_depth": 95,
+   "frac_frames": 0.95
+  },
+  "44": {
+   "max_depth_m": 0.1323,
+   "frames_over_depth": 96,
+   "frac_frames": 0.96
+  },
+  "45": {
+   "max_depth_m": 0.069,
+   "frames_over_depth": 94,
+   "frac_frames": 0.94
+  },
+  "46": {
+   "max_depth_m": 0.0736,
+   "frames_over_depth": 80,
+   "frac_frames": 0.8
+  },
+  "47": {
+   "max_depth_m": 0.0726,
+   "frames_over_depth": 94,
+   "frac_frames": 0.94
+  }
+ },
+ "note": "Convex-hull upper bound on depth, sampled at 10 Hz; fast crossings can be missed."
+}

@@ -163,3 +163,34 @@ R7h it650 passes the old v2.1 on 174/256 but v3 on 0: its stance is 0.89 m, and 
 
 ## Candidate R9h (launched 00:34), not a controlled comparison
 `20261107-003416` R9h: R7h's height reward + supported stand bonus + stance penalty + real torque limits, warm from R7h it650 (`init/R7h_stand_it650.pt`, sha256 bd9aff4d44a64dd8...), fresh optimiser, 500 iterations. A direct attempt at v3, changing several things at once; only DEV under v3 can judge it, and it can't attribute any effect to one change. Baseline: R7h it650 under real limits, table above.
+
+## v16 checks (2026-11-07 01:55-02:25; DEV, assist off, v3). Delayed about 50 minutes by my launcher bug
+`gpu_run.py` waits for the estimate plus a 20 GB reserve; with 12 jobs only about 5 GB was free, so the evaluation chains waited and then hit the time limit. Training was not affected. Fixed: `evalv2.sh` takes `G1R_EST_GB`, `G1R_RESERVE_GB=0.5` for 0.9 GB evaluations (every GPU process is this project's).
+| checkpoint | v2.1 | v3 before 3b | strict | persists | torque OK | soft | hard | stance median | rise s |
+|---|---|---|---|---|---|---|---|---|---|
+| R8 it300 | 2 | 0 | 2 | 0 | 3 | 6.3 | 2.6 | 0.98 | 4.5 |
+| R8f it300 / it450 | 0 / 0 | 0 / 0 | 0 / 0 | 0 / 0 | 31 / 59 | 2.1 / 2.4 | 0.2 / 0.7 | - | - |
+| R8s it300 / it450 | 0 / 0 | 0 / 0 | 0 / 0 | 0 / 0 | 23 / 17 | 14.5 / 29.1 | 5.4 / 14.3 | - | - |
+| R8p it300 / it450 | 0 / 0 | 0 / 0 | 0 / 0 | 0 / 0 | 2 / 3 | 22.1 / 41.3 | 3.8 / 15.3 | - | - |
+| R8w it300 | 0 | 0 | 0 | 0 | 7 | 5.3 | 1.4 | - | - |
+| R8t it300 | 0 | 0 | 0 | 0 | 256 | 3.6 | 0.8 | - | - |
+| R8 it450 | 0 | 0 | 248 | 248 | 14 | 56.1 | 3.5 | 1.00 | 1.9 |
+| R8w warm it650 | 3 | 3 | 247 | 247 | 33 | 15.7 | 6.0 | 0.43 | 3.5 |
+| R8w warm it850 (3 evals) | 9-12 | 3-7 | 256 | 256 | 31 | 12.5 | 3.9 | 0.46 | 0.9 |
+| R9h it750 | 4 | 2 | 256 | 256 | 256 | 37.5 | 16.1 | 0.64 | 1.1 |
+| R9h it900 (3 evals) | 11-18 | 10-18 | 254-256 | 254-256 | 256 | 11.6 | 2.0 | 0.42 | 1.3 |
+E1 and E2 have not reached a supported stand by iteration 450. R8 (control) reaches the wide straddle (1.00 m) like R7m. The stance penalty narrows it: about 0.42-0.46 m median in R8w warm and R9h.
+
+**Why standing robots fail v3** (R9h it900, 256 strict): airborne on more than 2% of steps 228, of which 128 fail only that rule; soft limits 48; hard steps 27; hard excess 68; stance 17; torque 0. Airborne steps come mostly during the rise, mostly single 20 ms samples (1046 of 1897 streaks are one step), highest foot about 6 cm up, pelvis speed about 0.85 m/s. The contact sensor stores the last 3 physics substeps; the frozen rule uses only the latest one.
+**Proposed Amendment 4 (measurement), NOT adopted, needs Kaleb's approval:** count a step airborne only if no contact on all 3 stored substeps. It would loosen an approved rule after seeing results, so it's reported separately: R9h it900 v3-before-3b 122/256 with it against 11-18 without; R8w warm it850 19 against 3.
+
+**3b self-penetration, the decisive check** (`results/selfpen_*.json`, 48 strict robots each): R9h it900: 0 of 48 pass; the left hand sits inside the right hip on about 97% of frames, up to 12 cm deep. R8w warm it850: 33 of 48 pass; overlaps are brief (torso against upper arm). R7h it650: 0 of 40, fingers inside the pelvis.
+**First full v3 passes:** in the R8w warm it850 trace, DEV poses 5 (prone) and 16 (side_a) pass every v3 clause including 3b. Uncut close-up `media/20261107_02_R8wW_it850_v3poses.mp4`: upright, moderate stance, no hand contact, up by about 1 s, holds to 10 s. That is 2 of the 48 robots checked for 3b, about 1% of DEV, one seed, DEV only. Not a headline result.
+
+## v17 (launched 02:24): self-collision on, because 3b is the binding constraint
+Self-collision verified to act: with R9h it900, robots with hand or elbow contact force went from 0-1 of 128 to 34-45 (`runs/verify_R9h*.log`). `nconmax` 80 -> 160.
+| job | task | change | start |
+|---|---|---|---|
+| `20261107-022451` | R9hc | R9h + self-collision | warm from R9h it900 (`init/R9h_it900.pt`, sha256 b6f98eb7956b8fde...) |
+| `20261107-022453` | R8wc | R8w + real torque + self-collision | warm from R8w warm it850 (`init/R8wW_it850.pt`, sha256 d446252cecf56b01...) |
+Limitation: with self-collision on, self-contact counts as contact, so a robot touching itself in the air isn't counted as airborne. These runs will also be evaluated with self-collision off plus the offline 3b check.

@@ -1,0 +1,227 @@
+{
+ "which": "v21",
+ "robots": 40,
+ "depth_threshold_m": 0.02,
+ "pairs_checked": 603,
+ "sampled_hz": 10,
+ "robots_clean": 0,
+ "robots_le_3pct_frames": 1,
+ "max_depth_p50": 0.0364,
+ "top_pairs": {
+  "pelvis|left_four_link": 1428,
+  "left_hip_roll_link|left_five_link": 111,
+  "left_hip_roll_link|left_six_link": 91,
+  "pelvis|left_five_link": 84,
+  "pelvis|left_six_link": 66,
+  "left_hip_yaw_link|left_four_link": 32,
+  "pelvis|left_three_link": 18,
+  "left_hip_yaw_link|left_three_link": 9,
+  "pelvis|left_palm_link": 7,
+  "torso_link|left_shoulder_yaw_link": 5,
+  "left_shoulder_yaw_link|logo_link": 4,
+  "left_hip_roll_link|left_elbow_roll_link": 4
+ },
+ "per_env": {
+  "0": {
+   "max_depth_m": 0.0311,
+   "frames_over_depth": 43,
+   "frac_frames": 0.43
+  },
+  "1": {
+   "max_depth_m": 0.0329,
+   "frames_over_depth": 52,
+   "frac_frames": 0.52
+  },
+  "2": {
+   "max_depth_m": 0.0363,
+   "frames_over_depth": 45,
+   "frac_frames": 0.45
+  },
+  "3": {
+   "max_depth_m": 0.0401,
+   "frames_over_depth": 49,
+   "frac_frames": 0.49
+  },
+  "4": {
+   "max_depth_m": 0.0826,
+   "frames_over_depth": 53,
+   "frac_frames": 0.53
+  },
+  "5": {
+   "max_depth_m": 0.0381,
+   "frames_over_depth": 55,
+   "frac_frames": 0.55
+  },
+  "6": {
+   "max_depth_m": 0.0431,
+   "frames_over_depth": 44,
+   "frac_frames": 0.44
+  },
+  "7": {
+   "max_depth_m": 0.0469,
+   "frames_over_depth": 38,
+   "frac_frames": 0.38
+  },
+  "9": {
+   "max_depth_m": 0.053,
+   "frames_over_depth": 25,
+   "frac_frames": 0.25
+  },
+  "10": {
+   "max_depth_m": 0.0362,
+   "frames_over_depth": 52,
+   "frac_frames": 0.52
+  },
+  "11": {
+   "max_depth_m": 0.0295,
+   "frames_over_depth": 39,
+   "frac_frames": 0.39
+  },
+  "13": {
+   "max_depth_m": 0.048,
+   "frames_over_depth": 50,
+   "frac_frames": 0.5
+  },
+  "14": {
+   "max_depth_m": 0.0298,
+   "frames_over_depth": 28,
+   "frac_frames": 0.28
+  },
+  "15": {
+   "max_depth_m": 0.0268,
+   "frames_over_depth": 19,
+   "frac_frames": 0.19
+  },
+  "16": {
+   "max_depth_m": 0.0432,
+   "frames_over_depth": 37,
+   "frac_frames": 0.37
+  },
+  "17": {
+   "max_depth_m": 0.0344,
+   "frames_over_depth": 49,
+   "frac_frames": 0.49
+  },
+  "18": {
+   "max_depth_m": 0.0416,
+   "frames_over_depth": 33,
+   "frac_frames": 0.33
+  },
+  "19": {
+   "max_depth_m": 0.0288,
+   "frames_over_depth": 31,
+   "frac_frames": 0.31
+  },
+  "20": {
+   "max_depth_m": 0.0365,
+   "frames_over_depth": 48,
+   "frac_frames": 0.48
+  },
+  "22": {
+   "max_depth_m": 0.0475,
+   "frames_over_depth": 53,
+   "frac_frames": 0.53
+  },
+  "23": {
+   "max_depth_m": 0.0327,
+   "frames_over_depth": 37,
+   "frac_frames": 0.37
+  },
+  "24": {
+   "max_depth_m": 0.0395,
+   "frames_over_depth": 55,
+   "frac_frames": 0.55
+  },
+  "26": {
+   "max_depth_m": 0.0286,
+   "frames_over_depth": 23,
+   "frac_frames": 0.23
+  },
+  "27": {
+   "max_depth_m": 0.0372,
+   "frames_over_depth": 38,
+   "frac_frames": 0.38
+  },
+  "28": {
+   "max_depth_m": 0.0348,
+   "frames_over_depth": 53,
+   "frac_frames": 0.53
+  },
+  "29": {
+   "max_depth_m": 0.0309,
+   "frames_over_depth": 34,
+   "frac_frames": 0.34
+  },
+  "31": {
+   "max_depth_m": 0.0299,
+   "frames_over_depth": 33,
+   "frac_frames": 0.33
+  },
+  "33": {
+   "max_depth_m": 0.0314,
+   "frames_over_depth": 44,
+   "frac_frames": 0.44
+  },
+  "35": {
+   "max_depth_m": 0.0303,
+   "frames_over_depth": 21,
+   "frac_frames": 0.21
+  },
+  "36": {
+   "max_depth_m": 0.0705,
+   "frames_over_depth": 45,
+   "frac_frames": 0.45
+  },
+  "37": {
+   "max_depth_m": 0.0245,
+   "frames_over_depth": 3,
+   "frac_frames": 0.03
+  },
+  "39": {
+   "max_depth_m": 0.0518,
+   "frames_over_depth": 36,
+   "frac_frames": 0.36
+  },
+  "41": {
+   "max_depth_m": 0.037,
+   "frames_over_depth": 20,
+   "frac_frames": 0.2
+  },
+  "43": {
+   "max_depth_m": 0.0286,
+   "frames_over_depth": 44,
+   "frac_frames": 0.44
+  },
+  "45": {
+   "max_depth_m": 0.0444,
+   "frames_over_depth": 56,
+   "frac_frames": 0.56
+  },
+  "47": {
+   "max_depth_m": 0.0387,
+   "frames_over_depth": 56,
+   "frac_frames": 0.56
+  },
+  "50": {
+   "max_depth_m": 0.0368,
+   "frames_over_depth": 53,
+   "frac_frames": 0.53
+  },
+  "51": {
+   "max_depth_m": 0.0359,
+   "frames_over_depth": 24,
+   "frac_frames": 0.24
+  },
+  "52": {
+   "max_depth_m": 0.0294,
+   "frames_over_depth": 43,
+   "frac_frames": 0.43
+  },
+  "53": {
+   "max_depth_m": 0.0526,
+   "frames_over_depth": 37,
+   "frac_frames": 0.37
+  }
+ },
+ "note": "Convex-hull upper bound on depth, sampled at 10 Hz; fast crossings can be missed."
+}
