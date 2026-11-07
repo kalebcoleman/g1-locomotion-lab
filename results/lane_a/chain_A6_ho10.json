@@ -1,0 +1,45 @@
+{
+ "handover_steps": 10,
+ "handover_rule": "consecutive standing steps before the walking policy takes over (no reset/teleport; same physics state)",
+ "task": "G1-Recovery-A-v0",
+ "checkpoint": "<workspace>/projects/g1-recovery/lanes/a/runs/A6_fromA1_lr3e4_s1_4096/model_599.pt",
+ "walk_checkpoint": "<workspace>/envs/lab-3.0.0-src/logs/rsl_rl/g1_flat/2026-11-06_15-13-37/model_1499.pt",
+ "num_envs": 256,
+ "total_s": 20.0,
+ "fwd_cmd": 0.8,
+ "stage1_recovered": 8,
+ "stage1_rate": 0.03125,
+ "stage2_handover_then_no_fall": 8,
+ "stage3_chain_success": 8,
+ "chain_success_rate": 0.03125,
+ "fell_after_handover": 23,
+ "handover_time_s_mean": 3.149677276611328,
+ "walk_displacement_m_mean": 3.4103589057922363,
+ "walk_fwd_speed_mean": 0.16777585446834564,
+ "recovery_failure_causes": {
+  "success": 8,
+  "never_rose": 32,
+  "rose_not_upright": 118,
+  "stood_then_fell": 98,
+  "late_hold_incomplete": 0
+ },
+ "chain_by_category": {
+  "side_a": {
+   "n": 64,
+   "chain_success_rate": 0.015625
+  },
+  "prone": {
+   "n": 64,
+   "chain_success_rate": 0.046875
+  },
+  "side_b": {
+   "n": 64,
+   "chain_success_rate": 0.0625
+  },
+  "supine": {
+   "n": 64,
+   "chain_success_rate": 0.0
+  }
+ },
+ "note": "walking policy trained on the minimal-collision G1; here applied to the full-collision G1 (same joints/actuators)"
+}

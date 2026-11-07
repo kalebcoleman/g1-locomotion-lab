@@ -1,0 +1,69 @@
+{
+ "task": "G1-Recovery-A-v0",
+ "checkpoint": "<workspace>/projects/g1-recovery/lanes/a/runs/V10_velpen3/model_599.pt",
+ "num_envs": 256,
+ "episode_s": 10.0,
+ "steps": 500,
+ "success_hold_s": 2.0,
+ "success_rate": 0.07421875,
+ "successes": 19,
+ "recovery_time_s_mean": 2.249473810195923,
+ "recovery_time_s_median": 1.6200000047683716,
+ "longest_stand_s_mean": 0.7135156393051147,
+ "total_stand_s_mean": 0.7976561784744263,
+ "joint_limit_violation_step_frac": 0.17620313167572021,
+ "joint_limit_violations_per_step_mean": 0.3159140646457672,
+ "eval_wall_s": 6.9125096797943115,
+ "strict_supported_stand": {
+  "definition": "pelvis>=0.60 m, torso tilt<=26 deg, BOTH feet contact force>10 N and feet<0.15 m above floor, pelvis speed<0.6 m/s, held 2 s",
+  "success_rate": 0.01953125,
+  "successes": 5,
+  "recovery_time_s_mean": 3.631999969482422,
+  "longest_stand_s_mean": 0.140625,
+  "total_stand_s_mean": 0.4952343702316284,
+  "envs_ever_supported_stand": 46,
+  "by_category": {
+   "side_a": 0.0,
+   "prone": 0.015625,
+   "side_b": 0.015625,
+   "supine": 0.046875
+  }
+ },
+ "plausibility": {
+  "definition": "PLAUSIBLE recovery = strict supported stand held 2 s AND joint-velocity-limit violations on <=2% of steps AND peak pelvis upward speed <=2.0 m/s",
+  "plausible_successes": 1,
+  "plausible_rate": 0.00390625,
+  "vel_limit_violation_step_frac_mean": 0.007695313077419996,
+  "peak_pelvis_vz_mean": 4.115656852722168,
+  "peak_pelvis_vz_max": 6.9068193435668945,
+  "strict_successes_failing_plausibility": 4,
+  "flight_step_frac_mean": 0.13030469417572021,
+  "plausible_v1p1_successes": 0,
+  "v1p1_definition": "POST-HOC amendment (added after seeing A8c): plausible AND free-flight (no body in contact with anything) on <=2% of steps"
+ },
+ "failure_causes": {
+  "success": 19,
+  "never_rose": 22,
+  "rose_not_upright": 54,
+  "stood_then_fell": 160,
+  "late_hold_incomplete": 1
+ },
+ "by_category": {
+  "side_a": {
+   "n": 64,
+   "success_rate": 0.046875
+  },
+  "prone": {
+   "n": 64,
+   "success_rate": 0.09375
+  },
+  "side_b": {
+   "n": 64,
+   "success_rate": 0.078125
+  },
+  "supine": {
+   "n": 64,
+   "success_rate": 0.078125
+  }
+ }
+}

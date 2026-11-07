@@ -1,0 +1,57 @@
+{
+ "task": "G1-Recovery-B-v0",
+ "checkpoint": "<workspace>/projects/g1-recovery/lanes/b/runs/B6_fromA1_lr3e4_s1_4096/model_599.pt",
+ "num_envs": 256,
+ "episode_s": 10.0,
+ "steps": 500,
+ "success_hold_s": 2.0,
+ "success_rate": 0.00390625,
+ "successes": 1,
+ "recovery_time_s_mean": 1.3600000143051147,
+ "recovery_time_s_median": 1.3600000143051147,
+ "longest_stand_s_mean": 0.05039062350988388,
+ "total_stand_s_mean": 0.05039062350988388,
+ "joint_limit_violation_step_frac": 0.14150001108646393,
+ "joint_limit_violations_per_step_mean": 0.30906251072883606,
+ "eval_wall_s": 6.813510179519653,
+ "strict_supported_stand": {
+  "definition": "pelvis>=0.60 m, torso tilt<=26 deg, BOTH feet contact force>10 N and feet<0.15 m above floor, pelvis speed<0.6 m/s, held 2 s",
+  "success_rate": 0.00390625,
+  "successes": 1,
+  "recovery_time_s_mean": 2.7799999713897705,
+  "longest_stand_s_mean": 0.02828124910593033,
+  "total_stand_s_mean": 0.03265625238418579,
+  "envs_ever_supported_stand": 2,
+  "by_category": {
+   "side_a": 0.0,
+   "prone": 0.015625,
+   "side_b": 0.0,
+   "supine": 0.0
+  }
+ },
+ "failure_causes": {
+  "success": 1,
+  "never_rose": 120,
+  "rose_not_upright": 108,
+  "stood_then_fell": 27,
+  "late_hold_incomplete": 0
+ },
+ "by_category": {
+  "side_a": {
+   "n": 64,
+   "success_rate": 0.0
+  },
+  "prone": {
+   "n": 64,
+   "success_rate": 0.015625
+  },
+  "side_b": {
+   "n": 64,
+   "success_rate": 0.0
+  },
+  "supine": {
+   "n": 64,
+   "success_rate": 0.0
+  }
+ }
+}

@@ -1,0 +1,11 @@
+{
+ "task": "G1-Recovery-B-v0",
+ "num_envs": 1024,
+ "iterations": 1000,
+ "seed": 1,
+ "transitions": 24576000,
+ "train_wall_s": 1055.3495647907257,
+ "transitions_per_s": 23287.070767753987,
+ "mean_level_end": 0.1396484375,
+ "note": "wall time/throughput measured on a GPU shared with other jobs; not a benchmark"
+}
