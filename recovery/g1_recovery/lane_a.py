@@ -495,3 +495,30 @@ class G1RecoveryR8wcEnvCfg(G1RecoveryBaseEnvCfg):
     """R8w with real torque limits and self-collision on, intended to warm-start from R8w warm (two changes vs R8w)."""
     def __post_init__(self):
         super().__post_init__(); _r8(self, RewardsR8w); real_torque_limits(self); self_collisions_on(self)
+
+
+def add_ground_sensor(cfg):
+    """Second contact sensor filtered to the ground, so self-contact never counts as touching the world."""
+    import copy
+    gc = copy.deepcopy(cfg.scene.contact_forces); gc.filter_shape_prim_expr = ["/World/ground/.*"]; gc.track_air_time = False
+    cfg.scene.ground_contact = gc
+    return cfg
+
+
+def free_flight_ground(env):
+    """1 while no body touches the ground (self-contact ignored)."""
+    gm = env.scene.sensors["ground_contact"].data.force_matrix_w.torch
+    return (torch.linalg.norm(gm, dim=-1).sum((-1, -2)) < 1.0).float()
+
+
+@configclass
+class RewardsR9hg(RewardsR9h):
+    """R9h with the free-flight penalty measured against the ground only, at weight 20 instead of 5 (net contact let self-contact hide flight once self-collision is on)."""
+    flight = RewTerm(func=free_flight_ground, weight=-20.0)
+
+
+@configclass
+class G1RecoveryR9hgEnvCfg(G1RecoveryBaseEnvCfg):
+    """R9hc with the ground-only flight penalty (single reward-term change vs R9hc)."""
+    def __post_init__(self):
+        super().__post_init__(); _r8(self, RewardsR9hg); real_torque_limits(self); self_collisions_on(self); add_ground_sensor(self)

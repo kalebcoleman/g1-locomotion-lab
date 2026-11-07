@@ -194,3 +194,20 @@ Self-collision verified to act: with R9h it900, robots with hand or elbow contac
 | `20261107-022451` | R9hc | R9h + self-collision | warm from R9h it900 (`init/R9h_it900.pt`, sha256 b6f98eb7956b8fde...) |
 | `20261107-022453` | R8wc | R8w + real torque + self-collision | warm from R8w warm it850 (`init/R8wW_it850.pt`, sha256 d446252cecf56b01...) |
 Limitation: with self-collision on, self-contact counts as contact, so a robot touching itself in the air isn't counted as airborne. These runs will also be evaluated with self-collision off plus the offline 3b check.
+
+## v17 check (2026-11-07 02:50-03:10; DEV, assist off, v3)
+| checkpoint, eval env | v2.1 | v3 before 3b (net contact) | v3 before 3b (ground-only flight) | strict | stance | 3b pass |
+|---|---|---|---|---|---|---|
+| R9hc it1000, self-collision on | 110-111 | 106-111 | **5** | 256 | 0.35 | 64/64 |
+| R9hc it1000, self-collision off | 9 | 8 | - | 254 | 0.30 | - |
+| R8wc it950, self-collision on | 8 | 8 | not run | 256 | 0.46 | 64/64 |
+| R8wc it950, self-collision off | 3 | 3 | - | 256 | 0.42 | - |
+| R9h it1149, self-collision off | 40 / 39 | 40 / 39 | 39 | 250 | 0.40 | fails (R9h it900: 0/48) |
+| R8w warm it999 | 16 | 6 | not run | 256 | 0.40 | - |
+**Measurement loophole found and closed in the evaluator:** with self-collision on, the net contact force includes self-contact, so a robot touching itself in the air was not counted as airborne. A second contact sensor filtered to the ground (`G1R_GROUND_SENSOR`, default on) gives ground-only flight. It is stricter, never looser. Validated: with self-collision off it matches net-force flight on all 256 robots (R9h it1149). R9hc drops from 111 to 5. **Headline for self-collision runs uses ground-only flight.**
+Self-collision does what it should for 3b: R9hc and R8wc pass on 64 of 64 checked robots (median worst depth 1-3 mm).
+Best full v3 so far: about 5/256 (R9hc, ground flight, 3b passes) and 2 confirmed (R8w warm it850). About 1-2% of DEV, one seed.
+The training flight penalty in R9hc/R8wc has the same loophole, which may have taught robots to stay touching themselves while airborne.
+
+## v17 addition (launched 03:10): ground-only flight penalty
+`G1-Recovery-R9hg-v0`: R9hc with `free_flight_ground` at weight -20 replacing the net-contact flight penalty (-5); warm from R9hc it1000 (`init/R9hc_it1000.pt`, sha256 a343cf9d3969a84c...), 500 iterations. Hypothesis: airborne steps during the rise are now the main v3 failure, and the old penalty was both weak (about -1.8 per episode against height about +9.5) and blind to self-contact. Failure mode: a slower or no rise.
