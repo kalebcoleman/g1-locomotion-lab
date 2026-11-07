@@ -244,3 +244,7 @@ Limitations: one seed, and a warm-start chain (R7h scratch it650 -> R9h -> R9hc 
 
 ## Seed replication (launched 04:20): the R9hg recipe from scratch, seeds 4 and 5
 `20261107-042047` (seed 4), `20261107-042048` (seed 5): `G1-Recovery-R9hg-v0` from random weights, 16384 envs, 1500 iterations. This tests the recipe itself, not the seed-3 warm-start chain (R7h -> R9h -> R9hc -> R9hg) that produced the candidate. If these fail, the candidate's result depends on that chain, and an exact chain replication on new seeds is the next step.
+
+## HoST port, iteration 300 (05:25; DEV, assist off via `G1-Host-*-Eval-v0`)
+Training: force still 200 N (no decay yet: the decay needs the resetting robots' mean head height above 0.9 m), rescale 1.0, group returns task 184 / 177, target 21 / 16 (supine / prone), so with the force on in training the robots reach the post-task region.
+Assist off: 0 supported stands for either policy. Own family, of 64: supine policy reached seated 64, fold 58, crouch on feet 50, high on feet 18; prone policy 64, 24, 26, 11. Expected this early: HoST trains 12,000 iterations and its force decays only once the robots stand. Next check when the force has decayed or at iteration 1000.
