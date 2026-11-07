@@ -28,3 +28,23 @@ Metric names: legacy = pelvis+upright 2 s; strict = supported stand 2 s; v2 = st
 
 ## Throughput (combined, all jobs at 16384 envs, GPU also shared when noted)
 1 job ~160 k/s (with two 4096-env jobs running); 3 jobs ~300 k/s combined (~100 k each, 23.8 GB, 100 % util, 300 W). 6 jobs: to be measured.
+
+## v13 interim (2026-11-06 21:56): R1-R3 cancelled at ~500 its (mine; checkpoints kept), HELDOUT_v2 assist off
+| run (checkpoint) | legacy | strict | v2 | ever supported | pos-limit steps | peak vz |
+|---|---|---|---|---|---|---|
+| R1 @1500 | 0 | 0 | 0 | 0 | 0.29 | 0.73 |
+| R2 @1500 | 0 | 0 | 0 | 0 | **0.06** | 0.58 |
+| R3 @1300 | 0 | 0 | 0 | 0 | 0.13 | 0.61 |
+The body-only position-limit penalty works (0.29 -> 0.06, under the v2 limit of 0.10). None of these train on lying starts (levels 0-1 only); cancelled to free compute for lying-start runs.
+
+## v14 (added 21:56; R4/R4n/R5 from v13 still running; all 16384 envs, 1000 its, fixed lr 3e-4)
+Source for the ideas: g1-humanoid-rl ch. 14 (MIT, https://github.com/chaoticcuriosity-io/g1-humanoid-rl): from-scratch PPO with lying-only starts reached a stand with a floor-to-stand height ramp weight 10, upright 2. Not verified against our plausibility criteria; our robot, action space and penalties differ.
+| job | task | init | change vs | hypothesis |
+|---|---|---|---|---|
+| 20261106-215637 | R4n (seed 3) | scratch (sigma 1.0) | R4n warm: no warm start | the sit-up warm start is a local optimum |
+| 20261106-215640 | R6b | Lane A v1 | R4n warm: height 10, upright 2 | the height signal is too weak vs penalties |
+| 20261106-215641 | R6c (seed 3) | scratch | R6b: lying-only starts, no warm start | closest to the precedent, plus our no-launch/limit penalties |
+Selection rule: successive halving on `Curriculum/lying_ever_supported`, `lying_strict_hold`, `lying_max_h` at ~300 iterations, then HELDOUT_v2 v2 evaluation. TEST stays untouched.
+
+## Throughput
+1 job: ~160 k/s (while two 4096-env jobs ran). 3 jobs: ~300 k/s combined (~100 k each). 6 jobs: ~43 k/s each (~260-300 k/s combined). Combined throughput saturates near 300 k/s at the GPU's 300 W cap, so more than ~3 jobs only divides it. VRAM ~7.7 GB per 16384-env job.

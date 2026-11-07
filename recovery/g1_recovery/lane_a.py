@@ -217,3 +217,33 @@ class G1RecoveryR5EnvCfg(G1RecoveryBaseEnvCfg):
 class G1RecoveryR5EvalEnvCfg(G1RecoveryBaseEnvCfg):
     def __post_init__(self):
         super().__post_init__(); _recipe(self, RewardsR2, False, 0); self.actions.joint_pos.scale = 1.0
+
+
+# ---------------------------------------------------------------------------------------------------------- v14: height-dominant reward (idea from g1-humanoid-rl, MIT, ch. 14: monotonic floor-to-stand ramp weight 10, upright 2)
+def height_ramp_floor(env, floor=0.1):
+    h = env.scene["robot"].data.root_pos_w.torch[:, 2] - env.scene.env_origins[:, 2]
+    return torch.clamp((h - floor) / (K.STAND_H - floor), 0.0, 1.0)
+
+
+@configclass
+class RewardsR6(RewardsR2):
+    """R2 with a height-dominant task reward: monotonic ramp from the floor (0.1 m) to the standing height, weight 10 (R2: 2); upright weight 2 (R2: 1)."""
+    height = RewTerm(func=height_ramp_floor, weight=10.0)
+    upright = RewTerm(func=upright, weight=2.0)
+
+
+POSE_MIX_LYING = [0.0, 0.0, 0.0, 0.5, 0.5]
+
+
+@configclass
+class G1RecoveryR6bEnvCfg(G1RecoveryBaseEnvCfg):
+    """R6b = R4n with the height-dominant reward (single change vs R4n)."""
+    def __post_init__(self):
+        super().__post_init__(); _recipe_mix(self, False); self.rewards = RewardsR6()
+
+
+@configclass
+class G1RecoveryR6cEnvCfg(G1RecoveryBaseEnvCfg):
+    """R6c = R6b with lying-only starts (single change vs R6b); meant to be trained from scratch."""
+    def __post_init__(self):
+        super().__post_init__(); _recipe_mix(self, False); self.rewards = RewardsR6(); self.pose_mix = POSE_MIX_LYING
