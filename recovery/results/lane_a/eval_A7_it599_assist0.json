@@ -1,0 +1,54 @@
+{
+ "task": "G1-Recovery-A-Assist-v0",
+ "checkpoint": "<workspace>/projects/g1-recovery/lanes/a/runs/A7_gatedassist_fromA1_lr3e4_s1_4096/model_599.pt",
+ "num_envs": 256,
+ "episode_s": 10.0,
+ "steps": 500,
+ "success_hold_s": 2.0,
+ "success_rate": 0.02734375,
+ "successes": 7,
+ "recovery_time_s_mean": 3.7857143878936768,
+ "recovery_time_s_median": 3.7799999713897705,
+ "longest_stand_s_mean": 0.173828125,
+ "total_stand_s_mean": 0.2102343738079071,
+ "joint_limit_violation_step_frac": 0.20081250369548798,
+ "joint_limit_violations_per_step_mean": 0.3669453263282776,
+ "eval_wall_s": 5.918988227844238,
+ "failure_causes": {
+  "success": 7,
+  "never_rose": 108,
+  "rose_not_upright": 87,
+  "stood_then_fell": 50,
+  "late_hold_incomplete": 4
+ },
+ "by_category": {
+  "side_a": {
+   "n": 64,
+   "success_rate": 0.015625
+  },
+  "prone": {
+   "n": 64,
+   "success_rate": 0.046875
+  },
+  "side_b": {
+   "n": 64,
+   "success_rate": 0.046875
+  },
+  "supine": {
+   "n": 64,
+   "success_rate": 0.0
+  }
+ },
+ "assist": {
+  "level_env_var": "0",
+  "envs_with_force": 0,
+  "force_steps_mean": 0.0,
+  "force_seconds_mean": 0.0,
+  "impulse_Ns_mean": 0.0,
+  "max_force_N": 0.0,
+  "first_step_mean": null,
+  "last_step_mean": null,
+  "robot_weight_N": null,
+  "note": "force applies only while torso upright (gravity z < -0.8) and pelvis < 0.62 m; unassisted eval = G1R_EVAL_ASSIST unset or 0"
+ }
+}

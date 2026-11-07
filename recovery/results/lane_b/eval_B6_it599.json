@@ -1,0 +1,42 @@
+{
+ "task": "G1-Recovery-B-v0",
+ "checkpoint": "<workspace>/projects/g1-recovery/lanes/b/runs/B6_fromA1_lr3e4_s1_4096/model_599.pt",
+ "num_envs": 256,
+ "episode_s": 10.0,
+ "steps": 500,
+ "success_hold_s": 2.0,
+ "success_rate": 0.01171875,
+ "successes": 3,
+ "recovery_time_s_mean": 2.5266666412353516,
+ "recovery_time_s_median": 1.7400000095367432,
+ "longest_stand_s_mean": 0.10546875,
+ "total_stand_s_mean": 0.10546875,
+ "joint_limit_violation_step_frac": 0.14002344012260437,
+ "joint_limit_violations_per_step_mean": 0.30271875858306885,
+ "eval_wall_s": 6.816163778305054,
+ "failure_causes": {
+  "success": 3,
+  "never_rose": 120,
+  "rose_not_upright": 104,
+  "stood_then_fell": 29,
+  "late_hold_incomplete": 0
+ },
+ "by_category": {
+  "side_a": {
+   "n": 64,
+   "success_rate": 0.015625
+  },
+  "prone": {
+   "n": 64,
+   "success_rate": 0.015625
+  },
+  "side_b": {
+   "n": 64,
+   "success_rate": 0.015625
+  },
+  "supine": {
+   "n": 64,
+   "success_rate": 0.0
+  }
+ }
+}

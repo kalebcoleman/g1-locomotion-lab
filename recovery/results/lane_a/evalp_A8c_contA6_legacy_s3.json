@@ -1,0 +1,66 @@
+{
+ "task": "G1-Recovery-A-v0",
+ "checkpoint": "<workspace>/projects/g1-recovery/lanes/a/runs/A8c_contA6_legacy_s3/model_599.pt",
+ "num_envs": 256,
+ "episode_s": 10.0,
+ "steps": 500,
+ "success_hold_s": 2.0,
+ "success_rate": 1.0,
+ "successes": 256,
+ "recovery_time_s_mean": 0.5753905773162842,
+ "recovery_time_s_median": 0.5399999618530273,
+ "longest_stand_s_mean": 9.397655487060547,
+ "total_stand_s_mean": 9.431953430175781,
+ "joint_limit_violation_step_frac": 0.2960156500339508,
+ "joint_limit_violations_per_step_mean": 0.3213750123977661,
+ "eval_wall_s": 7.010667562484741,
+ "strict_supported_stand": {
+  "definition": "pelvis>=0.60 m, torso tilt<=26 deg, BOTH feet contact force>10 N and feet<0.15 m above floor, pelvis speed<0.6 m/s, held 2 s",
+  "success_rate": 0.93359375,
+  "successes": 239,
+  "recovery_time_s_mean": 1.66343092918396,
+  "longest_stand_s_mean": 7.636327743530273,
+  "total_stand_s_mean": 8.7290620803833,
+  "envs_ever_supported_stand": 256,
+  "by_category": {
+   "side_a": 0.921875,
+   "prone": 0.921875,
+   "side_b": 0.9375,
+   "supine": 0.953125
+  }
+ },
+ "plausibility": {
+  "definition": "PLAUSIBLE recovery = strict supported stand held 2 s AND joint-velocity-limit violations on <=2% of steps AND peak pelvis upward speed <=2.0 m/s",
+  "plausible_successes": 51,
+  "plausible_rate": 0.19921875,
+  "vel_limit_violation_step_frac_mean": 0.0036171874962747097,
+  "peak_pelvis_vz_mean": 2.987088203430176,
+  "peak_pelvis_vz_max": 5.870275974273682,
+  "strict_successes_failing_plausibility": 188
+ },
+ "failure_causes": {
+  "success": 256,
+  "never_rose": 0,
+  "rose_not_upright": 0,
+  "stood_then_fell": 0,
+  "late_hold_incomplete": 0
+ },
+ "by_category": {
+  "side_a": {
+   "n": 64,
+   "success_rate": 1.0
+  },
+  "prone": {
+   "n": 64,
+   "success_rate": 1.0
+  },
+  "side_b": {
+   "n": 64,
+   "success_rate": 1.0
+  },
+  "supine": {
+   "n": 64,
+   "success_rate": 1.0
+  }
+ }
+}

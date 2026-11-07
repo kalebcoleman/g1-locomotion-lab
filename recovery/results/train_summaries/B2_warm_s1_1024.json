@@ -1,0 +1,12 @@
+{
+ "init_actor": "<workspace>/envs/lab-3.0.0-src/logs/rsl_rl/g1_flat/2026-11-06_15-13-37/model_1499.pt",
+ "task": "G1-Recovery-B-v0",
+ "num_envs": 1024,
+ "iterations": 1000,
+ "seed": 1,
+ "transitions": 24576000,
+ "train_wall_s": 1167.285236120224,
+ "transitions_per_s": 21053.979986660954,
+ "mean_level_end": 1.08984375,
+ "note": "wall time/throughput measured on a GPU shared with other jobs; not a benchmark"
+}

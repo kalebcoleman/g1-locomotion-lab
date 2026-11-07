@@ -1,0 +1,13 @@
+{
+ "init_actor": "<workspace>/projects/g1-recovery/lanes/a/runs/A_s1_1024/model_999.pt",
+ "lr_override": 0.0003,
+ "task": "G1-Recovery-A-v0",
+ "num_envs": 4096,
+ "iterations": 600,
+ "seed": 2,
+ "transitions": 58982400,
+ "train_wall_s": 1406.4570350646973,
+ "transitions_per_s": 41936.86584765584,
+ "mean_level_end": 0.573974609375,
+ "note": "wall time/throughput measured on a GPU shared with other jobs; not a benchmark"
+}
