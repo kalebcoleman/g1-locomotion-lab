@@ -1,0 +1,145 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>G1 recovery system</title>
+<style>
+  svg{width:100%;height:auto;display:block;font-family:var(--font-sans,system-ui,sans-serif)}
+  .box{fill:var(--card,#fff);stroke:var(--border,#bbb);stroke-width:1.2}
+  .ours{fill:var(--card,#fff);stroke:var(--chart-1,#2a78d6);stroke-width:2}
+  .up{fill:var(--card,#fff);stroke:var(--muted-foreground,#777);stroke-width:1.2;stroke-dasharray:4 3}
+  .zone{fill:none;stroke:var(--border,#bbb);stroke-width:1;stroke-dasharray:2 4}
+  .t{fill:var(--foreground,#111);font-size:13px;font-weight:600}
+  .s{fill:var(--muted-foreground,#555);font-size:11.5px}
+  .z{fill:var(--muted-foreground,#555);font-size:11.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+  .a{stroke:var(--foreground,#111);stroke-width:1.4;fill:none;marker-end:url(#h)}
+  .al{fill:var(--muted-foreground,#555);font-size:11px}
+  .chip{font-size:11px;font-weight:600}
+  .ok{fill:var(--success,#1a7f37)} .no{fill:var(--destructive,#c0392b)} .wait{fill:var(--warning,#b7791f)}
+  .l1{fill:var(--chart-1,#2a78d6);opacity:.16}.l2{fill:var(--chart-1,#2a78d6);opacity:.3}
+  h3{font-size:13px;font-weight:600;margin:0 0 6px}
+</style></head><body>
+<svg viewBox="0 0 720 860" role="img" aria-label="Recovery system: simulation, observations, recovery and walking policies, hand-over rule, joint targets; PPO training loop; evaluation">
+<defs><marker id="h" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="var(--foreground,#111)"/></marker></defs>
+
+<!-- RUNTIME -->
+<text class="z" x="8" y="16">Runtime control loop, 50 Hz (one simulated robot)</text>
+<rect class="zone" x="2" y="24" width="716" height="396" rx="10"/>
+
+<rect class="up" x="20" y="38" width="680" height="64" rx="8"/>
+<text class="t" x="34" y="60">Isaac Lab 3.0.0 + Newton / MuJoCo-Warp physics, 200 Hz (4 physics steps per control step)</text>
+<text class="s" x="34" y="78">Unitree G1, full-collision model: 37 joints (12 legs, 1 torso, 10 arms, 14 hands), 38 collision shapes.</text>
+<text class="s" x="34" y="94">Gravity and contacts always on. No hidden support or teleporting in evaluation.</text>
+
+<path class="a" d="M360,102 V128"/>
+<text class="al" x="368" y="119">robot state (no contact sensing in the observation)</text>
+
+<rect class="up" x="20" y="128" width="680" height="48" rx="8"/>
+<text class="t" x="34" y="148">Observation: 123 numbers, identical for both policies</text>
+<text class="s" x="34" y="166">base velocity 3 + spin 3 + gravity direction 3 + velocity command 3 + joint angles 37 + joint speeds 37 + last action 37</text>
+
+<path class="a" d="M170,176 V206"/><path class="a" d="M550,176 V206"/>
+
+<rect class="ours" x="20" y="206" width="300" height="72" rx="8"/>
+<text class="t" x="34" y="228">Recovery policy (being trained)</text>
+<text class="s" x="34" y="246">Command is zero. Trained here with PPO.</text>
+<text class="chip no" x="34" y="266">Status: no valid get-up yet</text>
+
+<rect class="up" x="400" y="206" width="300" height="72" rx="8"/>
+<text class="t" x="414" y="228">Walking policy (existing, unchanged)</text>
+<text class="s" x="414" y="246">Iteration 1499 of the published run. vx = 0.8 m/s.</text>
+<text class="chip ok" x="414" y="266">Status: 256/256 walked on this robot</text>
+
+<path class="a" d="M320,242 H400"/>
+<text class="al" x="326" y="236">one-way</text>
+<rect class="box" x="225" y="292" width="270" height="52" rx="8"/>
+<text class="t" x="360" y="312" text-anchor="middle">Hand-over rule</text>
+<text class="s" x="360" y="330" text-anchor="middle">supported stand held 2 s, measured in the simulator</text>
+<path d="M360,292 V246" stroke="var(--foreground,#111)" stroke-width="1" stroke-dasharray="3 3" fill="none"/>
+<text class="chip wait" x="505" y="322">Not validated yet</text>
+
+<path class="a" d="M170,278 V358 H300"/><path class="a" d="M550,278 V358 H420"/>
+<rect class="up" x="300" y="346" width="120" height="30" rx="6"/>
+<text class="s" x="360" y="366" text-anchor="middle">37 action values</text>
+<path class="a" d="M360,376 V392"/>
+<text class="s" x="360" y="408" text-anchor="middle">joint target = default pose + 0.5 × action, then PD actuators apply torque, back to physics</text>
+
+<!-- TRAINING -->
+<text class="z" x="8" y="446">Training loop (recovery policy only)</text>
+<rect class="zone" x="2" y="454" width="716" height="170" rx="10"/>
+<rect class="ours" x="20" y="470" width="160" height="136" rx="8"/>
+<text class="t" x="32" y="492">Start poses</text>
+<text class="s" x="32" y="510">16,384 robots at once</text>
+<text class="s" x="32" y="526">lying on back, front,</text>
+<text class="s" x="32" y="542">or either side; limbs</text>
+<text class="s" x="32" y="558">randomised; episode</text>
+<text class="s" x="32" y="574">resets after 10 s</text>
+<rect class="ours" x="200" y="470" width="160" height="136" rx="8"/>
+<text class="t" x="212" y="492">Rollout</text>
+<text class="s" x="212" y="510">24 control steps each</text>
+<text class="s" x="212" y="526">= 393,216 transitions</text>
+<text class="s" x="212" y="542">per iteration, actions</text>
+<text class="s" x="212" y="558">sampled with Gaussian</text>
+<text class="s" x="212" y="574">exploration noise</text>
+<rect class="ours" x="380" y="470" width="150" height="136" rx="8"/>
+<text class="t" x="392" y="492">Reward</text>
+<text class="s" x="392" y="510">+ height, upright, stand</text>
+<text class="s" x="392" y="526">− joint-limit, speed,</text>
+<text class="s" x="392" y="542">flight, jerky action</text>
+<text class="s" x="392" y="558">Critic predicts return;</text>
+<text class="s" x="392" y="574">GAE gives advantage</text>
+<rect class="up" x="550" y="470" width="150" height="136" rx="8"/>
+<text class="t" x="562" y="492">PPO update</text>
+<text class="s" x="562" y="510">rsl_rl 5.5.1</text>
+<text class="s" x="562" y="526">5 epochs × 4 batches</text>
+<text class="s" x="562" y="542">= 20 gradient steps</text>
+<text class="s" x="562" y="558">new weights, repeat</text>
+<text class="s" x="562" y="574">(1,000 iterations)</text>
+<path class="a" d="M180,538 H200"/><path class="a" d="M360,538 H380"/><path class="a" d="M530,538 H550"/>
+
+<!-- EVAL -->
+<text class="z" x="8" y="648">Evaluation (no learning, no assist, separate from training)</text>
+<rect class="zone" x="2" y="656" width="716" height="196" rx="10"/>
+<rect class="box" x="20" y="672" width="200" height="164" rx="8"/>
+<text class="t" x="32" y="694">Fixed pose sets</text>
+<text class="s" x="32" y="714">DEV: 256 poses, used to</text>
+<text class="s" x="32" y="730">compare runs now</text>
+<text class="s" x="32" y="752">HELDOUT: 256, final</text>
+<text class="s" x="32" y="768">comparison only</text>
+<text class="s" x="32" y="790">TEST: 256, untouched</text>
+<text class="s" x="32" y="806">until one candidate</text>
+<rect class="box" x="240" y="672" width="280" height="164" rx="8"/>
+<text class="t" x="252" y="694">Valid get-up (criteria v2.1), all required</text>
+<text class="s" x="252" y="714">Pelvis ≥ 0.60 m, tilt ≤ 26°, both feet carrying</text>
+<text class="s" x="252" y="730">load, slow pelvis: held 2 s continuously</text>
+<text class="s" x="252" y="748">No launch: peak upward speed ≤ 2 m/s</text>
+<text class="s" x="252" y="764">No flight: ≤ 2% of steps airborne</text>
+<text class="s" x="252" y="780">Joint speed limit broken on ≤ 2% of steps</text>
+<text class="s" x="252" y="796">Soft position limit ≤ 10%, hard ≤ 3%, ≤ 0.10 rad</text>
+<text class="s" x="252" y="812">No assist force applied at all</text>
+<rect class="box" x="540" y="672" width="160" height="164" rx="8"/>
+<text class="t" x="552" y="694">Then the chain</text>
+<text class="s" x="552" y="714">Hand over to walking</text>
+<text class="s" x="552" y="730">Next 10 s: no fall,</text>
+<text class="s" x="552" y="746">≥ 3 m along heading,</text>
+<text class="s" x="552" y="762">≥ 0.5 m/s mean</text>
+<text class="s" x="552" y="786">Plus videos and posture</text>
+<text class="s" x="552" y="802">counts for review</text>
+<path class="a" d="M220,754 H240"/><path class="a" d="M520,754 H540"/>
+</svg>
+
+<h3 style="margin-top:18px">Network architecture (fully connected, ELU activation; actor and critic share no weights)</h3>
+<svg viewBox="0 0 720 150" role="img" aria-label="Actor 123 to 256 to 128 to 128 to 37; critic 123 to 256 to 128 to 128 to 1">
+<text class="t" x="0" y="20">Actor (policy)</text><text class="s" x="110" y="20">85,962 parameters</text>
+<g><rect class="box" x="0" y="30" width="96" height="40" rx="6"/><text class="s" x="48" y="55" text-anchor="middle">input 123</text>
+<rect class="ours" x="124" y="30" width="96" height="40" rx="6"/><text class="s" x="172" y="55" text-anchor="middle">256</text>
+<rect class="ours" x="248" y="30" width="96" height="40" rx="6"/><text class="s" x="296" y="55" text-anchor="middle">128</text>
+<rect class="ours" x="372" y="30" width="96" height="40" rx="6"/><text class="s" x="420" y="55" text-anchor="middle">128</text>
+<rect class="box" x="496" y="30" width="224" height="40" rx="6"/><text class="s" x="608" y="55" text-anchor="middle">37 action means + 37 learned noise levels</text>
+<path class="a" d="M96,50 H124"/><path class="a" d="M220,50 H248"/><path class="a" d="M344,50 H372"/><path class="a" d="M468,50 H496"/></g>
+<text class="t" x="0" y="96">Critic (value)</text><text class="s" x="110" y="96">81,281 parameters; used in training only</text>
+<g><rect class="box" x="0" y="106" width="96" height="40" rx="6"/><text class="s" x="48" y="131" text-anchor="middle">input 123</text>
+<rect class="ours" x="124" y="106" width="96" height="40" rx="6"/><text class="s" x="172" y="131" text-anchor="middle">256</text>
+<rect class="ours" x="248" y="106" width="96" height="40" rx="6"/><text class="s" x="296" y="131" text-anchor="middle">128</text>
+<rect class="ours" x="372" y="106" width="96" height="40" rx="6"/><text class="s" x="420" y="131" text-anchor="middle">128</text>
+<rect class="box" x="496" y="106" width="224" height="40" rx="6"/><text class="s" x="608" y="131" text-anchor="middle">1 value estimate</text>
+<path class="a" d="M96,126 H124"/><path class="a" d="M220,126 H248"/><path class="a" d="M344,126 H372"/><path class="a" d="M468,126 H496"/></g>
+</svg>
+</body></html>
