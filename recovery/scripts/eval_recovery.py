@@ -45,9 +45,13 @@ with launch_simulation(env_cfg, args):
         dq = r.data.default_joint_pos.torch[0]; lim = r.data.soft_joint_pos_limits.torch[0]
         mask = torch.tensor([0.0 if K.is_hand_joint(n) else 1.0 for n in r.joint_names], device=dev)
         K.make_heldout(dq, lim[:, 0], lim[:, 1], mask, path=xa.heldout); print("made held-out set", xa.heldout)
-    runner = create_rsl_rl_runner(env, agent_cfg)
-    runner.load(args.checkpoint, map_location=agent_cfg.device) if args.checkpoint else None
-    policy = runner.get_inference_policy(device=dev)
+    from g1_recovery import host_port as _HP
+    if _HP.is_host_checkpoint(args.checkpoint):
+        policy = _HP.load_host_policy(args.checkpoint, dev)      # HoST-port actor (train_host.py)
+    else:
+        runner = create_rsl_rl_runner(env, agent_cfg)
+        runner.load(args.checkpoint, map_location=agent_cfg.device) if args.checkpoint else None
+        policy = runner.get_inference_policy(device=dev)
     # re-reset so the (possibly just created) held-out file is used
     u._rec_fixed = None
     f = np.load(xa.heldout); u._rec_fixed = {k: torch.as_tensor(f[k], device=dev) for k in ["z", "quat", "q", "category"]}

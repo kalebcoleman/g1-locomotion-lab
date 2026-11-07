@@ -38,9 +38,13 @@ with launch_simulation(env_cfg, args):
     env = C.create_isaaclab_env(args.task, env_cfg, args, convert_marl_to_single_agent=False)
     env = RslRlVecEnvWrapper(env, clip_actions=agent_cfg.clip_actions)
     u = env.unwrapped; dev = u.device
-    runner = create_rsl_rl_runner(env, agent_cfg)
-    if args.checkpoint: runner.load(args.checkpoint, map_location=agent_cfg.device)
-    policy = runner.get_inference_policy(device=dev)
+    from g1_recovery import host_port as _HP
+    if _HP.is_host_checkpoint(args.checkpoint):
+        policy = _HP.load_host_policy(args.checkpoint, dev)      # HoST-port actor (train_host.py)
+    else:
+        runner = create_rsl_rl_runner(env, agent_cfg)
+        if args.checkpoint: runner.load(args.checkpoint, map_location=agent_cfg.device)
+        policy = runner.get_inference_policy(device=dev)
     if xa.level is None:
         f = np.load(xa.heldout); u._rec_fixed = {k: torch.as_tensor(f[k], device=dev) for k in ["z", "quat", "q", "category"]}
     else:

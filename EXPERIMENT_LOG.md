@@ -211,3 +211,20 @@ The training flight penalty in R9hc/R8wc has the same loophole, which may have t
 
 ## v17 addition (launched 03:10): ground-only flight penalty
 `G1-Recovery-R9hg-v0`: R9hc with `free_flight_ground` at weight -20 replacing the net-contact flight penalty (-5); warm from R9hc it1000 (`init/R9hc_it1000.pt`, sha256 a343cf9d3969a84c...), 500 iterations. Hypothesis: airborne steps during the rise are now the main v3 failure, and the old penalty was both weak (about -1.8 per episode against height about +9.5) and blind to self-contact. Failure mode: a slower or no rise.
+
+## v18 check (03:34, DEV, v3 with ground-only flight)
+| checkpoint | v3 before 3b | by direction (side_a, prone, side_b, supine) | v2.1 | strict | stance | soft | hard |
+|---|---|---|---|---|---|---|---|
+| **R9hg it1100** | **94** | 22, 38, 10, 24 | 188 | 256 | 0.44 | 4.1 | 1.3 |
+| R9hc it1150 | 10 | 3, 2, 1, 4 | 137 | 255 | 0.43 | 9.5 | 1.7 |
+| R8wc it1100 | 3 | 0, 0, 2, 1 | 159 | 256 | 0.35 | 8.1 | 2.4 |
+| R8f it900 / R8p it900 / R8 it900 | 0 / 0 / 0 | - | 0 / 0 / 20 | 256 / 255 / 256 | 0.73 / 0.86 / 0.77 | 84 / 89 / 22 | 51 / 7 / 2 |
+R9hg it1100 3b: 64 of 64 checked robots pass. Single evaluation, one seed, DEV (used for selection). Video `media/20261107_03_R9hg_it1100_*`: rises in about 1 s, upright, normal stance, feet only.
+
+## Kaleb's direction (2026-11-07 ~04:00): build on the referenced code itself
+The documents from the Fable review (`kalebcoleman/g1-recovery` PR #1: `research/recovery_review_2026-11-07.md`, `research/REFERENCES.md`) were meant as the code base to use, not only as ideas. Cloned read-only into `~/isaac-workspace/external_src/` (not vendored): g1-humanoid-rl @224d579 (MIT), HoST @70bb580 (MIT), HumanUP @7516e0f (Apache-2.0), mjlab @dcdf6ce (Apache-2.0).
+- **g1-humanoid-rl ch. 14** (`recovery-task/`): height ramp 10, upright 2, action rate -0.03, no success termination, four lying resets, and it keeps mjlab's G1 terms (pose, dof limits, body angular velocity -0.05, angular momentum -0.02, self-collision cost -1). Our R6 recipe already matches its core; its self-collision cost and smaller penalties were not used.
+- **HoST** is the full method our recipes only borrowed from. Ported in `g1_recovery/host_port.py` and `scripts/train_host.py`: four reward groups (task = orientation x head height; regularisation; style; post-task target) with HoST's terms and scales; a multi-critic PPO (one critic per group, per-critic advantage normalisation, group weights 2.5/0.1/1/1, smoothness regulariser, adaptive KL 0.01, 50 steps per env, 5 x 4 updates); relative joint targets recomputed every physics substep with the 1.0 -> 0.25 action-rescale curriculum; 30 unactuated steps; 200 N pulling force while upright with its decay curriculum (training only; evaluation tasks `G1-Host-*-Eval-v0` have it off); 6-step observation history; actor 512-256-128 (tanh), critics 512-256; init std 0.8, entropy 0.01; HoST PD gains; terminations at base speed 20 m/s or joint speed 300 rad/s; one policy per fall family (supine, prone) as in HoST.
+- Robot and protocol differences: 37 joints (fingers excluded from style and limit terms); real torque limits; self-collision on; our DEV-like start sampler restricted to one family (+-30 deg) instead of HoST's fixed quaternion; head point = torso_link + R(0, 0, 0.45) and foot corners from HoST's URDF offsets; target base height 0.72 m (HoST 0.75 m). No HoST domain randomisation beyond our env's friction and mass events. HoST trains 12,000 iterations on 4096 envs; these runs use 8192 envs and 6000 iterations.
+- Launched outside the Isaac MCP (`runs/host_Supine.log`, `runs/host_Prone.log`, checkpoints in `runs/host_*`), because `isaaclab__train` only runs Isaac Lab's rsl_rl script and cannot run a custom multi-critic trainer. MCP gap to fix: custom training entry points.
+- HumanUP's two-stage method (discovery, then tracking of the policy's own rollouts) is the next port if HoST stalls.
