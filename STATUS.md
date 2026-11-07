@@ -1,5 +1,5 @@
 # G1 Locomotion Lab (integrated, PRIVATE, local only): STATUS
-_Updated 2026-11-07 03:12 MST._ Nothing here has been pushed; the public repo `g1-locomotion-lab` is unchanged and must not receive private content without Kaleb's review.
+_Updated 2026-11-07 04:20 MST._ Nothing here has been pushed; the public repo `g1-locomotion-lab` is unchanged and must not receive private content without Kaleb's review.
 
 ## Goal
 Simulated Unitree G1 (Isaac Lab 3.0.0, Newton/MJWarp): walk -> fall -> recover unassisted -> stable stand -> resume walking/turning. Targets: >=50% plausible unassisted recoveries on a fixed held-out set; >=50% recovery->walking chains; stretch: continuous walk->push->fall->recover->walk/turn. These are goals, not results.
@@ -18,7 +18,7 @@ Simulated Unitree G1 (Isaac Lab 3.0.0, Newton/MJWarp): walk -> fall -> recover u
 - v17: `20261107-022451` R9hc and `-022453` R8wc (self-collision on, warm starts). R7 runs and R7u warm finished.
 - v16, from the independent review: `20261106-235212` R8 control; `-235213` R8f (E1); `-235215` R8s (E2 supine); `-235216` R8p (E2 prone).
 Check rule for v16: DEV at iteration 300 with video, then audit any pass with `diag_trace.py` + `audit_trace.py`. HELDOUT only for the final comparison (3 evaluations each); TEST untouched.
-**Best verified result:** full v3 on about 2-5 of 256 DEV poses (R9hc it1000 with ground-only flight; R8w warm it850). About 1-2%, one seed, DEV only. A 106/256 figure for R9hc was a measurement loophole (self-contact hid flight), found and closed. Main remaining failure: airborne steps during the rise.
+**Best verified result:** R9hg it1100 (`init/` not yet; run `2026-11-07_03-02-51/model_1100.pt`): full v3 on HELDOUT 127-129/256 (49.6-50.4%) over three evaluations, incl. self-penetration on all robots. By family: prone ~78%, side_a ~50%, supine ~46%, side_b ~27%. One seed, warm-start chain, TEST untouched, no walking chain yet.
 **Closest behaviour:** R7m and R7h iteration 500 hold a stable wide straddle from all directions (strict 255 and 256 of 256) but score 0 under v2.1, with an ankle roll at its hard stop on 75-83% of steps. Not counted.
 **Criteria:** v3 (v2.1 + Amendment 3), approved 2026-11-07. Under v3 every checkpoint so far scores 0. R7h iteration 650 passes the older v2.1 on 174/256 DEV poses but fails v3 on stance and torque.
 

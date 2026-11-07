@@ -228,3 +228,16 @@ The documents from the Fable review (`kalebcoleman/g1-recovery` PR #1: `research
 - Robot and protocol differences: 37 joints (fingers excluded from style and limit terms); real torque limits; self-collision on; our DEV-like start sampler restricted to one family (+-30 deg) instead of HoST's fixed quaternion; head point = torso_link + R(0, 0, 0.45) and foot corners from HoST's URDF offsets; target base height 0.72 m (HoST 0.75 m). No HoST domain randomisation beyond our env's friction and mass events. HoST trains 12,000 iterations on 4096 envs; these runs use 8192 envs and 6000 iterations.
 - Launched outside the Isaac MCP (`runs/host_Supine.log`, `runs/host_Prone.log`, checkpoints in `runs/host_*`), because `isaaclab__train` only runs Isaac Lab's rsl_rl script and cannot run a custom multi-critic trainer. MCP gap to fix: custom training entry points.
 - HumanUP's two-stage method (discovery, then tracking of the policy's own rollouts) is the next port if HoST stalls.
+
+## Candidate R9hg it1100: DEV repeats, HELDOUT x3, self-penetration (2026-11-07 04:20)
+DEV (selection set), v3 before 3b with ground-only flight: 94, 95, 97 / 256 (three evaluations). Neighbouring checkpoints: it1150 111, it1200 92, it1250 26; the policy degrades with more training, so the candidate is the checkpoint, not the run.
+**HELDOUT (first use for this candidate), three evaluations, assist off, criteria v3:**
+| eval | v3 before 3b | 3b pass among them | full v3 | side_a | prone | side_b | supine | v2.1 | strict |
+|---|---|---|---|---|---|---|---|---|---|
+| 1 | 128 | 128 | 128 (50.0%) | 29 | 47 | 19 | 33 | 213 | 256 |
+| 2 | 127 | 127 | 127 (49.6%) | 35 | 48 | 15 | 29 | 208 | 255 |
+| 3 | 129 | 129 | 129 (50.4%) | 31 | 52 | 19 | 27 | 211 | 256 |
+3b from a separate HELDOUT trace of the same checkpoint (`results/selfpen_R9hg_it1100_HELDOUT.json`): 256/256 robots pass, median worst depth 4 mm (10 Hz, convex-hull bound).
+By family, out of 64: prone 47-52 (73-81%), side_a 29-35 (45-55%), supine 27-33 (42-52%), side_b 15-19 (23-30%). **The 50% is an average across families; it does not hold for side_b or supine.**
+HELDOUT is easier than DEV in limb noise: half its poses have 0.1 rad instead of 0.4 rad.
+Limitations: one seed, and a warm-start chain (R7h scratch it650 -> R9h -> R9hc -> R9hg), so nothing yet about seed robustness. TEST untouched. Not yet chained to walking.
