@@ -247,3 +247,64 @@ class G1RecoveryR6cEnvCfg(G1RecoveryBaseEnvCfg):
     """R6c = R6b with lying-only starts (single change vs R6b); meant to be trained from scratch."""
     def __post_init__(self):
         super().__post_init__(); _recipe_mix(self, False); self.rewards = RewardsR6(); self.pose_mix = POSE_MIX_LYING
+
+
+# ---------------------------------------------------------------------------------------------------------- v15: fix the forward-fold optimum seen at the R6c check
+def upright_full(env):
+    """(1 + up) / 2 in [0, 1]: unlike `upright` (clamped at 0), it has a gradient when the torso is upside down (R6 policies hold up = -0.97)."""
+    return 0.5 * (1.0 - env.scene["robot"].data.projected_gravity_b.torch[:, 2])
+
+
+def imu_height_ramp(env, floor=0.1, target=0.85):
+    """Upper-body height: imu_link (0.85 m standing, 0.38 m in the fold). head_link/torso_link report the pelvis origin in this USD, so they cannot be used."""
+    r = env.scene["robot"]
+    if not hasattr(env, "_imu_bid"):
+        env._imu_bid = r.find_bodies("imu_link")[0][0]
+    h = r.data.body_pos_w.torch[:, env._imu_bid, 2] - env.scene.env_origins[:, 2]
+    return torch.clamp((h - floor) / (target - floor), 0.0, 1.0)
+
+
+def height_ramp_gated(env):
+    """Pelvis ramp x (0.25 + 0.75 * upright_full): a folded robot earns only a quarter of the height reward (HoST: orientation x height)."""
+    return height_ramp_floor(env) * (0.25 + 0.75 * upright_full(env))
+
+
+@configclass
+class RewardsR7u(RewardsR6):
+    """R6 with `upright_full` (single change: orientation gradient below horizontal)."""
+    upright = RewTerm(func=upright_full, weight=2.0)
+
+
+@configclass
+class RewardsR7h(RewardsR6):
+    """R6 with the height term on imu_link instead of the pelvis (single change)."""
+    height = RewTerm(func=imu_height_ramp, weight=10.0)
+
+
+@configclass
+class RewardsR7m(RewardsR6):
+    """R6 with the pelvis height gated by torso orientation (single change)."""
+    height = RewTerm(func=height_ramp_gated, weight=10.0)
+
+
+def _r7(cfg, rewards):
+    _recipe_mix(cfg, False); cfg.rewards = rewards(); cfg.pose_mix = POSE_MIX_LYING
+    return cfg
+
+
+@configclass
+class G1RecoveryR7uEnvCfg(G1RecoveryBaseEnvCfg):
+    def __post_init__(self):
+        super().__post_init__(); _r7(self, RewardsR7u)
+
+
+@configclass
+class G1RecoveryR7hEnvCfg(G1RecoveryBaseEnvCfg):
+    def __post_init__(self):
+        super().__post_init__(); _r7(self, RewardsR7h)
+
+
+@configclass
+class G1RecoveryR7mEnvCfg(G1RecoveryBaseEnvCfg):
+    def __post_init__(self):
+        super().__post_init__(); _r7(self, RewardsR7m)

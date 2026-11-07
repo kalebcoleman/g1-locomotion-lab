@@ -54,3 +54,24 @@ Selection rule: successive halving on `Curriculum/lying_ever_supported`, `lying_
 - Distribution (both, same in rad): target offset |mean| 0.25 rad, p99 1.6 rad. Raw |a| at scale 0.5: mean 0.49, p99 3.21, max 10.56; at scale 1.0: mean 0.25, p99 1.6, max 5.06. Output layer is linear and `clip_actions` is null, so the network itself never saturates; the effective saturation is joint targets beyond limits: 1.7% of joint-steps beyond soft, 1.0% beyond hard, up to 2.66 rad beyond soft (right elbow).
 - **Correction:** I had claimed a deep knee tuck was out of reach because it needs a mean action near 3.4 at scale 0.5. Raw actions already reach p99 3.2 and max 10.6, so reach of the MEAN is not the bottleneck. R5 tests only doubled exploration noise (0.16 -> 0.32 rad) plus any learning-dynamics effect of the rescaled output. To re-check on R5's trained checkpoints with `scripts/diag_actions.py`.
 - Sit-up policy past HARD limits on 9.5% of steps (any joint), up to 0.22 rad (hip pitch); soft 16.5%. Led to criteria v2.1.
+
+## Check at iteration 300 (from-scratch runs; 2026-11-06 ~22:40), DEV set, assist OFF, criteria v2.1, plus video review (`media/20261106_224419_chk300_*`)
+| run | ckpt | legacy | strict | v2 | v2.1 | ever supported | never rose | rose not upright | peak vz | pos-limit steps | past-hard steps | behaviour on video |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| R4 | 1300 | 0 | 0 | 0 | 0 | 0 | 168 | 88 | 0.63 | 0.00 | 0.0% | sits |
+| R4n | 1300 | 0 | 0 | 0 | 0 | 0 | 162 | 94 | 0.76 | 0.00 | 0.0% | sits |
+| R5 | 1300 | 0 | 0 | 0 | 0 | 0 | 157 | 99 | 0.84 | 0.02 | 0.0% | sits (frames not inspected individually) |
+| R4n scratch | 300 | 0 | 0 | 0 | 0 | 0 | 109 | 147 | 0.65 | 0.01 | 0.0% | sits, torso upright |
+| R6b | 1300 | 0 | 0 | 0 | 0 | 0 | 0 | 256 | 1.13 | 0.05 | 0.2% | sprawled/folded, pelvis raised |
+| R6c scratch | 350 | 0 | 0 | 0 | 0 | 0 | 0 | 256 | 1.24 | 0.40 | 3.3% | **all robots in a forward fold within ~1 s, then hold it** |
+**No valid get-up.** Diagnosis of R6c (`runs/probeH_V.log`): pelvis 0.52 m, imu_link 0.38 m, feet near the floor, pelvis up-vector **-0.97** (torso upside down). `upright = clamp(up, 0, 1)` is exactly 0 there: no gradient to uncurl. head_link/torso_link report the pelvis origin in this USD (`runs/probeH_stand.log`), imu_link does not (0.846 m standing).
+R4 vs R4n: assist made no visible difference at this stage (assist level stayed 1.0, no supported stands). R6 vs R4: the height-dominant reward moved the failure from "sits" to "fold": every pose rises above 0.35 m, none is upright.
+**Pruned (mine; checkpoints kept):** R4, R4n, R5, R4n-scratch, R6b. **Kept as control:** R6c scratch.
+
+## v15 (launched ~22:50; all from scratch unless noted, lying-only starts, seed 3, 16384 envs, 1000 its, lr 3e-4, no assist; single change vs R6c)
+| task | change | hypothesis |
+|---|---|---|
+| R7u | upright = (1 + up) / 2, gradient below horizontal | the clamp removes the only signal to uncurl |
+| R7h | height term on imu_link instead of pelvis (0.85 m standing) | a fold should not pay the height reward |
+| R7m | pelvis height x (0.25 + 0.75 upright_full) (HoST: orientation x height) | same, multiplicatively |
+| R7u warm from R6c@350 (`init/R6cS_fold_it350.pt`) | R7u, starting from the fold | can the fold be a stepping stone? |
