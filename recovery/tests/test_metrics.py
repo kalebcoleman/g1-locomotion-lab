@@ -23,6 +23,14 @@ def test_speed_uses_3d_not_xy_only():                  # xy speed 0.1 but vertic
     assert not M.supported_stand(T(0.7), T(0.95), torch.full((1, 2), 50.), torch.full((1, 2), 0.05), v3).item()
 
 
+def test_amendment3_torque_persist_stance():           # the R7m iteration-350 pattern: valid 2 s hold, but a wide straddle that drops to a kneel with torques above the real limits
+    assert M.torque_ok(T(15), 500).item() and not M.torque_ok(T(16), 500).item()
+    assert M.persists(T(0.90)).item() and not M.persists(T(0.10)).item()
+    assert M.stance_ok(T(0.60)).item() and not M.stance_ok(T(0.88)).item()
+    assert M.real_torque_limit("left_knee_joint") == 139.0 and M.real_torque_limit("torso_joint") == 88.0 and M.real_torque_limit("left_shoulder_roll_joint") == 25.0
+    assert M.real_torque_limit("left_zero_joint") == float("inf")
+
+
 def test_threshold_edges():
     f = torch.full((1, 2), 50.); z = torch.full((1, 2), 0.05)
     assert M.supported_stand(T(0.60), T(0.90), f, z, T(0.59)).item()

@@ -284,7 +284,9 @@ def reset_fallen(env, env_ids, fixed_poses: str | None = None):
             lv = get_levels(env)[ids]
         amin = torch.tensor(LEVEL_ALPHA_MIN, device=dev)[lv]; amax = torch.tensor(LEVEL_ALPHA_MAX, device=dev)[lv]
         jn = torch.tensor(LEVEL_JOINT_NOISE, device=dev)[lv]
-        z, quat, q = sample_poses(n, amin, amax, jn, defq, lim[:, 0], lim[:, 1], mask, env._rec_gen, dev)
+        fam = getattr(env.cfg, "pose_phi_deg", None)       # one fall family: (centre deg, half-width deg); None = all directions
+        phi = None if fam is None else (fam[0] + (torch.rand(n, generator=env._rec_gen).to(dev) * 2 - 1) * fam[1]) * math.pi / 180.0
+        z, quat, q = sample_poses(n, amin, amax, jn, defq, lim[:, 0], lim[:, 1], mask, env._rec_gen, dev, phi=phi)
         bank = get_bank(env)
         if bank is not None:
             for L, sel in ((1, bank["sit"]), (2, bank["mid"])):

@@ -6,6 +6,8 @@ from isaaclab.managers import RewardTermCfg as RewTerm
 from isaaclab.managers import SceneEntityCfg
 from isaaclab.utils import configclass
 from isaaclab.envs import mdp
+from isaaclab.envs.mdp.actions.joint_actions import JointPositionAction
+from isaaclab.envs.mdp.actions.actions_cfg import JointPositionActionCfg
 from . import common as K
 from .env_cfg import G1RecoveryBaseEnvCfg
 
@@ -308,3 +310,104 @@ class G1RecoveryR7hEnvCfg(G1RecoveryBaseEnvCfg):
 class G1RecoveryR7mEnvCfg(G1RecoveryBaseEnvCfg):
     def __post_init__(self):
         super().__post_init__(); _r7(self, RewardsR7m)
+
+
+# --- v16 (R8 family). Base R8 = R7m with the stand bonus on the feet-supported mask; E1 = R8f; E2 = R8s / R8p; see EXPERIMENT_LOG.md
+def standing_bonus_supported(env):
+    """standing_bonus on the same feet-supported condition the evaluator requires (the R1-R7 recipes used the pelvis + tilt mask, so unsupported stands were rewarded)."""
+    r = env.scene["robot"]
+    m = (K.standing_mask(env) & K.supported_mask(env)).float()
+    still = torch.exp(-torch.sum(torch.square(r.data.root_lin_vel_b.torch), -1) - 0.5 * torch.sum(torch.square(r.data.root_ang_vel_b.torch), -1))
+    return m * (0.5 + 0.5 * still)
+
+
+_PROP_WORDS = {"palm", "zero", "one", "two", "three", "four", "five", "six", "elbow", "knee", "head"}
+
+
+def _contact_groups(env):
+    if not hasattr(env, "_cg_feet"):
+        names = list(env.scene.sensors["contact_forces"].body_names)
+        env._cg_feet = [i for i, n in enumerate(names) if "ankle_roll" in n]
+        env._cg_prop = [i for i, n in enumerate(names) if _PROP_WORDS & set(n.split("_"))]
+    return env._cg_feet, env._cg_prop
+
+
+def feet_load_share(env):
+    """Share of all contact force carried by the feet, paid only while both feet are loaded."""
+    feet, _ = _contact_groups(env)
+    F = torch.linalg.norm(env.scene.sensors["contact_forces"].data.net_forces_w.torch, dim=-1)
+    both = (F[:, feet] > K.SUPPORT_FORCE_N).all(-1).float()
+    return both * F[:, feet].sum(-1) / (F.sum(-1) + 1.0)
+
+
+def prop_force(env, pelvis_h=0.40, full_n=100.0):
+    """Contact force on hands, elbows, knees and head once the pelvis is above `pelvis_h` (early propping from lying stays free); saturates at `full_n`."""
+    _, prop = _contact_groups(env)
+    F = torch.linalg.norm(env.scene.sensors["contact_forces"].data.net_forces_w.torch, dim=-1)
+    h = env.scene["robot"].data.root_pos_w.torch[:, 2] - env.scene.env_origins[:, 2]
+    return (h > pelvis_h).float() * torch.clamp(F[:, prop].sum(-1) / full_n, max=1.0)
+
+
+@configclass
+class RewardsR8(RewardsR7m):
+    """R7m with the stand bonus on the feet-supported mask (single change vs R7m)."""
+    stand = RewTerm(func=standing_bonus_supported, weight=5.0)
+
+
+@configclass
+class RewardsR8f(RewardsR8):
+    """E1: R8 + feet-load-share reward + gated prop-force penalty."""
+    feet_share = RewTerm(func=feet_load_share, weight=3.0)
+    prop = RewTerm(func=prop_force, weight=-2.0)
+
+
+class SettleJointPositionAction(JointPositionAction):
+    """For the first `settle_steps` control steps of an episode the target follows the measured joint position: stiffness does no work and only joint damping acts, so the robot settles passively under gravity."""
+
+    def process_actions(self, actions):
+        super().process_actions(actions)
+        m = self._env.episode_length_buf < self.cfg.settle_steps
+        if m.any():
+            self._processed_actions[m] = self._asset.data.joint_pos.torch[m][:, self._joint_ids]
+
+
+@configclass
+class SettleJointPositionActionCfg(JointPositionActionCfg):
+    class_type: type = SettleJointPositionAction
+    settle_steps: int = 30
+
+
+def _r8(cfg, rewards, phi_deg=None, settle=0):
+    _r7(cfg, rewards)
+    if phi_deg is not None:
+        cfg.pose_phi_deg = phi_deg
+    if settle:
+        a = cfg.actions.joint_pos
+        cfg.actions.joint_pos = SettleJointPositionActionCfg(asset_name=a.asset_name, joint_names=a.joint_names, scale=a.scale, use_default_offset=a.use_default_offset, preserve_order=a.preserve_order, clip=a.clip, settle_steps=settle)
+    return cfg
+
+
+@configclass
+class G1RecoveryR8EnvCfg(G1RecoveryBaseEnvCfg):
+    def __post_init__(self):
+        super().__post_init__(); _r8(self, RewardsR8)
+
+
+@configclass
+class G1RecoveryR8fEnvCfg(G1RecoveryBaseEnvCfg):
+    def __post_init__(self):
+        super().__post_init__(); _r8(self, RewardsR8f)
+
+
+@configclass
+class G1RecoveryR8sEnvCfg(G1RecoveryBaseEnvCfg):
+    """E2: R8, supine family only (phi 270 +- 30 deg), 30-step passive settle."""
+    def __post_init__(self):
+        super().__post_init__(); _r8(self, RewardsR8, phi_deg=(270.0, 30.0), settle=30)
+
+
+@configclass
+class G1RecoveryR8pEnvCfg(G1RecoveryBaseEnvCfg):
+    """E2: R8, prone family only (phi 90 +- 30 deg), 30-step passive settle."""
+    def __post_init__(self):
+        super().__post_init__(); _r8(self, RewardsR8, phi_deg=(90.0, 30.0), settle=30)

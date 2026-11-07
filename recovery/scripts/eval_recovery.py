@@ -53,12 +53,19 @@ with launch_simulation(env_cfg, args):
     from g1_recovery import metrics as M
     _sens = u.scene.sensors["contact_forces"]; _bn = list(_sens.body_names); _feet = [i for i, n in enumerate(_bn) if "ankle_roll" in n]; _tr = [i for i, n in enumerate(_bn) if n in ("pelvis", "torso_link", "pelvis_contour_link", "head_link", "imu_link", "logo_link")]
     _fb = [r.body_names.index(n) for n in r.body_names if "ankle_roll" in n]; reached = torch.zeros(N, len(M.POSTURES), dtype=torch.bool, device=dev); _first = torch.full((N, len(M.POSTURES)), -1.0, device=dev)
+    # Amendment 3 and rising-window measurements (additive; the v2.1 verdicts above them are unchanged)
+    _lim = torch.tensor([M.real_torque_limit(n) for n in r.joint_names], device=dev); _bj = torch.isfinite(_lim); _org = u.scene.env_origins
+    _A = {k: [] for k in ["supp", "stance", "soft", "hard", "over"]}; _tmax = torch.zeros(N, device=dev)
     for s in range(steps):
         with torch.inference_mode():
             obs, _, dones, _ = env.step(policy(obs))
         _f = torch.linalg.norm(_sens.data.net_forces_w.torch, dim=-1)
         _pf = M.posture_flags(r.data.root_pos_w.torch[:, 2] - u.scene.env_origins[:, 2], -r.data.projected_gravity_b.torch[:, 2], _f[:, _feet], r.data.body_pos_w.torch[:, _fb, 2] - u.scene.env_origins[:, 2:3], _f[:, _tr].sum(-1), torch.linalg.norm(r.data.root_lin_vel_w.torch, dim=-1), t.run_s, u.step_dt)
         _first = torch.where(_pf & (_first < 0), torch.full_like(_first, s * u.step_dt), _first); reached |= _pf
+        _q = r.data.joint_pos.torch; _sl = r.data.soft_joint_pos_limits.torch; _hl = r.data.joint_pos_limits.torch; _ratio = r.data.applied_torque.torch.abs() / _lim
+        _pfeet = r.data.body_pos_w.torch[:, _fb, :2]; _A["stance"].append(torch.linalg.norm(_pfeet[:, 0] - _pfeet[:, 1], dim=-1)); _A["supp"].append(_pf[:, M.POSTURES.index("supported_stand_any")])
+        _A["soft"].append(((torch.maximum(_sl[..., 0] - _q, _q - _sl[..., 1]) > 0) & _bj).any(-1)); _A["hard"].append(((torch.maximum(_hl[..., 0] - _q, _q - _hl[..., 1]) > 0) & _bj).any(-1)); _A["over"].append(((_ratio > 1.0) & _bj).any(-1))
+        _tmax = torch.maximum(_tmax, (_ratio * _bj).max(-1).values)
     wall = time.time() - t0
     dt = u.step_dt; ok = t.succ
     res = dict(task=args.task, checkpoint=args.checkpoint, num_envs=N, episode_s=K.EPISODE_S, steps=steps, success_hold_s=K.HOLD_S,
@@ -100,6 +107,20 @@ with launch_simulation(env_cfg, args):
     if "difficulty" in _f.files:
         dif = torch.as_tensor(_f["difficulty"], device=dev)[torch.arange(N, device=dev) % len(_f["difficulty"])]; nz = _f["noise"]
         res["by_difficulty_limb_noise_rad"] = {str(round(float(v), 2)): dict(n=int((dif == i).sum()), plausible_v2_rate=float(plaus_v2[dif == i].float().mean()), plausible_v21_rate=float(plaus_v21[dif == i].float().mean()), strict_rate=float(ok_s[dif == i].float().mean()), legacy_rate=float(ok[dif == i].float().mean())) for i, v in enumerate(sorted(set(nz.tolist())))}
+    _B = {k: torch.stack(v, 0) for k, v in _A.items()}          # (T, N)
+    _over_steps = _B["over"].sum(0); _tq = M.torque_ok(_over_steps, steps); _tail = _B["supp"][-int(round(1.0 / dt)):].float().mean(0); _per = M.persists(_tail)
+    _hs = t.succ_start_s.long().clamp(0, steps - 1); _hlen = int(round(K.HOLD_S / dt)); _tidx = (_hs[None] + torch.arange(_hlen, device=dev)[:, None]).clamp(max=steps - 1)
+    _stance = _B["stance"].gather(0, _tidx).mean(0); _st = M.stance_ok(_stance)
+    _rise = torch.arange(steps, device=dev)[:, None] < _hs[None]; _rn = _rise.sum(0).clamp(min=1).float()    # steps from reset to the start of the counted hold
+    _rf = {k: (_B[k] & _rise).sum(0).float() / _rn for k in ["soft", "hard", "over"]}
+    a3a = plaus_v21 & _tq; a3full = a3a & _per & _st
+    _sv = lambda m, v: [round(float(x), 3) for x in v[m]] if m.any() else []
+    res["amendment3"] = dict(status="3a torque applied; 3b self-penetration measured offline by selfpen_check.py; 3c persistence and 3d stance are proposed, pending approval", real_limits=dict(M.REAL_TORQUE_LIMITS),
+        v21_and_torque=int(a3a.sum()), v21_torque_persist_stance=int(a3full.sum()), v21_persist=int((plaus_v21 & _per).sum()), v21_stance=int((plaus_v21 & _st).sum()), strict_persist=int((t.succ_s & _per).sum()),
+        torque_ok_robots=int(_tq.sum()), torque_over_step_frac_mean=float((_over_steps.float() / steps).mean()), torque_ratio_max=float(_tmax.max()), torque_ratio_max_mean=float(_tmax.mean()), still_supported_final_s=int(_per.sum()),
+        stance_hold_m_of_strict=_sv(t.succ_s, _stance)[:256], by_category_v21_torque={CAT: int(a3a[cat == i].sum()) for i, CAT in enumerate(K.CATEGORIES)},
+        rise_window_of_strict=dict(seconds_mean=float((_rn[t.succ_s] * dt).mean()) if t.succ_s.any() else None, soft_frac_mean=float(_rf["soft"][t.succ_s].mean()) if t.succ_s.any() else None, hard_frac_mean=float(_rf["hard"][t.succ_s].mean()) if t.succ_s.any() else None, torque_over_frac_mean=float(_rf["over"][t.succ_s].mean()) if t.succ_s.any() else None,
+                                  soft_le_10pct=int((_rf["soft"][t.succ_s] <= 0.10).sum()), hard_le_3pct=int((_rf["hard"][t.succ_s] <= 0.03).sum())))
     res["pose_set"] = os.path.basename(xa.heldout)
     res["postures_reached"] = {n: dict(envs=int(reached[:, i].sum()), first_time_s_mean=round(float(_first[:, i][reached[:, i]].mean()), 2) if reached[:, i].any() else None, by_category={CAT: int(reached[:, i][cat == j].sum()) for j, CAT in enumerate(K.CATEGORIES)}) for i, n in enumerate(M.POSTURES)}
     res["per_env"] = dict(strict=ok_s.int().tolist(), plausible_v2=plaus_v2.int().tolist(), plausible_v21=plaus_v21.int().tolist(), vel_viol_frac=[round(float(x), 3) for x in vvf], flight_frac=[round(float(x), 3) for x in (t.flight_steps.float() / steps)],

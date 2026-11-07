@@ -19,6 +19,9 @@ class Params:
     pos_viol_frac: float = 0.10      # joint-POSITION-limit-violating steps (v2 addition)
     hard_viol_frac: float = 0.03     # v2.1: steps with any body joint past its HARD limit (walking reference 1.5%)
     hard_excess: float = 0.10        # v2.1: max excursion past a hard limit, rad (walking reference p99 0.083, max 0.105)
+    torque_over_frac: float = 0.03   # Amendment 3a: steps with any body joint above Unitree's published torque limit
+    persist_frac: float = 0.90       # Amendment 3c (proposed): supported on at least this share of the final second
+    stance_max: float = 0.60         # Amendment 3d (proposed): mean distance between the feet over the 2 s hold, m
     walk_window_s: float = 10.0
     walk_dist: float = 3.0           # m along the commanded heading within the window
     walk_speed: float = 0.5          # m/s mean along heading
@@ -41,6 +44,29 @@ def plausible_recovery(supported_success, vel_viol_steps, flight_steps, pos_viol
     if assist_active is not None:
         ok = ok & ~assist_active
     return ok
+
+
+# Unitree's published actuator limits (unitree_rl_lab, BSD-3, G1 29-DoF cfg), Nm. This USD's elbow_pitch / elbow_roll / torso_joint map to elbow / wrist_roll / waist_yaw. Finger joints have no published entry and are excluded.
+REAL_TORQUE_LIMITS = (("hip_pitch", 88.0), ("hip_yaw", 88.0), ("hip_roll", 139.0), ("knee", 139.0), ("ankle", 50.0), ("torso_joint", 88.0), ("shoulder", 25.0), ("elbow", 25.0))
+
+
+def real_torque_limit(joint_name):
+    return next((v for k, v in REAL_TORQUE_LIMITS if k in joint_name), float("inf"))
+
+
+def torque_ok(over_steps, steps, p: Params = P):
+    """Amendment 3a: every body joint within the real limit on at least 97% of steps."""
+    return over_steps.float() / steps <= p.torque_over_frac
+
+
+def persists(supported_tail_frac, p: Params = P):
+    """Amendment 3c (proposed): still in the supported stand during the final second of the episode."""
+    return supported_tail_frac >= p.persist_frac
+
+
+def stance_ok(stance_hold_mean, p: Params = P):
+    """Amendment 3d (proposed): the counted hold is not a wide straddle."""
+    return stance_hold_mean <= p.stance_max
 
 
 def heading_progress(p0_xy, p1_xy, heading_xy):
