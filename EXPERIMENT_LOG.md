@@ -263,3 +263,13 @@ Assist off: 0 supported stands for either policy. Own family, of 64: supine poli
 - The two chain drivers started in the same second, so Isaac Lab gave their first stages the same log folder and their checkpoints overwrote each other. The surviving chain ("replicate A", now in stage R9h) is a valid replicate from either seed 4 or seed 5, not attributable. Seed 5 restarted with `chain_replicate_v2.sh` (unique `--run_name` per seed and stage). The original script was restored byte-for-byte for the running driver after an edit while it was being read.
 - HoST prone it2200 trace (`runs/traces/host_prone.npz`): on its own family, joints sit past their hard limits on ~94% of steps (ankle roll, hip yaw +-2.75, hip pitch 3.05, ankle pitch, shoulder roll), 0 strict stands. Cause: MJWarp joint limits are compliant (HoST trained on PhysX with stiff limits), HoST's actions are offsets from the current position, and its -100 limit penalty sits in the 0.1-weighted regularisation group. Proposed fix (awaiting approval): clamp joint targets to the limits inside the action.
 - Public repo: PR #1 (videos, pictures, architecture), #2 (short README) and #3 (badges, GIFs, results table) merged into kalebcoleman/g1-locomotion-lab main.
+
+## Replication result (2026-11-07 23:10; all runs finished; criteria v3 with ground-only flight)
+Same chain as the seed-3 candidate, hand-over iterations fixed in advance, final checkpoint R9hg it1100:
+| replicate | DEV v3 | HELDOUT full v3 (3 evals) | HELDOUT soft / hard limit steps | notes |
+|---|---|---|---|---|
+| seed 3 (original candidate) | 94-97 | 127-129 (49.6-50.4%) | 4 / 1.3% | |
+| **seed 5** (clean) | 77 | **105-112 (41.0-43.8%)** | 7 / 3% | 3b: 256/256 pass (trace); side_a 43-44, supine 31-38, side_b 16-18, prone 13-14 of 64 |
+| replicate A (seed 4 or 5, collided stage 1) | 1 | 2-4 (~1%) | 58 / 19% | stands (strict 249-256) but joints past limits |
+Two of three chains give 41-50% full v3 on HELDOUT; one fails on joint limits. Which direction is hard differs by seed (seed 3: prone best; seed 5: prone worst).
+HoST port, final (iteration 6000, rescale 0.25, assist off, DEV, own family): 0/64 strict stands for both; joints past hard limits on 91-95% of steps. The port does not work in our simulator without the joint-target clamp proposed above.
