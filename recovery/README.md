@@ -6,6 +6,10 @@ Work in progress. Simulation only: Isaac Lab 3.0.0 with Newton / MuJoCo-Warp, Un
 
 **Criteria v3** (all required): pelvis at least 0.60 m with the torso within 26 degrees of vertical and both feet carrying load, held for 2 s; no launch (upward pelvis speed at most 2 m/s); at most 2% of steps without ground contact; joint speed limits broken on at most 2% of steps; soft joint limits on at most 10% and hard limits on at most 3% of steps (at most 0.10 rad past); torque within Unitree's limits on at least 97% of steps; no limb passing through the body; feet at most 0.60 m apart; still standing in the final second; no assist force.
 
+<p align="center"><img src="media/recovery_best_close.gif" width="560" alt="Best policy so far, four lying starts"></p>
+
+<p align="center"><img src="media/recovery_before_after.gif" alt="Earlier forward fold (left) and current best (right), same 16 starts"></p>
+
 ## Architecture
 
 ![Recovery system](architecture/figures/recovery_system_dark.png)
@@ -37,7 +41,8 @@ Plain-language overview, PPO settings and version names: [architecture/SYSTEM_OV
 | <img src="media/20261107_02_R8wW_it850_close_sheet.png" width="360"> | [20261107_02_R8wW_it850_close.mp4](media/20261107_02_R8wW_it850_close.mp4) | Stance penalty narrows the straddle to about 0.45 m. | 3-7/256 v3 on DEV |
 | <img src="media/20261107_02_R8wW_it850_dev16_sheet.png" width="360"> | [20261107_02_R8wW_it850_dev16.mp4](media/20261107_02_R8wW_it850_dev16.mp4) | 16 DEV poses. | as above |
 
-## Failure modes that the criteria caught
+<details>
+<summary><b>Failure modes that the criteria caught</b></summary>
 
 | contact sheet | video | what it shows | verdict |
 |---|---|---|---|
@@ -48,7 +53,10 @@ Plain-language overview, PPO settings and version names: [architecture/SYSTEM_OV
 | <img src="media/20261106_235_chkv15_R7m_it350_close_sheet.png" width="360"> | [20261106_235_chkv15_R7m_it350_close.mp4](media/20261106_235_chkv15_R7m_it350_close.mp4) | Fast leg splay into a wide straddle, then drops to a kneel at about 8 s. | **Rejected:** passed the older v2.1 on 21-29 poses but not a stable stand; torque 3-6x real limits |
 | <img src="media/20261106_235_chkv15_R7m_it350_sheet.png" width="360"> | [20261106_235_chkv15_R7m_it350.mp4](media/20261106_235_chkv15_R7m_it350.mp4) | 16 DEV poses. | Rejected, as above |
 
-## Reward-design progression (iteration-300 checks)
+</details>
+
+<details>
+<summary><b>Reward-design progression (iteration-300 checks)</b></summary>
 
 | contact sheet | video | what it shows | verdict |
 |---|---|---|---|
@@ -63,7 +71,10 @@ Plain-language overview, PPO settings and version names: [architecture/SYSTEM_OV
 | <img src="media/20261106_224419_chk300_R4n_t1_3_6_9.png" width="360"> | [20261106_224419_chk300_R4n.mp4](media/20261106_224419_chk300_R4n.mp4) | Lying-dominant starts, no assist. | Sits |
 | <img src="media/20261106_224419_chk300_R4nS_t1_3_6_9.png" width="360"> | [20261106_224419_chk300_R4nS.mp4](media/20261106_224419_chk300_R4nS.mp4) | Same from scratch. | Sits |
 
-## Earlier rounds (before the current criteria)
+</details>
+
+<details>
+<summary><b>Earlier rounds (before the current criteria)</b></summary>
 
 | image | what it shows |
 |---|---|
@@ -77,4 +88,6 @@ Plain-language overview, PPO settings and version names: [architecture/SYSTEM_OV
 | <img src="media/earlier/20261106_190102_A8c_heldout_t1.5s.png" width="360"> | A8c: the launch exploit that scored 256/256 under the first criteria (rejected: airborne at 0.3 s) |
 | <img src="media/earlier/20261106_205009_V11_unassisted_16poses.gif" width="360"> | V11 without assist: crouched hand-and-foot postures, no flight |
 | <img src="media/earlier/20261106_205009_V11_unassisted_t6s.png" width="360"> | V11 without assist: crouched hand-and-foot postures, no flight |
+
+</details>
 
