@@ -27,7 +27,7 @@
 
 <rect class="up" x="20" y="38" width="680" height="64" rx="8"/>
 <text class="t" x="34" y="60">Isaac Lab 3.0.0 + Newton / MuJoCo-Warp physics, 200 Hz (4 physics steps per control step)</text>
-<text class="s" x="34" y="78">Unitree G1, full-collision model: 37 joints (12 legs, 1 torso, 10 arms, 14 hands), 38 collision shapes.</text>
+<text class="s" x="34" y="78">Unitree G1, full collision: 37 joints, 38 shapes, self-collision on, Unitree’s real torque limits.</text>
 <text class="s" x="34" y="94">Gravity and contacts always on. No hidden support or teleporting in evaluation.</text>
 
 <path class="a" d="M360,102 V128"/>
@@ -41,8 +41,8 @@
 
 <rect class="ours" x="20" y="206" width="300" height="72" rx="8"/>
 <text class="t" x="34" y="228">Recovery policy (being trained)</text>
-<text class="s" x="34" y="246">Command is zero. Trained here with PPO.</text>
-<text class="chip no" x="34" y="266">Status: no valid get-up yet</text>
+<text class="s" x="34" y="246">Command is zero. Best: R9hg iteration 1100.</text>
+<text class="chip wait" x="34" y="266">Best: 50% valid (v3) on HELDOUT, one seed</text>
 
 <rect class="up" x="400" y="206" width="300" height="72" rx="8"/>
 <text class="t" x="414" y="228">Walking policy (existing, unchanged)</text>
@@ -81,11 +81,11 @@
 <text class="s" x="212" y="574">exploration noise</text>
 <rect class="ours" x="380" y="470" width="150" height="136" rx="8"/>
 <text class="t" x="392" y="492">Reward</text>
-<text class="s" x="392" y="510">+ height, upright, stand</text>
-<text class="s" x="392" y="526">− joint-limit, speed,</text>
-<text class="s" x="392" y="542">flight, jerky action</text>
-<text class="s" x="392" y="558">Critic predicts return;</text>
-<text class="s" x="392" y="574">GAE gives advantage</text>
+<text class="s" x="392" y="510">+ IMU height, upright,</text>
+<text class="s" x="392" y="526">feet-loaded stand</text>
+<text class="s" x="392" y="542">− wide stance, flight,</text>
+<text class="s" x="392" y="558">joint limits, speed,</text>
+<text class="s" x="392" y="574">jerky action</text>
 <rect class="up" x="550" y="470" width="150" height="136" rx="8"/>
 <text class="t" x="562" y="492">PPO update</text>
 <text class="s" x="562" y="510">rsl_rl 5.5.1</text>
@@ -111,11 +111,11 @@
 <text class="s" x="252" y="714">Pelvis ≥ 0.60 m, tilt ≤ 26°, both feet carrying</text>
 <text class="s" x="252" y="730">load, slow pelvis: held 2 s continuously</text>
 <text class="s" x="252" y="748">No launch: peak upward speed ≤ 2 m/s</text>
-<text class="s" x="252" y="764">No flight: ≤ 2% of steps airborne</text>
+<text class="s" x="252" y="764">No flight: ≤ 2% of steps off the ground</text>
 <text class="s" x="252" y="780">Joint speed limit broken on ≤ 2% of steps</text>
 <text class="s" x="252" y="796">Soft position limit ≤ 10%, hard ≤ 3%, ≤ 0.10 rad</text>
-<text class="s" x="252" y="812">Real torque limits on ≥ 97% of steps; no self-overlap</text>
-<text class="s" x="252" y="828">Feet ≤ 0.60 m apart; still up in final second; no assist</text>
+<text class="s" x="252" y="812">Real torque limits ≥ 97% of steps, no self-overlap</text>
+<text class="s" x="252" y="828">Feet ≤ 0.60 m apart, up at the end, no assist</text>
 <rect class="box" x="540" y="672" width="160" height="164" rx="8"/>
 <text class="t" x="552" y="694">Then the chain</text>
 <text class="s" x="552" y="714">Hand over to walking</text>

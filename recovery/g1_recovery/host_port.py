@@ -78,7 +78,8 @@ def _H(env):
         h["target_q"] = tgt
         h["head_off"] = torch.tensor(HEAD_OFFSET, device=dev)
         h["aux"] = torch.tensor(AUX, device=dev)
-        h["force"] = torch.full((env.num_envs,), FORCE0 if getattr(env.cfg, "host_force", True) else 0.0, device=dev)
+        # G1R_HOST_FORCE_START restores the force curriculum when resuming a run (default FORCE0)
+        h["force"] = torch.full((env.num_envs,), float(os.environ.get("G1R_HOST_FORCE_START", FORCE0)) if getattr(env.cfg, "host_force", True) else 0.0, device=dev)
         # evaluation must use the action rescale the policy was trained at (HoST anneals it 1.0 -> 0.25); G1R_HOST_RESCALE sets it, default 1.0
         h["rescale"] = torch.full((env.num_envs,), float(os.environ.get("G1R_HOST_RESCALE", "1.0")), device=dev)
         h["last_head"] = torch.zeros(env.num_envs, device=dev)
