@@ -1,33 +1,62 @@
+<div align="center">
+
 # G1 Locomotion Lab
 
-**Training and evaluating a Unitree G1 humanoid in simulation: walking, and getting back up after a fall.**
-Isaac Lab 3.0.0 with the Newton / MuJoCo-Warp physics backend. Simulation only, no physical robot.
+**A Unitree G1 humanoid learning to walk, and to get back up after a fall, in simulation.**
+
+![Isaac Lab 3.0.0](https://img.shields.io/badge/Isaac%20Lab-3.0.0-76B900)
+![Physics](https://img.shields.io/badge/physics-Newton%20%2F%20MuJoCo--Warp-1f6feb)
+![Robot](https://img.shields.io/badge/robot-Unitree%20G1-555)
+![RL](https://img.shields.io/badge/RL-PPO%20(rsl__rl)-8250df)
+![Scope](https://img.shields.io/badge/scope-simulation%20only-lightgrey)
+![License](https://img.shields.io/badge/license-BSD--3--Clause-blue)
 
 ![Unitree G1 policies at training iteration 0 (left) and 1499 (right), same scripted commands](media/hero_before_after.gif)
 
-*16 robots per side, same scripted stand, walk, turn and stop commands. Left: untrained policy. Right: final walking policy. Fallen robots are reset in place.*
+<sub>16 robots per side, same scripted stand, walk, turn and stop commands. Left: untrained. Right: final walking policy. Fallen robots are reset in place.</sub>
 
-## Highlights
+</div>
+
+## Walking and getting up
 
 <table>
 <tr>
-<td width="50%"><img src="media/newton_best_single_robot.gif" alt="Final walking policy, one robot"><br><b>Walking.</b> 237 of 256 robots stayed up through a 24 s stand, walk, turn and stop test with random pushes (231 and 233 in reruns). Turning causes most falls.</td>
-<td width="50%"><img src="recovery/media/20261107_03_R9hg_it1100_close_sheet.png" alt="Best recovery policy so far"><br><b>Getting up (work in progress).</b> The best policy so far stands up unassisted from 49.6-50.4% of 256 held-out lying poses under strict validity checks. One seed; uneven across fall directions.</td>
+<td width="50%" align="center"><img src="media/newton_best_single_robot.gif" alt="Final walking policy, one robot"></td>
+<td width="50%" align="center"><img src="recovery/media/recovery_best_close.gif" alt="Best get-up policy, four lying starts"></td>
 </tr>
 <tr>
-<td><img src="media/progression_chart.png" alt="Walking training progression"><br>Walking: training log and scripted test across checkpoints.</td>
-<td><img src="recovery/architecture/figures/recovery_system_dark.png" alt="Recovery system architecture"><br>Recovery system: policies, hand-over, training loop and validity criteria.</td>
+<td valign="top"><b>Walking.</b> 237 of 256 robots stayed up through a 24 s stand, walk, turn and stop test with random pushes (231 and 233 in reruns). Most falls happen while turning.</td>
+<td valign="top"><b>Getting up</b> <i>(work in progress)</i>. From lying on the back, front or side, with no help, in about a second. The best policy passes strict validity checks on about half of held-out starting poses.</td>
 </tr>
 </table>
+
+## From a fold to a stand
+
+![Earlier policy stuck in a forward fold (left) and the current best policy standing (right), same 16 starting poses](recovery/media/recovery_before_after.gif)
+
+<sub>Same 16 lying starts, same camera, no assist. Left: an earlier reward settled into a forward fold, pelvis high and torso upside down. Right: the current best policy stands up.</sub>
+
+## At a glance
+
+| | Result | Notes |
+|---|---|---|
+| **Walking** | 237 / 256 robots stay up | 24 s scripted test with pushes; reruns 231 and 233; one seed |
+| **Getting up** | 49.6-50.4% of 256 held-out poses pass all checks | three evaluations, assist off; prone about 78%, side B about 27%; one seed |
+| **What "passes" means** | supported 2 s stand, no launch or flight, joint, torque and self-penetration limits, normal stance, still up at the end | details in [recovery/README.md](recovery/README.md) |
+| **Not done yet** | hand-over from getting up to walking; replication on more seeds | training now |
+
+## Architecture
+
+![Recovery system: physics, observations, recovery and walking policies, hand-over, training loop and validity criteria](recovery/architecture/figures/recovery_system_dark.png)
 
 ## Explore
 
 | | |
 |---|---|
-| **Walking write-up** | [Results](docs/WALKING.md#results-at-a-glance), [method and architecture](docs/WALKING.md#method-and-architecture), [how to reproduce](docs/WALKING.md#reproducing), [limitations](docs/WALKING.md#limitations) |
-| **Fall recovery** | [Videos, pictures and architecture](recovery/README.md), [system overview](recovery/architecture/SYSTEM_OVERVIEW.md) |
-| **GPU-physics check** | [Newton / MuJoCo-Warp kernels run on the GPU](diagnostics/README.md) |
-| **Data** | [Evaluation results](results/), [resolved configs](configs/), [scripts](scripts/) |
+| **Walking write-up** | [Results](docs/WALKING.md#results-at-a-glance) · [method](docs/WALKING.md#method-and-architecture) · [reproduce](docs/WALKING.md#reproducing) · [limitations](docs/WALKING.md#limitations) |
+| **Getting up** | [Video gallery](recovery/README.md) · [system overview](recovery/architecture/SYSTEM_OVERVIEW.md) · [network diagram](recovery/architecture/figures/network_architecture_dark.png) |
+| **GPU physics check** | [Newton / MuJoCo-Warp kernels run on the GPU](diagnostics/README.md) |
+| **Data** | [Results](results/) · [configs](configs/) · [scripts](scripts/) |
 
 ## Credits and licenses
 
