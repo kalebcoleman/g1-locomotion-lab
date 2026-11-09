@@ -5,7 +5,7 @@ Rules: existing scripts/config only until a source change is approved; no hardwa
 |---|---|---|
 | M0 | reproducible commands, provenance, resume/checkpoint/gate validation, document negative pilot | done; committed on branch `m1-metrics-and-m0-docs` (local, not pushed) |
 | M1 | movement-quality telemetry + early-rise spread knobs | implemented and validated on the frozen baseline (`eval_recovery.py`, `diag_trace.py`, `metrics.movement_metrics`, `lane_a.STANCE_DEFAULTS`); committed on the branch, not pushed |
-| M2 | frozen walk -> actual fall -> get-up -> stable stand -> walk, resets never credited | not started; existing `scripts/eval_chain.py` is stage 2 (reset-start poses), a continuous-fall runner is not confirmed to exist (Stage 3 in `EVAL_PROTOCOL.md` is "stretch") |
+| M2 | frozen walk -> actual fall -> get-up -> stable stand -> walk, resets never credited | implemented as an evaluation (`eval_fall_handover.py`); 6 of 250 induced falls complete the sequence under the v3 gate, 25 of 248 under a strict-stand gate; see `pilots/m2_fall_handover_20261108/README.md` |
 | M3 | rough terrain, same 37-joint morphology | later; needs obs (123-d) and action (37-d) compatibility check against the walking policy (same dims confirmed for the recovery policy; terrain obs may add height scan) |
 | M4 | pushes, friction randomisation | later; base env already has friction/mass startup events, pushes disabled in recovery |
 | imitation | human reference tracking | gated: legal data (LAFAN1 NC-ND), morphology (no waist roll/pitch in this env), trainer (none usable); see `REFERENCE_DATA_RESEARCH.md` |
