@@ -1,6 +1,6 @@
 {
  "task": "G1-Recovery-A-Assist-v0",
- "checkpoint": "/home/kacolem8@ad.asu.edu/isaac-workspace/projects/g1-locomotion-lab-integrated/recovery/checkpoints/V11_launchpen5_assist_it599.pt",
+ "checkpoint": "<workspace>/projects/g1-locomotion-lab-integrated/recovery/checkpoints/V11_launchpen5_assist_it599.pt",
  "num_envs": 256,
  "episode_s": 10.0,
  "steps": 500,

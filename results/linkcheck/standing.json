@@ -1,6 +1,6 @@
 {
  "label": "standing",
- "checkpoint": "/home/kacolem8@ad.asu.edu/isaac-workspace/projects/g1-locomotion-lab-integrated/checkpoints/walking_newton_it1499.pt",
+ "checkpoint": "<workspace>/projects/g1-locomotion-lab-integrated/checkpoints/walking_newton_it1499.pt",
  "seconds": 3.0,
  "num_envs": 16,
  "all_body_names": [

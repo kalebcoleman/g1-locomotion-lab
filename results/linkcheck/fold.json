@@ -1,6 +1,6 @@
 {
  "label": "fold",
- "checkpoint": "/home/kacolem8@ad.asu.edu/isaac-workspace/envs/lab-3.0.0-src/logs/rsl_rl/g1_recovery_r/init/R6cS_fold_it350.pt",
+ "checkpoint": "<workspace>/envs/lab-3.0.0-src/logs/rsl_rl/g1_recovery_r/init/R6cS_fold_it350.pt",
  "seconds": 5.0,
  "num_envs": 16,
  "all_body_names": [

@@ -1,6 +1,6 @@
 {
  "task": "G1-Recovery-R5-Eval-v0",
- "checkpoint": "/home/kacolem8@ad.asu.edu/isaac-workspace/envs/lab-3.0.0-src/logs/rsl_rl/g1_recovery_r/init/laneA_v1_situp_it999_scale1p0.pt",
+ "checkpoint": "<workspace>/envs/lab-3.0.0-src/logs/rsl_rl/g1_recovery_r/init/laneA_v1_situp_it999_scale1p0.pt",
  "action_scale": 1.0,
  "pose_set": "dev_v1.npz",
  "num_envs": 256,
@@ -79,7 +79,7 @@
   "left_hip_pitch_joint": 0.0
  },
  "compare": {
-  "ckpt": "/home/kacolem8@ad.asu.edu/isaac-workspace/envs/lab-3.0.0-src/logs/rsl_rl/g1_recovery_r/init/laneA_v1_situp_it999.pt",
+  "ckpt": "<workspace>/envs/lab-3.0.0-src/logs/rsl_rl/g1_recovery_r/init/laneA_v1_situp_it999.pt",
   "scale": 0.5,
   "target_diff_rad_max": 2.384185791015625e-06,
   "target_diff_rad_mean": 2.9592808914458146e-07,

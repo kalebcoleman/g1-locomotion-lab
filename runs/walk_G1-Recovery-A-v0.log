@@ -2,7 +2,7 @@ Visual material specified for ground plane but no diffuse color found. Preservin
 I: Initializing Version 2.74.0-release.7316+gl.ec99a64b
 I: Client ID: 4DGW7SCO
 I: ThreadId(02) hub_client::client::Client::new Launching client mode=Shared with_cleaner=false cache_path=None cache_size=None
-I: ThreadId(03) launch self=Launcher { discovery_lock: RwLock { lock: RwLock { inner: File { fd: 54, path: "/tmp/hub-kacolem8@ad.asu.edu.lock", read: false, write: true } } }, mode: Shared, with_cleaner: false, config_file: "/tmp/hub-kacolem8@ad.asu.edu-656E79C0.config.json" } cmd="hub" "--mode=shared" "--write-config" "/tmp/hub-kacolem8@ad.asu.edu-656E79C0.config.json" "--"
+I: ThreadId(03) launch self=Launcher { discovery_lock: RwLock { lock: RwLock { inner: File { fd: 54, path: "/tmp/hub-<user>.lock", read: false, write: true } } }, mode: Shared, with_cleaner: false, config_file: "/tmp/hub-<user>-656E79C0.config.json" } cmd="hub" "--mode=shared" "--write-config" "/tmp/hub-<user>-656E79C0.config.json" "--"
 I: Not using Hub: Hub not found
 I: Successfully created S3 provider for https://omniverse-content-production.s3-us-west-2.amazonaws.com
 I: Using CloudFront http://dcb18d6mfegct.cloudfront.net/, List = No
@@ -152,4 +152,4 @@ Critic Model: MLPModel(
   )
 )
 CUDA graph took: Last: 0.462782 s, Mean: 0.462782 s, Std: 0.000000 s, N: 1
-WALK_JSON {"task": "G1-Recovery-A-v0", "robot_model": "full-collision g1.usd", "checkpoint": "/home/kacolem8@ad.asu.edu/isaac-workspace/projects/g1-locomotion-lab-integrated/checkpoints/walking_newton_it1499.pt", "num_envs": 256, "pushes_m_s": 0.0, "protocol": "3 s settle (zero cmd), 10 s walk vx=0.80, 8 s turn wz=0.80; walk ok = no fall AND >=3 m along heading AND >=0.5 m/s", "fell_in_settle": 0, "fell_in_walk": 0, "fell_in_turn": 6, "walk_successes": 256, "walk_success_rate": 1.0, "along_disp_m_mean": 6.371963024139404, "along_disp_m_p10": 5.912144660949707, "lateral_m_mean": -2.6210389137268066, "fwd_tracking_abs_err_mean": 0.09333083033561707, "turn_yaw_rad_mean": 4.03043270111084, "turn_yaw_target_rad": 6.4, "turn_success_ge_90deg": 250}
+WALK_JSON {"task": "G1-Recovery-A-v0", "robot_model": "full-collision g1.usd", "checkpoint": "<workspace>/projects/g1-locomotion-lab-integrated/checkpoints/walking_newton_it1499.pt", "num_envs": 256, "pushes_m_s": 0.0, "protocol": "3 s settle (zero cmd), 10 s walk vx=0.80, 8 s turn wz=0.80; walk ok = no fall AND >=3 m along heading AND >=0.5 m/s", "fell_in_settle": 0, "fell_in_walk": 0, "fell_in_turn": 6, "walk_successes": 256, "walk_success_rate": 1.0, "along_disp_m_mean": 6.371963024139404, "along_disp_m_p10": 5.912144660949707, "lateral_m_mean": -2.6210389137268066, "fwd_tracking_abs_err_mean": 0.09333083033561707, "turn_yaw_rad_mean": 4.03043270111084, "turn_yaw_target_rad": 6.4, "turn_success_ge_90deg": 250}

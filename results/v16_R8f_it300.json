@@ -1,6 +1,6 @@
 {
  "task": "G1-Recovery-R8f-v0",
- "checkpoint": "/home/kacolem8@ad.asu.edu/isaac-workspace/envs/lab-3.0.0-src/logs/rsl_rl/g1_recovery_r/2026-11-06_23-52-16/model_300.pt",
+ "checkpoint": "<workspace>/envs/lab-3.0.0-src/logs/rsl_rl/g1_recovery_r/2026-11-06_23-52-16/model_300.pt",
  "num_envs": 256,
  "episode_s": 10.0,
  "steps": 500,
