@@ -27,8 +27,8 @@ Check rule for v16: DEV at iteration 300 with video, then audit any pass with `d
 - Recipes are baked into task ids (no env vars): `G1-Recovery-R1-v0`, `R2-v0` and `-Eval-v0` variants (assist off).
 
 ## Documentation
-- `docs/SYSTEM_OVERVIEW.md`: version names, active jobs and their controls, PPO settings, network architecture, reward weights, limitations, sources.
-- `docs/figures/recovery_system_dark.png`, `docs/figures/network_architecture_dark.png` (sources: `docs/*_diagram.html`).
+- `recovery/architecture/SYSTEM_OVERVIEW.md`: version names, active jobs and their controls, PPO settings, network architecture, reward weights, limitations, sources.
+- `recovery/architecture/figures/recovery_system_dark.png`, `recovery/architecture/figures/network_architecture_dark.png` (sources: `recovery/architecture/*_diagram.html`).
 
 ## Next
 1. R8w warm: DEV after 100 new iterations; is the stance narrowing, and does it hold a stand?

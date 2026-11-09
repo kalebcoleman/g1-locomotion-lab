@@ -1,8 +1,8 @@
 # G1 Locomotion Lab: system overview
 
-Written 2026-11-06 for discussing the project with Dr. Zhang. Simulation only (Isaac Lab 3.0.0, Newton/MuJoCo-Warp, Unitree G1). For live job state and the latest results, see `../STATUS.md` and `../EXPERIMENT_LOG.md`.
+Written 2026-11-06 for discussing the project with Dr. Zhang, updated 2026-11-07. Simulation only (Isaac Lab 3.0.0, Newton/MuJoCo-Warp, Unitree G1). The experiment log, protocol and code live in the private working project; this public copy covers the architecture.
 
-**Current result:** walking is verified, recovery is not solved. No policy has produced a valid unassisted get-up under criteria v2.1 or v3. The closest behaviour is a stable wide straddle (`../EXPERIMENT_LOG.md`).
+**Current result (2026-11-07):** walking is verified. Recovery: the best policy so far (R9hg, iteration 1100) passes criteria v3 on 127-129 of 256 HELDOUT poses (49.6-50.4%) over three evaluations, with assist off and the self-penetration check included. One seed, a warm-start chain; prone about 78%, side A about 50%, supine about 46%, side B about 27%. TEST is untouched and the hand-over to walking is not yet tested. See `../README.md` for the videos.
 
 ## Short version
 
@@ -54,8 +54,8 @@ Two separate numbering schemes both use "v". Say which one you mean.
 
 | Name | What it means |
 |---|---|
-| Criteria v1, v1.1, v2, v2.1, v3 | The rules for counting a success. v3 (v2.1 + Amendment 3) is current (`../EVAL_PROTOCOL.md`). |
-| Training rounds v1–v15 | Batches of experiments, in order. Rounds 1–12 are in `recovery/`; v13–v15 use the R recipes. |
+| Criteria v1, v1.1, v2, v2.1, v3 | The rules for counting a success. v3 (v2.1 + Amendment 3) is current (evaluation protocol in the private project). |
+| Training rounds v1–v15 | Batches of experiments, in order. Rounds 1–12 used the earlier lane recipes; v13–v15 use the R recipes. |
 | Lane A / Lane B | Early approaches: A is task reward, B is HoST-inspired assist force with staged rewards. |
 | A1…A9, B1…B6, V10–V12 | Runs from rounds 1–12. |
 | R1–R7 | Reward and training recipes from rounds 13–15; each usually adds one change. |
@@ -78,7 +78,7 @@ Two separate numbering schemes both use "v". Say which one you mean.
 | R6c | R6b + lying-only starts |
 | R7u, R7h, R7m | R6c + one reward change (below) |
 
-## v15 experiments
+## v15 experiments (historical snapshot, 2026-11-06 23:17)
 
 All five jobs use 16,384 robots, seed 3, a 3e-4 learning rate and no assist. Iterations are a snapshot from about 23:17 MST on 2026-11-06.
 
@@ -127,4 +127,4 @@ From the run's saved `env.yaml`. The reward manager scales each term by the time
 - Schulman et al., "High-Dimensional Continuous Control Using Generalized Advantage Estimation", 2015, arXiv:1506.02438.
 - HoST: Huang et al., RSS 2025, arXiv:2502.08378, MIT licence, https://github.com/InternRobotics/HoST. Ideas adapted with attribution; code not copied.
 - HumanUP: He, Dong et al., RSS 2025, arXiv:2502.12152, Apache-2.0, https://github.com/RunpeiDong/HumanUP. Ideas adapted with attribution; code not copied.
-- Comparison notes: `../recovery/research/host_humanup_vs_ours.md`.
+- HoST and HumanUP were later cloned read-only and HoST was ported to Isaac Lab (multi-critic PPO, reward groups, force curriculum); that port is still training.

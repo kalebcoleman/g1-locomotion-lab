@@ -1,5 +1,5 @@
-# Provenance of imported components (integration project, PRIVATE, local only)
-Nothing here has been pushed. The originals are untouched; this folder is a new git repo (branch `integration/main`).
+# Provenance of imported components (integration project)
+Status 2026-11-08: this history was written as a private, local-only integration repo (branch `integration/main`) and was published to this repository through PR #4 on Kaleb's decision. The table below records the state at import time; entries marked private were private then. Originals are untouched.
 | Component | Source | Commit | Visibility | How imported | Licence |
 |---|---|---|---|---|---|
 | `walking/` | https://github.com/kalebcoleman/g1-locomotion-lab (local `projects/g1-locomotion-lab`) | 8f137ed | public | `git subtree add` with full history | BSD-3 (original) + third-party notices inside |
