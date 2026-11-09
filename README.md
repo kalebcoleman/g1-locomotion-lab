@@ -26,7 +26,7 @@
 </tr>
 <tr>
 <td valign="top"><b>Walking.</b> 237 of 256 robots stayed up through a 24 s stand, walk, turn and stop test with random pushes (231 and 233 in reruns). Most falls happen while turning.</td>
-<td valign="top"><b>Getting up</b> <i>(work in progress)</i>. From lying on the back, front or side, with no help, in about a second. The best policy passes strict validity checks on about half of held-out starting poses.</td>
+<td valign="top"><b>Getting up</b> <i>(work in progress)</i>. From lying on the back, front or side, with no help, in about a second. The current baseline passes strict validity checks on 68% of held-out starting poses.</td>
 </tr>
 </table>
 
@@ -34,16 +34,28 @@
 
 ![Earlier policy stuck in a forward fold (left) and the current best policy standing (right), same 16 starting poses](recovery/media/recovery_before_after.gif)
 
-<sub>Same 16 lying starts, same camera, no assist. Left: an earlier reward settled into a forward fold, pelvis high and torso upside down. Right: the current best policy stands up.</sub>
+<sub>Same 16 lying starts, same camera, no assist. Left: an earlier reward settled into a forward fold, pelvis high and torso upside down. Right: a get-up policy standing up.</sub>
 
 ## At a glance
 
 | | Result | Notes |
 |---|---|---|
 | **Walking** | 237 / 256 robots stay up | 24 s scripted test with pushes; reruns 231 and 233; one seed |
-| **Getting up** | 49.6-50.4% of 256 held-out poses pass all checks | three evaluations, assist off; prone about 78%, side B about 27%; one seed |
+| **Getting up** | **68.2%** of 256 held-out poses pass all checks (mean 174.7 of 256), up from 50.5% (129.3) | checkpoint `recC`, assist off, one seed; by direction (of 64 each) side A 52, prone 52, side B 36, supine 35, against 31, 47, 19, 33 before |
+| **Hand-over, getting up to walking** | 6 of 250 robots pass the strict check when handed to the walking policy straight away; **28.7%** with a blend of the upper body; **99.9%** when the hand-over waits for a readiness check instead | zero re-falls with the blend; the readiness gate is not the same test as the strict check ([M2b](pilots/m2b_handover_fixes_20261108/README.md)) |
+| **Pushes** | half of the robots fall at about 2.2 m/s of added speed (M50 2.16 m/s) | training used pushes up to 0.5 m/s; weakest to the left and rear-left (about 1.4 m/s), strongest forward-right (3.4 to 3.6) ([M4](pilots/m4_robustness_20261108/README.md)) |
+| **Low friction** | M50 falls from 2.16 m/s at friction 1.0 to 1.45 at 0.3 | walking alone survives 98-99% of the first 3 s down to 0.4 and 56% at 0.2 |
+| **Terrain** | at least 80% survival on 19 degree downhill, 9 degree uphill, 5.8 cm steps down, 2.8 cm steps up, 8 cm rough noise | blind walking, no height scan; the policy was trained on flat ground ([M3](pilots/m3_terrain_baseline_20261108/README.md)) |
 | **What "passes" means** | supported 2 s stand, no launch or flight, joint, torque and self-penetration limits, normal stance, still up at the end | details in [recovery/README.md](recovery/README.md) |
-| **Not done yet** | hand-over from getting up to walking; replication on more seeds | training now |
+
+All get-up numbers use criteria v3 before the self-penetration check, on the held-out set. The test set is untouched.
+
+## What we learned
+
+- **The get-up still straddles.** Every standing policy here pushes its feet about 1.4 m apart, around 0.4 s into the rise (peak foot spread 1.38 m before, 1.39 m after), before settling to a normal stance. Reward-only changes did not remove it. A pilot that added penalties for foot spread and joint effort lowered success from about 128 to 64 to 83 of 256 and left the spread unchanged. Looking human-like is not measured by any check, and a stronger fix likely needs reference motion ([notes](pilots/humanlike_20261108/ROADMAP.md)).
+- **Continued training can collapse because of joint limits.** Policies drifted toward joint limits and fell apart. A penalty on body joint limits (weight -100) with a learning rate of 3e-5 kept training stable and produced the recC checkpoint ([Goal 4 write-up](pilots/g4_humanlike_getup_20261108/README.md)).
+- **Getting up works; handing over is the weak link.** The get-up policy ends with arms, fingers and waist about 1.2 to 1.3 rad away from the pose the walking policy was trained on, against 0.03 to 0.07 rad of variation in normal walking, and feet 0.44 m apart against 0.24 m. Handing over immediately fails; blending the upper body and waiting for a readiness check recover most of the loss ([M2](pilots/m2_fall_handover_20261108/README.md), [M2b](pilots/m2b_handover_fixes_20261108/README.md)).
+- **Friction in this solver is a maximum, not a product.** Lowering only the floor friction does nothing, since contacts use the larger of the two materials. The first friction sweep was invalid for this reason and was discarded; the fixed one lowers both together.
 
 ## Architecture
 
@@ -54,7 +66,8 @@
 | | |
 |---|---|
 | **Walking write-up** | [Results](docs/WALKING.md#results-at-a-glance) · [method](docs/WALKING.md#method-and-architecture) · [reproduce](docs/WALKING.md#reproducing) · [limitations](docs/WALKING.md#limitations) |
-| **Getting up** | [Video gallery](recovery/README.md) · [system overview](recovery/architecture/SYSTEM_OVERVIEW.md) · [network diagram](recovery/architecture/figures/network_architecture_dark.png) |
+| **Getting up** | [Video gallery](recovery/README.md) · [system overview](recovery/architecture/SYSTEM_OVERVIEW.md) · [network diagram](recovery/architecture/figures/network_architecture_dark.png) · [get-up checkpoints](recovery/checkpoints/README.md) |
+| **Roadmap and status** | [Roadmap](pilots/humanlike_20261108/ROADMAP.md) · [status](STATUS.md) · [experiment log](EXPERIMENT_LOG.md) |
 | **GPU physics check** | [Newton / MuJoCo-Warp kernels run on the GPU](walking/diagnostics/README.md) |
 | **Data** | [Results](walking/results/) · [configs](walking/configs/) · [scripts](walking/scripts/) |
 
@@ -63,8 +76,8 @@
 | Path | Contents |
 |---|---|
 | `walking/` | The walking project as first published: `configs/`, `scripts/`, `results/`, `media/`, `diagnostics/`, licences |
-| `recovery/` | Get-up experiments: task package `g1_recovery/`, `scripts/`, `tests/`, criteria, report, research notes, small checkpoints, media and architecture diagrams ([README](recovery/README.md)) |
-| `pilots/humanlike_20261108/` | One reward-regularised warm-start pilot (negative result), reproducibility tooling and the staged roadmap ([ROADMAP](pilots/humanlike_20261108/ROADMAP.md), [HANDOFF](pilots/humanlike_20261108/HANDOFF.md)) |
+| `recovery/` | Get-up experiments: task package `g1_recovery/`, `scripts/`, `tests/`, criteria, report, research notes, small checkpoints including the get-up baseline, media and architecture diagrams ([README](recovery/README.md)) |
+| `pilots/` | Dated, bounded experiments, each with its own README, results and ledger: [humanlike_20261108](pilots/humanlike_20261108/ROADMAP.md) (reward-only pilot, negative, and the roadmap), [m2](pilots/m2_fall_handover_20261108/README.md) and [m2b](pilots/m2b_handover_fixes_20261108/README.md) (fall, get-up, walk hand-over), [m3](pilots/m3_terrain_baseline_20261108/README.md) (terrain), [m4](pilots/m4_robustness_20261108/README.md) (pushes, friction), [g4](pilots/g4_humanlike_getup_20261108/README.md) (get-up training, recC) |
 | `EVAL_PROTOCOL.md`, `EXPERIMENT_LOG.md`, `STATUS.md`, `PROVENANCE.md` | Evaluation criteria (v3), dated experiment log, current status, where each imported part came from |
 | `results/`, `runs/`, `media/`, `checkpoints/` | Recovery-project result JSON, run logs, videos and the walking checkpoint (the walking project keeps its own copies under `walking/`) |
 
