@@ -96,7 +96,7 @@ Plain-language overview, PPO settings and version names: [architecture/SYSTEM_OV
 
 - **Read first:** [`REPORT.md`](REPORT.md) (results, lessons, profiling), [`CRITERIA.md`](CRITERIA.md) (success definitions frozen before evaluation, v1), [`STATUS.md`](STATUS.md) (run log, commands, next steps). The current evaluation protocol (criteria v3) is [`../EVAL_PROTOCOL.md`](../EVAL_PROTOCOL.md); the dated experiment log is [`../EXPERIMENT_LOG.md`](../EXPERIMENT_LOG.md).
 - **Code:** `g1_recovery/` (task package: env, pose curriculum, success tracker, assist, lane rewards, movement metrics), `scripts/` (train / eval / record / diagnose, GPU launch logger), `tests/` (metric unit tests), `tools/`.
-- **Research notes:** `research/` (HoST, HumanUP and APEX assessments).
+- **Research notes:** `research/` (HoST, HumanUP and APEX assessments; [`recovery_review_2026-11-07.md`](research/recovery_review_2026-11-07.md) is an independent review of the R6c/R7 stall, with its linked references in [`REFERENCES.md`](research/REFERENCES.md)).
 - **Data:** `results/` (per-run eval and diagnostic JSON, training summaries, curves), pose sets in `sets/`, `heldout_poses.npz`, `bank_v1.npz`, two small checkpoints in `checkpoints/`.
 - **Newer work:** [`../pilots/humanlike_20261108/`](../pilots/humanlike_20261108/) (negative pilot, roadmap, movement metrics on the frozen baseline).
 - Needs Isaac Lab 3.0.0 (not included). Licences and credits: [`NOTICE.md`](NOTICE.md), BSD-3-Clause for original material.
