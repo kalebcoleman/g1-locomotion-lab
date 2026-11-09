@@ -1,0 +1,81 @@
+{
+ "task": "G1-Recovery-A-Assist-v0",
+ "checkpoint": "<workspace>/projects/g1-recovery/lanes/a/runs/V10_assist_velpen10/model_599.pt",
+ "num_envs": 256,
+ "episode_s": 10.0,
+ "steps": 500,
+ "success_hold_s": 2.0,
+ "success_rate": 0.09375,
+ "successes": 24,
+ "recovery_time_s_mean": 1.5741666555404663,
+ "recovery_time_s_median": 1.459999918937683,
+ "longest_stand_s_mean": 1.0021092891693115,
+ "total_stand_s_mean": 1.075781226158142,
+ "joint_limit_violation_step_frac": 0.16499219834804535,
+ "joint_limit_violations_per_step_mean": 0.29951563477516174,
+ "eval_wall_s": 6.907663822174072,
+ "strict_supported_stand": {
+  "definition": "pelvis>=0.60 m, torso tilt<=26 deg, BOTH feet contact force>10 N and feet<0.15 m above floor, pelvis speed<0.6 m/s, held 2 s",
+  "success_rate": 0.078125,
+  "successes": 20,
+  "recovery_time_s_mean": 4.6620001792907715,
+  "longest_stand_s_mean": 0.27757811546325684,
+  "total_stand_s_mean": 0.7180468440055847,
+  "envs_ever_supported_stand": 45,
+  "by_category": {
+   "side_a": 0.140625,
+   "prone": 0.046875,
+   "side_b": 0.125,
+   "supine": 0.0
+  }
+ },
+ "plausibility": {
+  "definition": "PLAUSIBLE recovery = strict supported stand held 2 s AND joint-velocity-limit violations on <=2% of steps AND peak pelvis upward speed <=2.0 m/s",
+  "plausible_successes": 0,
+  "plausible_rate": 0.0,
+  "vel_limit_violation_step_frac_mean": 0.0030625001527369022,
+  "peak_pelvis_vz_mean": 3.1950724124908447,
+  "peak_pelvis_vz_max": 5.410184383392334,
+  "strict_successes_failing_plausibility": 20,
+  "flight_step_frac_mean": 0.11175781488418579,
+  "plausible_v1p1_successes": 0,
+  "v1p1_definition": "POST-HOC amendment (added after seeing A8c): plausible AND free-flight (no body in contact with anything) on <=2% of steps"
+ },
+ "failure_causes": {
+  "success": 24,
+  "never_rose": 6,
+  "rose_not_upright": 95,
+  "stood_then_fell": 131,
+  "late_hold_incomplete": 0
+ },
+ "by_category": {
+  "side_a": {
+   "n": 64,
+   "success_rate": 0.171875
+  },
+  "prone": {
+   "n": 64,
+   "success_rate": 0.0625
+  },
+  "side_b": {
+   "n": 64,
+   "success_rate": 0.140625
+  },
+  "supine": {
+   "n": 64,
+   "success_rate": 0.0
+  }
+ },
+ "assist": {
+  "level_env_var": "1.0",
+  "envs_with_force": 250,
+  "force_steps_mean": 369.05078125,
+  "force_seconds_mean": 7.381015300750732,
+  "impulse_Ns_mean": 1371.239990234375,
+  "max_force_N": 185.78021240234375,
+  "first_step_mean": 64.34000396728516,
+  "last_step_mean": 469.1800231933594,
+  "robot_weight_N": 309.6336821937561,
+  "note": "force applies only while torso upright (gravity z < -0.8) and pelvis < 0.62 m; unassisted eval = G1R_EVAL_ASSIST unset or 0"
+ }
+}

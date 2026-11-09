@@ -1,0 +1,69 @@
+{
+ "task": "G1-Recovery-A-v0",
+ "checkpoint": "<workspace>/projects/g1-recovery/lanes/a/runs/V11_launchpen5/model_599.pt",
+ "num_envs": 256,
+ "episode_s": 10.0,
+ "steps": 500,
+ "success_hold_s": 2.0,
+ "success_rate": 0.0,
+ "successes": 0,
+ "recovery_time_s_mean": null,
+ "recovery_time_s_median": null,
+ "longest_stand_s_mean": 0.0,
+ "total_stand_s_mean": 0.0,
+ "joint_limit_violation_step_frac": 0.28653907775878906,
+ "joint_limit_violations_per_step_mean": 0.5538125038146973,
+ "eval_wall_s": 7.549452304840088,
+ "strict_supported_stand": {
+  "definition": "pelvis>=0.60 m, torso tilt<=26 deg, BOTH feet contact force>10 N and feet<0.15 m above floor, pelvis speed<0.6 m/s, held 2 s",
+  "success_rate": 0.0,
+  "successes": 0,
+  "recovery_time_s_mean": null,
+  "longest_stand_s_mean": 0.0,
+  "total_stand_s_mean": 0.0,
+  "envs_ever_supported_stand": 0,
+  "by_category": {
+   "side_a": 0.0,
+   "prone": 0.0,
+   "side_b": 0.0,
+   "supine": 0.0
+  }
+ },
+ "plausibility": {
+  "definition": "PLAUSIBLE recovery = strict supported stand held 2 s AND joint-velocity-limit violations on <=2% of steps AND peak pelvis upward speed <=2.0 m/s",
+  "plausible_successes": 0,
+  "plausible_rate": 0.0,
+  "vel_limit_violation_step_frac_mean": 1.5625000742147677e-05,
+  "peak_pelvis_vz_mean": 0.5664136409759521,
+  "peak_pelvis_vz_max": 1.6830986738204956,
+  "strict_successes_failing_plausibility": 0,
+  "flight_step_frac_mean": 0.007460937835276127,
+  "plausible_v1p1_successes": 0,
+  "v1p1_definition": "POST-HOC amendment (added after seeing A8c): plausible AND free-flight (no body in contact with anything) on <=2% of steps"
+ },
+ "failure_causes": {
+  "success": 0,
+  "never_rose": 115,
+  "rose_not_upright": 141,
+  "stood_then_fell": 0,
+  "late_hold_incomplete": 0
+ },
+ "by_category": {
+  "side_a": {
+   "n": 64,
+   "success_rate": 0.0
+  },
+  "prone": {
+   "n": 64,
+   "success_rate": 0.0
+  },
+  "side_b": {
+   "n": 64,
+   "success_rate": 0.0
+  },
+  "supine": {
+   "n": 64,
+   "success_rate": 0.0
+  }
+ }
+}

@@ -1,0 +1,165 @@
+"""Evaluate a recovery checkpoint on the HELD-OUT fallen poses (256 poses, 4 fall directions, one 10 s episode each).
+  python eval_recovery.py --task G1-Recovery-A-v0 --checkpoint <model.pt> --num_envs 256 --out result.json [--video_dir D] physics=newton_mjwarp
+Metrics: recovery success (stand >= 2 s: pelvis >= 0.60 m and torso tilt <= 26 deg), recovery time (start of the successful hold),
+longest/total standing time, joint-limit violations (soft limits), failure causes. Needs the held-out npz (made on first use)."""
+import sys, os, json, time, argparse
+import numpy as np
+import warp as wp
+wp.config.enable_backward = False
+import torch
+from isaaclab.app import launch_simulation
+from isaaclab_rl.entrypoints.backends import play_rsl_rl as P
+from isaaclab_rl.entrypoints import common as C
+
+ex = argparse.ArgumentParser(add_help=False)
+ex.add_argument("--out", required=True)
+ex.add_argument("--heldout", default=os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "heldout_poses.npz"))
+xa, rest = ex.parse_known_args(sys.argv[1:])
+args = P._parse_args(rest)
+args.train_env_cfg = True
+import g1_recovery  # noqa: F401
+from g1_recovery import common as K
+from isaaclab_tasks.utils import resolve_task_config
+from isaaclab_rl.rsl_rl import RslRlVecEnvWrapper, create_rsl_rl_runner, handle_deprecated_rsl_rl_cfg, check_rsl_rl_version
+
+env_cfg, agent_cfg = resolve_task_config(args.task, args.agent, play_mode=False)
+env_cfg.fixed_poses_path = os.path.abspath(xa.heldout)   # base cfg passes this to reset_fallen
+GROUND = os.environ.get("G1R_GROUND_SENSOR", "1") == "1"   # second contact sensor filtered to the ground, so self-contact never counts as touching the world
+if GROUND:
+    import copy as _copy
+    _gc = _copy.deepcopy(env_cfg.scene.contact_forces); _gc.filter_shape_prim_expr = ["/World/ground/.*"]; _gc.track_air_time = False
+    env_cfg.scene.ground_contact = _gc
+with launch_simulation(env_cfg, args):
+    agent_cfg = P.cli_args.update_rsl_rl_cfg(agent_cfg, args)
+    agent_cfg = handle_deprecated_rsl_rl_cfg(agent_cfg, check_rsl_rl_version())
+    C.apply_env_overrides(args, env_cfg)
+    env_cfg.seed = 1
+    env_cfg.episode_length_s = 20.0     # we stop after exactly 10 s so the tracker is never reset mid-read
+    if not os.path.exists(xa.heldout):
+        pass
+    env = C.create_isaaclab_env(args.task, env_cfg, args, convert_marl_to_single_agent=False)
+    env = RslRlVecEnvWrapper(env, clip_actions=agent_cfg.clip_actions)
+    u = env.unwrapped; dev = u.device; N = u.num_envs
+    r = u.scene["robot"]
+    if not os.path.exists(xa.heldout):
+        dq = r.data.default_joint_pos.torch[0]; lim = r.data.soft_joint_pos_limits.torch[0]
+        mask = torch.tensor([0.0 if K.is_hand_joint(n) else 1.0 for n in r.joint_names], device=dev)
+        K.make_heldout(dq, lim[:, 0], lim[:, 1], mask, path=xa.heldout); print("made held-out set", xa.heldout)
+    from g1_recovery import host_port as _HP
+    if _HP.is_host_checkpoint(args.checkpoint):
+        policy = _HP.load_host_policy(args.checkpoint, dev)      # HoST-port actor (train_host.py)
+    else:
+        runner = create_rsl_rl_runner(env, agent_cfg)
+        runner.load(args.checkpoint, map_location=agent_cfg.device) if args.checkpoint else None
+        policy = runner.get_inference_policy(device=dev)
+    # re-reset so the (possibly just created) held-out file is used
+    u._rec_fixed = None
+    f = np.load(xa.heldout); u._rec_fixed = {k: torch.as_tensor(f[k], device=dev) for k in ["z", "quat", "q", "category"]}
+    obs, _ = env.reset()
+    steps = int(round(K.EPISODE_S / u.step_dt)); t = K.get_tracker(u)
+    cat = u._rec_fixed["category"][torch.arange(N, device=dev) % u._rec_fixed["z"].shape[0]]
+    t0 = time.time(); hmin_trace = []
+    from g1_recovery import metrics as M
+    _sens = u.scene.sensors["contact_forces"]; _bn = list(_sens.body_names); _feet = [i for i, n in enumerate(_bn) if "ankle_roll" in n]; _tr = [i for i, n in enumerate(_bn) if n in ("pelvis", "torso_link", "pelvis_contour_link", "head_link", "imu_link", "logo_link")]
+    _fb = [r.body_names.index(n) for n in r.body_names if "ankle_roll" in n]; reached = torch.zeros(N, len(M.POSTURES), dtype=torch.bool, device=dev); _first = torch.full((N, len(M.POSTURES)), -1.0, device=dev)
+    # Amendment 3 and rising-window measurements (additive; the v2.1 verdicts above them are unchanged)
+    _lim = torch.tensor([M.real_torque_limit(n) for n in r.joint_names], device=dev); _bj = torch.isfinite(_lim); _org = u.scene.env_origins
+    _A = {k: [] for k in ["supp", "stance", "soft", "hard", "over", "air_last", "air_all"] + (["air_ground"] if GROUND else [])}; _tmax = torch.zeros(N, device=dev)
+    _hip = [r.joint_names.index(n) for n in ("left_hip_roll_joint", "right_hip_roll_joint", "left_hip_yaw_joint", "right_hip_yaw_joint")]; _bji = torch.nonzero(_bj).squeeze(-1)   # M1 movement metrics: per-step traces
+    _Mv = {k: [] for k in ["h", "hip", "jv", "act"]}
+    for s in range(steps):
+        with torch.inference_mode():
+            _act = policy(obs)
+            obs, _, dones, _ = env.step(_act)
+        _f = torch.linalg.norm(_sens.data.net_forces_w.torch, dim=-1)
+        _pf = M.posture_flags(r.data.root_pos_w.torch[:, 2] - u.scene.env_origins[:, 2], -r.data.projected_gravity_b.torch[:, 2], _f[:, _feet], r.data.body_pos_w.torch[:, _fb, 2] - u.scene.env_origins[:, 2:3], _f[:, _tr].sum(-1), torch.linalg.norm(r.data.root_lin_vel_w.torch, dim=-1), t.run_s, u.step_dt)
+        _first = torch.where(_pf & (_first < 0), torch.full_like(_first, s * u.step_dt), _first); reached |= _pf
+        _q = r.data.joint_pos.torch; _sl = r.data.soft_joint_pos_limits.torch; _hl = r.data.joint_pos_limits.torch; _ratio = r.data.applied_torque.torch.abs() / _lim
+        _pfeet = r.data.body_pos_w.torch[:, _fb, :2]; _A["stance"].append(torch.linalg.norm(_pfeet[:, 0] - _pfeet[:, 1], dim=-1)); _A["supp"].append(_pf[:, M.POSTURES.index("supported_stand_any")])
+        _A["soft"].append(((torch.maximum(_sl[..., 0] - _q, _q - _sl[..., 1]) > 0) & _bj).any(-1)); _A["hard"].append(((torch.maximum(_hl[..., 0] - _q, _q - _hl[..., 1]) > 0) & _bj).any(-1)); _A["over"].append(((_ratio > 1.0) & _bj).any(-1))
+        _tmax = torch.maximum(_tmax, (_ratio * _bj).max(-1).values)
+        _Mv["h"].append(r.data.root_pos_w.torch[:, 2] - _org[:, 2]); _Mv["hip"].append(_q[:, _hip]); _Mv["jv"].append(r.data.joint_vel.torch[:, _bji]); _Mv["act"].append(_act.clone())
+        _fh = torch.linalg.norm(_sens.data.net_forces_w_history.torch, dim=-1).sum(-1)    # (N, history) total contact force over the last physics substeps
+        _A["air_last"].append(_fh[:, 0] < 1.0); _A["air_all"].append((_fh < 1.0).all(-1))
+        if GROUND:
+            _gm = u.scene.sensors["ground_contact"].data.force_matrix_w.torch          # (N, bodies, partners, 3)
+            _A["air_ground"].append(torch.linalg.norm(_gm, dim=-1).sum((-1, -2)) < 1.0)
+    wall = time.time() - t0
+    dt = u.step_dt; ok = t.succ
+    res = dict(task=args.task, checkpoint=args.checkpoint, num_envs=N, episode_s=K.EPISODE_S, steps=steps, success_hold_s=K.HOLD_S,
+               success_rate=float(ok.float().mean()), successes=int(ok.sum()),
+               recovery_time_s_mean=float((t.succ_start[ok].float() * dt).mean()) if ok.any() else None,
+               recovery_time_s_median=float((t.succ_start[ok].float() * dt).median()) if ok.any() else None,
+               longest_stand_s_mean=float((t.best_run.float() * dt).mean()), total_stand_s_mean=float((t.total_stand.float() * dt).mean()),
+               joint_limit_violation_step_frac=float(t.viol_steps.float().mean() / steps),
+               joint_limit_violations_per_step_mean=float(t.viol_joint_steps.float().mean() / steps), eval_wall_s=wall)
+    ok_s = t.succ_s
+    res["strict_supported_stand"] = dict(definition="pelvis>=0.60 m, torso tilt<=26 deg, BOTH feet contact force>10 N and feet<0.15 m above floor, pelvis speed<0.6 m/s, held 2 s",
+        success_rate=float(ok_s.float().mean()), successes=int(ok_s.sum()), recovery_time_s_mean=float((t.succ_start_s[ok_s].float() * dt).mean()) if ok_s.any() else None,
+        longest_stand_s_mean=float((t.best_run_s.float() * dt).mean()), total_stand_s_mean=float((t.total_stand_s.float() * dt).mean()),
+        envs_ever_supported_stand=int(t.ever_stood_s.sum()), by_category={CAT: float(ok_s[cat == i].float().mean()) for i, CAT in enumerate(K.CATEGORIES)})
+    vvf = t.vel_viol_steps.float() / steps; plaus = t.succ_s & (vvf <= 0.02) & (t.peak_vz <= 2.0)
+    from g1_recovery import metrics as M
+    assist_on = (u._assist_log["force_steps"] > 0) if hasattr(u, "_assist_log") else None
+    plaus_v2 = M.plausible_recovery(t.succ_s, t.vel_viol_steps, t.flight_steps, t.viol_steps, t.peak_vz, steps, assist_on)
+    plaus_v21 = plaus_v2 & M.hard_limits_ok(t.hard_viol_steps, t.hard_excess_max, steps)
+    res["plausibility"] = dict(definition="PLAUSIBLE recovery = strict supported stand held 2 s AND joint-velocity-limit violations on <=2% of steps AND peak pelvis upward speed <=2.0 m/s",
+        plausible_successes=int(plaus.sum()), plausible_rate=float(plaus.float().mean()), vel_limit_violation_step_frac_mean=float(vvf.mean()), peak_pelvis_vz_mean=float(t.peak_vz.mean()), peak_pelvis_vz_max=float(t.peak_vz.max()),
+        strict_successes_failing_plausibility=int((t.succ_s & ~plaus).sum()),
+        plausible_v21_successes=int(plaus_v21.sum()), plausible_v21_rate=float(plaus_v21.float().mean()), plausible_v21_by_category={CAT: float(plaus_v21[cat == i].float().mean()) for i, CAT in enumerate(K.CATEGORIES)}, v21_definition="v2 AND past-hard-limit on <=3% of steps AND hard excess <=0.10 rad",
+        criteria_version=K.CRITERIA_VERSION, plausible_v2_successes=int(plaus_v2.sum()), plausible_v2_rate=float(plaus_v2.float().mean()), plausible_v2_by_category={CAT: float(plaus_v2[cat == i].float().mean()) for i, CAT in enumerate(K.CATEGORIES)},
+        pos_limit_violation_step_frac_mean=float((t.viol_steps.float() / steps).mean()), v2_definition="strict supported stand (3D speed<0.6) 2 s AND vel-viol<=2% AND flight<=2% AND peak vz<=2.0 AND pos-limit-viol<=10% AND no assist force applied",
+        hard_limit_step_frac_mean=float((t.hard_viol_steps.float() / steps).mean()), hard_excess_rad_mean_of_env_max=float(t.hard_excess_max.mean()), hard_excess_rad_max=float(t.hard_excess_max.max()), soft_excess_rad_mean_of_env_max=float(t.soft_excess_max.mean()),
+        flight_step_frac_mean=float((t.flight_steps.float() / steps).mean()),
+        plausible_v1p1_successes=int((plaus & (t.flight_steps.float() / steps <= 0.02)).sum()), v1p1_definition="POST-HOC amendment (added after seeing A8c): plausible AND free-flight (no body in contact with anything) on <=2% of steps")
+    fc = t.failure_cause()
+    res["failure_causes"] = {n: int((fc == i).sum()) for i, n in enumerate(K.Tracker.FAIL)}
+    res["by_category"] = {CAT: dict(n=int((cat == i).sum()), success_rate=float(ok[cat == i].float().mean())) for i, CAT in enumerate(K.CATEGORIES)}
+    if hasattr(u, "_assist_log"):
+        L = u._assist_log; af = L["force_steps"]
+        res["assist"] = dict(level_env_var=os.environ.get("G1R_EVAL_ASSIST"), envs_with_force=int((af > 0).sum()), force_steps_mean=float(af.mean()), force_seconds_mean=float(af.mean() * u.step_dt),
+                             impulse_Ns_mean=float(L["impulse"].mean()), max_force_N=float(L["max_force"].max()), first_step_mean=float(L["first"][af > 0].mean()) if (af > 0).any() else None,
+                             last_step_mean=float(L["last"][af > 0].mean()) if (af > 0).any() else None, robot_weight_N=getattr(u, "_robot_weight", None),
+                             note="force applies only while torso upright (gravity z < -0.8) and pelvis < 0.62 m; unassisted eval = G1R_EVAL_ASSIST unset or 0")
+    _f = np.load(xa.heldout)
+    if "difficulty" in _f.files:
+        dif = torch.as_tensor(_f["difficulty"], device=dev)[torch.arange(N, device=dev) % len(_f["difficulty"])]; nz = _f["noise"]
+        res["by_difficulty_limb_noise_rad"] = {str(round(float(v), 2)): dict(n=int((dif == i).sum()), plausible_v2_rate=float(plaus_v2[dif == i].float().mean()), plausible_v21_rate=float(plaus_v21[dif == i].float().mean()), strict_rate=float(ok_s[dif == i].float().mean()), legacy_rate=float(ok[dif == i].float().mean())) for i, v in enumerate(sorted(set(nz.tolist())))}
+    _B = {k: torch.stack(v, 0) for k, v in _A.items()}          # (T, N)
+    _over_steps = _B["over"].sum(0); _tq = M.torque_ok(_over_steps, steps); _tail = _B["supp"][-int(round(1.0 / dt)):].float().mean(0); _per = M.persists(_tail)
+    _hs = t.succ_start_s.long().clamp(0, steps - 1); _hlen = int(round(K.HOLD_S / dt)); _tidx = (_hs[None] + torch.arange(_hlen, device=dev)[:, None]).clamp(max=steps - 1)
+    _stance = _B["stance"].gather(0, _tidx).mean(0); _st = M.stance_ok(_stance)
+    _rise = torch.arange(steps, device=dev)[:, None] < _hs[None]; _rn = _rise.sum(0).clamp(min=1).float()    # steps from reset to the start of the counted hold
+    _rf = {k: (_B[k] & _rise).sum(0).float() / _rn for k in ["soft", "hard", "over"]}
+    a3a = plaus_v21 & _tq; a3full = a3a & _per & _st
+    # Proposed Amendment 4 (measurement): flight = no contact on ANY of the last physics substeps (sensor history), instead of the single latest substep
+    _air_all = _B["air_all"].sum(0).float() / steps; _air_last = _B["air_last"].sum(0).float() / steps
+    _v2_a4 = M.plausible_recovery(t.succ_s, t.vel_viol_steps, (_B["air_all"].sum(0)), t.viol_steps, t.peak_vz, steps, assist_on)
+    _v3_a4 = _v2_a4 & M.hard_limits_ok(t.hard_viol_steps, t.hard_excess_max, steps) & _tq & _per & _st
+    if GROUND:   # stricter: airborne = no contact with the ground (self-contact does not count); identical to the net-force rule when self-collision is off
+        _air_g = _B["air_ground"].sum(0); _v3_g = M.plausible_recovery(t.succ_s, t.vel_viol_steps, _air_g, t.viol_steps, t.peak_vz, steps, assist_on) & M.hard_limits_ok(t.hard_viol_steps, t.hard_excess_max, steps) & _tq & _per & _st
+    _sv = lambda m, v: [round(float(x), 3) for x in v[m]] if m.any() else []
+    res["amendment3"] = dict(status="Approved 2026-11-07: criteria v3 = v2.1 + 3a torque + 3c persistence + 3d stance here, and 3b self-penetration offline (selfpen_check.py). A v3 pass needs plausible_v3_before_selfpen and 3b.", real_limits=dict(M.REAL_TORQUE_LIMITS),
+        v21_and_torque=int(a3a.sum()), v21_torque_persist_stance=int(a3full.sum()), plausible_v3_before_selfpen=int(a3full.sum()), ground_only_flight=(dict(flight_frac_mean=float((_air_g.float() / steps).mean()), v3_before_selfpen=int(_v3_g.sum()), by_category={CAT: int(_v3_g[cat == i].sum()) for i, CAT in enumerate(K.CATEGORIES)}) if GROUND else None), proposed_a4_flight_history=dict(history_len=int(_sens.data.net_forces_w_history.torch.shape[1]), flight_frac_latest_substep_mean=float(_air_last.mean()), flight_frac_all_substeps_mean=float(_air_all.mean()), v3_before_selfpen_with_a4=int(_v3_a4.sum()), v3_with_a4_by_category={CAT: int(_v3_a4[cat == i].sum()) for i, CAT in enumerate(K.CATEGORIES)}), plausible_v3_before_selfpen_by_category={CAT: int(a3full[cat == i].sum()) for i, CAT in enumerate(K.CATEGORIES)}, v21_persist=int((plaus_v21 & _per).sum()), v21_stance=int((plaus_v21 & _st).sum()), strict_persist=int((t.succ_s & _per).sum()),
+        torque_ok_robots=int(_tq.sum()), torque_over_step_frac_mean=float((_over_steps.float() / steps).mean()), torque_ratio_max=float(_tmax.max()), torque_ratio_max_mean=float(_tmax.mean()), still_supported_final_s=int(_per.sum()),
+        stance_hold_m_of_strict=_sv(t.succ_s, _stance)[:256], by_category_v21_torque={CAT: int(a3a[cat == i].sum()) for i, CAT in enumerate(K.CATEGORIES)},
+        rise_window_of_strict=dict(seconds_mean=float((_rn[t.succ_s] * dt).mean()) if t.succ_s.any() else None, soft_frac_mean=float(_rf["soft"][t.succ_s].mean()) if t.succ_s.any() else None, hard_frac_mean=float(_rf["hard"][t.succ_s].mean()) if t.succ_s.any() else None, torque_over_frac_mean=float(_rf["over"][t.succ_s].mean()) if t.succ_s.any() else None,
+                                  soft_le_10pct=int((_rf["soft"][t.succ_s] <= 0.10).sum()), hard_le_3pct=int((_rf["hard"][t.succ_s] <= 0.03).sum())))
+    # M1 movement metrics (definitions in metrics.movement_metrics; these never enter a success criterion)
+    _re = torch.where(t.succ_s, _hs.clamp(2, steps), torch.full_like(_hs, steps))          # rising window ends where the counted hold starts (whole episode if none)
+    _mm = M.movement_metrics(_B["stance"], torch.stack(_Mv["h"], 0), torch.stack(_Mv["hip"], 0), torch.stack(_Mv["jv"], 0), torch.stack(_Mv["act"], 0), dt, rise_end=_re)
+    def _agg(x, m=None):
+        x = x.float(); x = x if m is None else x[m]; x = x[torch.isfinite(x)]
+        return None if x.numel() == 0 else dict(n=int(x.numel()), mean=float(x.mean()), median=float(x.median()), p90=float(torch.quantile(x, 0.9)), max=float(x.max()))
+    _v3m = _v3_g if GROUND else a3full
+    res["movement"] = dict(definition=M.movement_metrics.__doc__, windows="spread/hip metrics over the whole 10 s episode (peak after the pelvis exceeds 0.12 m); acceleration, jerk and action rate over each robot's rising window (reset to start of the counted strict hold, else the whole episode)",
+        all_robots={k: _agg(v) for k, v in _mm.items()}, by_category={CAT: {k: _agg(v, cat == i) for k, v in _mm.items()} for i, CAT in enumerate(K.CATEGORIES)},
+        v3_pass_robots={k: _agg(v, _v3m) for k, v in _mm.items()}, per_env={k: [None if not torch.isfinite(x) else round(float(x), 4) for x in _mm[k]] for k in ["spread_peak_m", "spread_peak_gated_m", "spread_final_m", "hip_roll_peak_abs", "hip_yaw_peak_abs", "joint_acc_rms", "action_rate_mean"]})
+    res["pose_set"] = os.path.basename(xa.heldout)
+    res["postures_reached"] = {n: dict(envs=int(reached[:, i].sum()), first_time_s_mean=round(float(_first[:, i][reached[:, i]].mean()), 2) if reached[:, i].any() else None, by_category={CAT: int(reached[:, i][cat == j].sum()) for j, CAT in enumerate(K.CATEGORIES)}) for i, n in enumerate(M.POSTURES)}
+    res["per_env"] = dict(strict=ok_s.int().tolist(), v3_before_selfpen=a3full.int().tolist(), **({"v3g_before_selfpen": _v3_g.int().tolist(), "flight_frac_ground": [round(float(x), 3) for x in (_air_g.float() / steps)]} if GROUND else {}), v3_a4_before_selfpen=_v3_a4.int().tolist(), flight_frac_all_substeps=[round(float(x), 3) for x in _air_all], torque_over_frac=[round(float(x), 3) for x in (_over_steps.float() / steps)], persist_tail=[round(float(x), 3) for x in _tail], stance_hold=[round(float(x), 3) for x in _stance], plausible_v2=plaus_v2.int().tolist(), plausible_v21=plaus_v21.int().tolist(), vel_viol_frac=[round(float(x), 3) for x in vvf], flight_frac=[round(float(x), 3) for x in (t.flight_steps.float() / steps)],
+                          pos_viol_frac=[round(float(x), 3) for x in (t.viol_steps.float() / steps)], hard_viol_frac=[round(float(x), 3) for x in (t.hard_viol_steps.float() / steps)], hard_excess_max=[round(float(x), 3) for x in t.hard_excess_max], soft_excess_max=[round(float(x), 3) for x in t.soft_excess_max], peak_vz=[round(float(x), 2) for x in t.peak_vz], max_h=[round(float(x), 2) for x in t.max_h], best_supp_s=[round(float(x) * dt, 2) for x in t.best_run_s],
+                          category=cat.int().tolist(), failure_cause=fc.int().tolist())
+    json.dump(res, open(xa.out, "w"), indent=1)
+    print("EVAL_JSON", json.dumps(res), flush=True)
+    C.close_env(env)

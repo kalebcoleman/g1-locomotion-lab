@@ -23,7 +23,7 @@ What is mine and what is not:
 | Newton, MuJoCo-Warp, Warp, Isaac Sim | |
 
 I did not change the task, rewards or hyperparameters. The only settings I chose are the physics backend,
-environment count, seed and (default) iteration count. See [NOTICE.md](../NOTICE.md) for attribution.
+environment count, seed and (default) iteration count. See [NOTICE.md](../walking/NOTICE.md) for attribution.
 
 ## Results at a glance
 
@@ -31,12 +31,12 @@ environment count, seed and (default) iteration count. See [NOTICE.md](../NOTICE
 training environments. (B) is a *separate scripted test* of saved checkpoints in 256 fresh environments. Everything is one
 seed (seed 1) and one run; there are no repeats or confidence intervals.
 
-![Progression chart](../media/progression_chart.png)
+![Progression chart](../walking/media/progression_chart.png)
 
 **A (left): the training log.** Mean episode length at the end of training was **971 of a possible 1,000
 steps** (20 s at 50 Hz). This is the value of `Train/mean_episode_length` at iteration 1499 from the run's
-TensorBoard log ([`results/training_curves.csv`](../results/training_curves.csv),
-[final log block](../results/training_final_iteration.log)), averaged over episodes that ended in that iteration across the 1,024
+TensorBoard log ([`results/training_curves.csv`](../walking/results/training_curves.csv),
+[final log block](../walking/results/training_final_iteration.log)), averaged over episodes that ended in that iteration across the 1,024
 training environments. Those environments use random velocity commands and random pushes. It is a single
 unsmoothed value (iteration 1498 was 962); about 96.7% of episode ends were time-outs and 3.3% were falls
 (torso contact). It describes training behaviour, not the scripted test.
@@ -68,7 +68,7 @@ rows with very different survivor counts. The table reports walk linear error an
 | iteration 1000 | 225/256 | 5 / 6 / 7 / 13 | 0.10 | 0.77 |
 | **iteration 1499 (final)** | **237/256** | 0 / 2 / **17** / 0 | 0.11 | 0.38 |
 
-Raw per-run JSON is in [`results/`](../results/), summary in [`results/eval_summary.csv`](../results/eval_summary.csv).
+Raw per-run JSON is in [`results/`](../walking/results/), summary in [`results/eval_summary.csv`](../walking/results/eval_summary.csv).
 
 What the numbers do and do not say:
 
@@ -88,7 +88,7 @@ What the numbers do and do not say:
 
 ### Learning progression
 
-![Frames at iterations 0, 200, 350, 1499](../media/progression_frames.png)
+![Frames at iterations 0, 200, 350, 1499](../walking/media/progression_frames.png)
 
 Same frame (t = 6 s, during the turn phase) from the 16-robot clips at iterations 0, 200, 350 and 1499. In the
 clips, terminations among the 16 robots over 10 s were 119 (iteration 0), 106 (200), 0 (350) and 1 (1499).
@@ -107,11 +107,11 @@ clips, terminations among the 16 robots over 10 s were 119 (iteration 0), 106 (2
 
 **Final policy (iteration 1499), one robot, 8 s** (stand 2 s, walk 2 s, turn 2 s, stop 2 s; no pushes, no falls in this clip):
 
-![Final policy, one robot](../media/newton_best_single_robot.gif)
+![Final policy, one robot](../walking/media/newton_best_single_robot.gif)
 
 ## Method and architecture
 
-![Pipeline](../media/architecture.png)
+![Pipeline](../walking/media/architecture.png)
 
 Checked against the code (Isaac Lab 3.0.0 `velocity_env_cfg.py`, `g1/flat_env_cfg.py`, `g1/agents/rsl_rl_ppo_cfg.py`):
 
@@ -123,7 +123,7 @@ Checked against the code (Isaac Lab 3.0.0 `velocity_env_cfg.py`, `g1/flat_env_cf
 - **Termination:** time-out, or contact of `torso_link` with the ground. A termination is counted as a "fall".
 - **Policy:** MLP actor and critic, hidden sizes 256-128-128, ELU, PPO (rsl_rl `OnPolicyRunner`), 24 steps per env
   per iteration, learning rate 1e-3 adaptive, gamma 0.99, lambda 0.95. Full resolved configs:
-  [`configs/rsl_rl_agent.yaml`](../configs/rsl_rl_agent.yaml), [`configs/isaaclab_env.yaml`](../configs/isaaclab_env.yaml).
+  [`configs/rsl_rl_agent.yaml`](../walking/configs/rsl_rl_agent.yaml), [`configs/isaaclab_env.yaml`](../walking/configs/isaaclab_env.yaml).
 - **Physics:** `physics=newton_mjwarp` (Newton with the MuJoCo-Warp solver). The task's flat config already
   defaults to this in Isaac Lab 3.0.0.
 - **Training run:** 1,024 envs x 24 steps x 1,500 iterations = 36,864,000 environment steps, seed 1, about 40 minutes
@@ -187,7 +187,7 @@ produced the published numbers and clips. The three shell wrappers were rewritte
 
 **Rerun variation (same checkpoint, same command, same seed).** Two reruns of the iteration-1499 evaluation did **not**
 reproduce the published table exactly. Survivors out of 256: published 237, rerun 1 **231**, rerun 2 **233**. Falls stand/walk/turn/stop:
-published 0 / 2 / 17 / 0, rerun 1 1 / 1 / 23 / 5, rerun 2 0 / 2 / 13 / 8 ([`results/rerun_it1499_newton_push0.5.json`](../results/rerun_it1499_newton_push0.5.json) is
+published 0 / 2 / 17 / 0, rerun 1 1 / 1 / 23 / 5, rerun 2 0 / 2 / 13 / 8 ([`results/rerun_it1499_newton_push0.5.json`](../walking/results/rerun_it1499_newton_push0.5.json) is
 rerun 2; rerun 1's JSON was not kept, its numbers are from the console output). Walk and turn tracking errors were stable (0.107-0.108 m/s, 0.374-0.376 rad/s).
 Turning had the most falls in all three samples (17 of 19, 23 of 30, 13 of 23), but the exact split and the stop-phase count vary.
 Isaac Lab's config sets `deterministic_mode: not_guaranteed`, so a fixed seed does not give an identical run. Treat the published survivor counts as
@@ -202,7 +202,7 @@ time), Isaac Sim, and the raw MP4s (the public GIFs and PNGs in `media/` are der
 A separate 16-environment diagnostic confirmed that the task's Newton/MuJoCo-Warp solver and its state arrays live on the
 GPU and that CUDA-graph launches contain Newton collision and MuJoCo-Warp solver kernels. It was a separate short process
 on a shared GPU; the original 1,024-environment training run was not traced, and no speed comparison is made.
-Details and caveats: [`diagnostics/README.md`](../diagnostics/README.md).
+Details and caveats: [`diagnostics/README.md`](../walking/diagnostics/README.md).
 
 ## Limitations
 

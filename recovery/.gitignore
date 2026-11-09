@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+media-raw/
+*.mp4
+lanes/*/runs/
+lanes/*/logs/
+logs/

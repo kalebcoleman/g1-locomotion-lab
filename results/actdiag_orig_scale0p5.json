@@ -1,0 +1,81 @@
+{
+ "task": "G1-Recovery-R2-Eval-v0",
+ "checkpoint": "<workspace>/envs/lab-3.0.0-src/logs/rsl_rl/g1_recovery_r/init/laneA_v1_situp_it999.pt",
+ "action_scale": 0.5,
+ "pose_set": "dev_v1.npz",
+ "num_envs": 256,
+ "seconds": 10.0,
+ "hard_limits_available": true,
+ "raw_action_abs": {
+  "mean": 0.4911985397338867,
+  "p50": 0.12754984200000763,
+  "p90": 2.0232093334198,
+  "p99": 3.2056121826171875,
+  "max": 10.562609672546387
+ },
+ "joint_target_offset_rad_abs": {
+  "mean": 0.24559926986694336,
+  "p99": 1.6028060913085938
+ },
+ "targets_beyond_soft_limit_frac_mean": 0.016748981550335884,
+ "targets_beyond_soft_top": {
+  "right_elbow_pitch_joint": 0.141,
+  "left_elbow_pitch_joint": 0.059,
+  "right_hip_roll_joint": 0.056,
+  "right_ankle_pitch_joint": 0.053,
+  "left_ankle_pitch_joint": 0.031,
+  "right_hip_pitch_joint": 0.016
+ },
+ "target_excess_beyond_soft_max_rad_top": {
+  "right_elbow_pitch_joint": 2.655,
+  "right_hip_pitch_joint": 2.301,
+  "left_hip_pitch_joint": 1.568,
+  "left_elbow_pitch_joint": 1.295,
+  "right_shoulder_roll_joint": 0.662,
+  "left_ankle_pitch_joint": 0.597
+ },
+ "targets_beyond_hard_limit_frac_mean": 0.009624660015106201,
+ "q_beyond_soft_step_frac_any_joint_mean": 0.16496875882148743,
+ "q_beyond_soft_top": {
+  "right_elbow_pitch_joint": 0.105,
+  "right_hip_roll_joint": 0.089,
+  "right_ankle_pitch_joint": 0.059,
+  "left_elbow_pitch_joint": 0.026,
+  "left_ankle_pitch_joint": 0.026,
+  "right_hip_pitch_joint": 0.014
+ },
+ "q_excess_soft_max_rad_top": {
+  "left_hip_pitch_joint": 0.488,
+  "right_hip_pitch_joint": 0.44,
+  "right_elbow_pitch_joint": 0.296,
+  "right_hip_roll_joint": 0.295,
+  "left_hip_roll_joint": 0.281,
+  "left_knee_joint": 0.277
+ },
+ "q_excess_soft_mean_rad_when_counted": 0.09868373721837997,
+ "q_beyond_hard_step_frac_any_joint_mean": 0.09454687684774399,
+ "q_beyond_hard_top": {
+  "right_elbow_pitch_joint": 0.064,
+  "right_ankle_pitch_joint": 0.029,
+  "right_hip_roll_joint": 0.01,
+  "left_ankle_pitch_joint": 0.009,
+  "right_hip_pitch_joint": 0.006,
+  "left_hip_pitch_joint": 0.004
+ },
+ "q_excess_hard_max_rad_top": {
+  "left_hip_pitch_joint": 0.218,
+  "right_ankle_roll_joint": 0.191,
+  "right_ankle_pitch_joint": 0.184,
+  "right_hip_pitch_joint": 0.17,
+  "left_ankle_roll_joint": 0.159,
+  "right_hip_roll_joint": 0.155
+ },
+ "torque_sat_95pct_top": {
+  "right_hip_pitch_joint": 0.003,
+  "left_ankle_pitch_joint": 0.001,
+  "right_ankle_pitch_joint": 0.001,
+  "left_ankle_roll_joint": 0.0,
+  "right_ankle_roll_joint": 0.0,
+  "left_hip_pitch_joint": 0.0
+ }
+}

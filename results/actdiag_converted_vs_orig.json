@@ -1,0 +1,88 @@
+{
+ "task": "G1-Recovery-R5-Eval-v0",
+ "checkpoint": "<workspace>/envs/lab-3.0.0-src/logs/rsl_rl/g1_recovery_r/init/laneA_v1_situp_it999_scale1p0.pt",
+ "action_scale": 1.0,
+ "pose_set": "dev_v1.npz",
+ "num_envs": 256,
+ "seconds": 10.0,
+ "hard_limits_available": true,
+ "raw_action_abs": {
+  "mean": 0.24601535499095917,
+  "p50": 0.0639304369688034,
+  "p90": 1.0138719081878662,
+  "p99": 1.601804256439209,
+  "max": 5.056260108947754
+ },
+ "joint_target_offset_rad_abs": {
+  "mean": 0.24601535499095917,
+  "p99": 1.601804256439209
+ },
+ "targets_beyond_soft_limit_frac_mean": 0.016841372475028038,
+ "targets_beyond_soft_top": {
+  "right_elbow_pitch_joint": 0.142,
+  "left_elbow_pitch_joint": 0.06,
+  "right_hip_roll_joint": 0.054,
+  "right_ankle_pitch_joint": 0.053,
+  "left_ankle_pitch_joint": 0.031,
+  "right_hip_pitch_joint": 0.016
+ },
+ "target_excess_beyond_soft_max_rad_top": {
+  "right_elbow_pitch_joint": 2.663,
+  "right_hip_pitch_joint": 2.076,
+  "left_hip_pitch_joint": 1.489,
+  "left_elbow_pitch_joint": 1.295,
+  "right_hip_roll_joint": 0.589,
+  "right_shoulder_roll_joint": 0.526
+ },
+ "targets_beyond_hard_limit_frac_mean": 0.009809443727135658,
+ "q_beyond_soft_step_frac_any_joint_mean": 0.16717968881130219,
+ "q_beyond_soft_top": {
+  "right_elbow_pitch_joint": 0.105,
+  "right_hip_roll_joint": 0.092,
+  "right_ankle_pitch_joint": 0.058,
+  "left_elbow_pitch_joint": 0.026,
+  "left_ankle_pitch_joint": 0.026,
+  "right_hip_pitch_joint": 0.015
+ },
+ "q_excess_soft_max_rad_top": {
+  "left_hip_pitch_joint": 0.498,
+  "right_hip_pitch_joint": 0.447,
+  "right_hip_roll_joint": 0.32,
+  "left_hip_roll_joint": 0.303,
+  "right_elbow_pitch_joint": 0.3,
+  "left_knee_joint": 0.26
+ },
+ "q_excess_soft_mean_rad_when_counted": 0.09914743900299072,
+ "q_beyond_hard_step_frac_any_joint_mean": 0.09627343714237213,
+ "q_beyond_hard_top": {
+  "right_elbow_pitch_joint": 0.064,
+  "right_ankle_pitch_joint": 0.029,
+  "right_hip_roll_joint": 0.011,
+  "left_ankle_pitch_joint": 0.01,
+  "right_hip_pitch_joint": 0.006,
+  "left_hip_pitch_joint": 0.004
+ },
+ "q_excess_hard_max_rad_top": {
+  "left_hip_pitch_joint": 0.228,
+  "right_ankle_roll_joint": 0.214,
+  "right_ankle_pitch_joint": 0.184,
+  "right_hip_roll_joint": 0.181,
+  "right_hip_pitch_joint": 0.177,
+  "left_hip_roll_joint": 0.164
+ },
+ "torque_sat_95pct_top": {
+  "right_hip_pitch_joint": 0.002,
+  "left_ankle_pitch_joint": 0.002,
+  "right_ankle_pitch_joint": 0.001,
+  "right_ankle_roll_joint": 0.0,
+  "left_ankle_roll_joint": 0.0,
+  "left_hip_pitch_joint": 0.0
+ },
+ "compare": {
+  "ckpt": "<workspace>/envs/lab-3.0.0-src/logs/rsl_rl/g1_recovery_r/init/laneA_v1_situp_it999.pt",
+  "scale": 0.5,
+  "target_diff_rad_max": 2.384185791015625e-06,
+  "target_diff_rad_mean": 2.9592808914458146e-07,
+  "note": "max over body joints of |other_policy*other_scale - this_policy*this_scale| on the same simulated states"
+ }
+}

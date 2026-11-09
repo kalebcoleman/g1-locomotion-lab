@@ -1,0 +1,64 @@
+{
+ "run_dir": "2026-11-08_18-58-11_humanlike_p1_s21",
+ "git_head": "330493f536bdecd0a12c7b68dace9ac4b7ca0214",
+ "git_branch": "integration/main",
+ "git_untracked": 316,
+ "git_tracked_modified": 0,
+ "env_yaml_sha256": "cb6cb45abddbd78ae837795b14cccdad46d39216499f2496f55712868c32904a",
+ "agent_yaml_sha256": "6b7b0c37cf0ec18f8b361080634a26fc2f312513fc2f786a16adb1b2eacf7d73",
+ "start_ckpt_sha256": "665a89f58b3a3d76a13197836c2eeacd78df7e59a34a661269ab55d1384fdcf8",
+ "checkpoints": [
+  "model_1100.pt",
+  "model_1110.pt",
+  "model_1120.pt",
+  "model_1130.pt",
+  "model_1140.pt",
+  "model_1150.pt",
+  "model_1160.pt",
+  "model_1170.pt",
+  "model_1180.pt",
+  "model_1190.pt",
+  "model_1199.pt"
+ ],
+ "overrides_requested": {
+  "env.rewards.stance.weight": "-8.0",
+  "env.rewards.action_rate.weight": "-0.03",
+  "env.rewards.dof_acc.weight": "-1.0e-6",
+  "env.rewards.dof_limits_body.weight": "-15.0",
+  "agent.save_interval": "10"
+ },
+ "overrides_in_saved_config": {
+  "env.rewards.stance.weight": "-8.0",
+  "env.rewards.action_rate.weight": "-0.03",
+  "env.rewards.dof_acc.weight": "-1.0e-06",
+  "env.rewards.dof_limits_body.weight": "-15.0",
+  "agent.save_interval": "10"
+ },
+ "start": {
+  "iter": 1100,
+  "adam_step": 2020.0
+ },
+ "first_saved": {
+  "name": "model_1100.pt",
+  "iter": 1100,
+  "adam_step": 20.0
+ },
+ "last_saved": {
+  "name": "model_1199.pt",
+  "iter": 1199,
+  "adam_step": 2000.0
+ },
+ "iteration_counter_restored": true,
+ "optimizer_state_resumed": false,
+ "checkpoint_contents": [
+  "actor_state_dict",
+  "critic_state_dict",
+  "optimizer_state_dict",
+  "iter",
+  "infos"
+ ],
+ "obs_normalizer_in_checkpoint": false,
+ "curriculum_state_in_checkpoint": false,
+ "notes": "infos is None in checkpoints; the pose curriculum level (env._rec_level) is therefore not saved and restarts per config. Actor includes the learned action std (distribution.std_param). No observation normalizer keys exist.",
+ "resume_mode": "weights + iteration counter restored, optimizer RESET (warm start)"
+}

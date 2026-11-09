@@ -1,0 +1,381 @@
+{
+ "label": "standing",
+ "checkpoint": "<workspace>/projects/g1-locomotion-lab-integrated/checkpoints/walking_newton_it1499.pt",
+ "seconds": 3.0,
+ "num_envs": 16,
+ "all_body_names": [
+  "pelvis",
+  "left_hip_pitch_link",
+  "left_hip_roll_link",
+  "left_hip_yaw_link",
+  "left_knee_link",
+  "left_ankle_pitch_link",
+  "left_ankle_roll_link",
+  "pelvis_contour_link",
+  "right_hip_pitch_link",
+  "right_hip_roll_link",
+  "right_hip_yaw_link",
+  "right_knee_link",
+  "right_ankle_pitch_link",
+  "right_ankle_roll_link",
+  "torso_link",
+  "head_link",
+  "imu_link",
+  "left_shoulder_pitch_link",
+  "left_shoulder_roll_link",
+  "left_shoulder_yaw_link",
+  "left_elbow_pitch_link",
+  "left_elbow_roll_link",
+  "left_palm_link",
+  "left_five_link",
+  "left_six_link",
+  "left_three_link",
+  "left_four_link",
+  "left_zero_link",
+  "left_one_link",
+  "left_two_link",
+  "logo_link",
+  "right_shoulder_pitch_link",
+  "right_shoulder_roll_link",
+  "right_shoulder_yaw_link",
+  "right_elbow_pitch_link",
+  "right_elbow_roll_link",
+  "right_palm_link",
+  "right_five_link",
+  "right_six_link",
+  "right_three_link",
+  "right_four_link",
+  "right_zero_link",
+  "right_one_link",
+  "right_two_link"
+ ],
+ "torso_joint_mean": 0.00010628002928569913,
+ "torso_joint_std": 0.01897418685257435,
+ "links": {
+  "pelvis": {
+   "z_mean": 0.6928507089614868,
+   "z_alt_body_pos_w": 0.6928507089614868,
+   "up_z_mean": 0.9994562864303589,
+   "up_z_std": 0.000331139046465978,
+   "rel_to_torso_xyz": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "rel_to_torso_std": 0.0,
+   "rel_to_torso_angle_mean": 0.0146,
+   "rel_to_torso_angle_std": 0.01145,
+   "rel_to_pelvis_xyz": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "rel_to_pelvis_std": 0.0,
+   "rel_to_pelvis_angle_mean": 0.0,
+   "rel_to_pelvis_angle_std": 0.0,
+   "com_z_mean": 0.6168420314788818,
+   "newton_raw_z_env0": 0.6967,
+   "articulation_z_env0": 0.6967
+  },
+  "left_hip_pitch_link": {
+   "z_mean": 0.5898573398590088,
+   "z_alt_body_pos_w": 0.5898573398590088,
+   "up_z_mean": 0.7425705194473267,
+   "up_z_std": 0.012271667830646038,
+   "rel_to_torso_xyz": [
+    0.0,
+    0.0644,
+    -0.1027
+   ],
+   "rel_to_torso_std": 0.00122,
+   "rel_to_torso_angle_mean": 0.7634,
+   "rel_to_torso_angle_std": 0.02061,
+   "rel_to_pelvis_xyz": [
+    -0.0,
+    0.0645,
+    -0.1027
+   ],
+   "rel_to_pelvis_std": 0.0,
+   "rel_to_pelvis_angle_mean": 0.7631,
+   "rel_to_pelvis_angle_std": 0.02059,
+   "com_z_mean": 0.5902043581008911,
+   "newton_raw_z_env0": 0.5944,
+   "articulation_z_env0": 0.5944
+  },
+  "left_knee_link": {
+   "z_mean": 0.32690876722335815,
+   "z_alt_body_pos_w": 0.32690876722335815,
+   "up_z_mean": 0.9160863161087036,
+   "up_z_std": 0.011130261234939098,
+   "rel_to_torso_xyz": [
+    0.1654,
+    0.1358,
+    -0.3605
+   ],
+   "rel_to_torso_std": 0.00576,
+   "rel_to_torso_angle_mean": 0.3871,
+   "rel_to_torso_angle_std": 0.02876,
+   "rel_to_pelvis_xyz": [
+    0.1654,
+    0.1358,
+    -0.3605
+   ],
+   "rel_to_pelvis_std": 0.00529,
+   "rel_to_pelvis_angle_mean": 0.3867,
+   "rel_to_pelvis_angle_std": 0.0286,
+   "com_z_mean": 0.21823900938034058,
+   "newton_raw_z_env0": 0.3322,
+   "articulation_z_env0": 0.3322
+  },
+  "left_ankle_roll_link": {
+   "z_mean": 0.03470838814973831,
+   "z_alt_body_pos_w": 0.03470838814973831,
+   "up_z_mean": 0.9999558925628662,
+   "up_z_std": 0.0001117909632739611,
+   "rel_to_torso_xyz": [
+    0.0544,
+    0.1527,
+    -0.656
+   ],
+   "rel_to_torso_std": 0.01227,
+   "rel_to_torso_angle_mean": 0.0547,
+   "rel_to_torso_angle_std": 0.01692,
+   "rel_to_pelvis_xyz": [
+    0.0544,
+    0.1527,
+    -0.656
+   ],
+   "rel_to_pelvis_std": 0.01195,
+   "rel_to_pelvis_angle_mean": 0.0525,
+   "rel_to_pelvis_angle_std": 0.01117,
+   "com_z_mean": 0.0221993587911129,
+   "newton_raw_z_env0": 0.0342,
+   "articulation_z_env0": 0.0342
+  },
+  "right_ankle_roll_link": {
+   "z_mean": 0.03587057814002037,
+   "z_alt_body_pos_w": 0.03587057814002037,
+   "up_z_mean": 0.999428391456604,
+   "up_z_std": 0.0008264732314273715,
+   "rel_to_torso_xyz": [
+    0.1067,
+    -0.1799,
+    -0.6551
+   ],
+   "rel_to_torso_std": 0.01806,
+   "rel_to_torso_angle_mean": 0.0508,
+   "rel_to_torso_angle_std": 0.02159,
+   "rel_to_pelvis_xyz": [
+    0.1068,
+    -0.1799,
+    -0.6551
+   ],
+   "rel_to_pelvis_std": 0.01787,
+   "rel_to_pelvis_angle_mean": 0.0506,
+   "rel_to_pelvis_angle_std": 0.02132,
+   "com_z_mean": 0.023565582931041718,
+   "newton_raw_z_env0": 0.0402,
+   "articulation_z_env0": 0.0402
+  },
+  "torso_link": {
+   "z_mean": 0.6928507089614868,
+   "z_alt_body_pos_w": 0.6928507089614868,
+   "up_z_mean": 0.9994562864303589,
+   "up_z_std": 0.000331139046465978,
+   "rel_to_torso_xyz": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "rel_to_torso_std": 0.0,
+   "rel_to_torso_angle_mean": 0.0,
+   "rel_to_torso_angle_std": 0.0,
+   "rel_to_pelvis_xyz": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "rel_to_pelvis_std": 0.0,
+   "rel_to_pelvis_angle_mean": 0.0146,
+   "rel_to_pelvis_angle_std": 0.01145,
+   "com_z_mean": 0.862051248550415,
+   "newton_raw_z_env0": 0.6967,
+   "articulation_z_env0": 0.6967
+  },
+  "head_link": {
+   "z_mean": 0.6928507089614868,
+   "z_alt_body_pos_w": 0.6928507089614868,
+   "up_z_mean": 0.9994562864303589,
+   "up_z_std": 0.000331139046465978,
+   "rel_to_torso_xyz": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "rel_to_torso_std": 0.0,
+   "rel_to_torso_angle_mean": 0.0,
+   "rel_to_torso_angle_std": 0.0,
+   "rel_to_pelvis_xyz": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "rel_to_pelvis_std": 0.0,
+   "rel_to_pelvis_angle_mean": 0.0146,
+   "rel_to_pelvis_angle_std": 0.01145,
+   "com_z_mean": 1.1129218339920044,
+   "newton_raw_z_env0": 0.6967,
+   "articulation_z_env0": 0.6967
+  },
+  "imu_link": {
+   "z_mean": 0.8460738658905029,
+   "z_alt_body_pos_w": 0.8460738658905029,
+   "up_z_mean": 0.9994562864303589,
+   "up_z_std": 0.000331139046465978,
+   "rel_to_torso_xyz": [
+    -0.0423,
+    0.0017,
+    0.1521
+   ],
+   "rel_to_torso_std": 0.0,
+   "rel_to_torso_angle_mean": 0.0,
+   "rel_to_torso_angle_std": 0.0,
+   "rel_to_pelvis_xyz": [
+    -0.0423,
+    0.0017,
+    0.1521
+   ],
+   "rel_to_pelvis_std": 0.0008,
+   "rel_to_pelvis_angle_mean": 0.0146,
+   "rel_to_pelvis_angle_std": 0.01145,
+   "com_z_mean": 0.8460738658905029,
+   "newton_raw_z_env0": 0.8503,
+   "articulation_z_env0": 0.8503
+  },
+  "left_shoulder_pitch_link": {
+   "z_mean": 0.9515037536621094,
+   "z_alt_body_pos_w": 0.9515037536621094,
+   "up_z_mean": 0.8949717283248901,
+   "up_z_std": 0.0074663423001766205,
+   "rel_to_torso_xyz": [
+    -0.0025,
+    0.104,
+    0.2593
+   ],
+   "rel_to_torso_std": 0.0,
+   "rel_to_torso_angle_mean": 0.4442,
+   "rel_to_torso_angle_std": 0.00886,
+   "rel_to_pelvis_xyz": [
+    -0.0025,
+    0.1039,
+    0.2593
+   ],
+   "rel_to_pelvis_std": 0.00197,
+   "rel_to_pelvis_angle_mean": 0.4445,
+   "rel_to_pelvis_angle_std": 0.0098,
+   "com_z_mean": 0.9663721323013306,
+   "newton_raw_z_env0": 0.9565,
+   "articulation_z_env0": 0.9565
+  },
+  "left_shoulder_roll_link": {
+   "z_mean": 0.9655599594116211,
+   "z_alt_body_pos_w": 0.9655599594116211,
+   "up_z_mean": 0.9308212995529175,
+   "up_z_std": 0.006472415290772915,
+   "rel_to_torso_xyz": [
+    -0.0025,
+    0.1539,
+    0.2736
+   ],
+   "rel_to_torso_std": 0.0,
+   "rel_to_torso_angle_mean": 0.3555,
+   "rel_to_torso_angle_std": 0.0114,
+   "rel_to_pelvis_xyz": [
+    -0.0025,
+    0.1539,
+    0.2736
+   ],
+   "rel_to_pelvis_std": 0.00292,
+   "rel_to_pelvis_angle_mean": 0.3559,
+   "rel_to_pelvis_angle_std": 0.01328,
+   "com_z_mean": 0.9072479009628296,
+   "newton_raw_z_env0": 0.9712,
+   "articulation_z_env0": 0.9712
+  },
+  "logo_link": {
+   "z_mean": 0.6928507089614868,
+   "z_alt_body_pos_w": 0.6928507089614868,
+   "up_z_mean": 0.9994562864303589,
+   "up_z_std": 0.000331139046465978,
+   "rel_to_torso_xyz": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "rel_to_torso_std": 0.0,
+   "rel_to_torso_angle_mean": 0.0,
+   "rel_to_torso_angle_std": 0.0,
+   "rel_to_pelvis_xyz": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "rel_to_pelvis_std": 0.0,
+   "rel_to_pelvis_angle_mean": 0.0146,
+   "rel_to_pelvis_angle_std": 0.01145,
+   "com_z_mean": 0.9380719661712646,
+   "newton_raw_z_env0": 0.6967,
+   "articulation_z_env0": 0.6967
+  },
+  "right_shoulder_pitch_link": {
+   "z_mean": 0.9526230096817017,
+   "z_alt_body_pos_w": 0.9526230096817017,
+   "up_z_mean": 0.9052560925483704,
+   "up_z_std": 0.005157132633030415,
+   "rel_to_torso_xyz": [
+    -0.0025,
+    -0.104,
+    0.2593
+   ],
+   "rel_to_torso_std": 0.0,
+   "rel_to_torso_angle_mean": 0.4148,
+   "rel_to_torso_angle_std": 0.00874,
+   "rel_to_pelvis_xyz": [
+    -0.0025,
+    -0.1039,
+    0.2593
+   ],
+   "rel_to_pelvis_std": 0.00197,
+   "rel_to_pelvis_angle_mean": 0.4152,
+   "rel_to_pelvis_angle_std": 0.00974,
+   "com_z_mean": 0.9679585695266724,
+   "newton_raw_z_env0": 0.9552,
+   "articulation_z_env0": 0.9552
+  },
+  "right_shoulder_roll_link": {
+   "z_mean": 0.9672172665596008,
+   "z_alt_body_pos_w": 0.9672172665596008,
+   "up_z_mean": 0.9429463148117065,
+   "up_z_std": 0.0048583392053842545,
+   "rel_to_torso_xyz": [
+    -0.0025,
+    -0.1539,
+    0.2736
+   ],
+   "rel_to_torso_std": 0.0,
+   "rel_to_torso_angle_mean": 0.3177,
+   "rel_to_torso_angle_std": 0.01232,
+   "rel_to_pelvis_xyz": [
+    -0.0025,
+    -0.1539,
+    0.2736
+   ],
+   "rel_to_pelvis_std": 0.00292,
+   "rel_to_pelvis_angle_mean": 0.3182,
+   "rel_to_pelvis_angle_std": 0.01434,
+   "com_z_mean": 0.9080513119697571,
+   "newton_raw_z_env0": 0.9692,
+   "articulation_z_env0": 0.9692
+  }
+ }
+}

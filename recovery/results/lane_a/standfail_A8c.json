@@ -1,0 +1,25 @@
+{
+ "task": "G1-Recovery-A-v0",
+ "checkpoint": "<workspace>/projects/g1-recovery/lanes/a/runs/A8c_contA6_legacy/model_599.pt",
+ "held_out_envs": 256,
+ "n_success": 256,
+ "n_stood_then_fell": 0,
+ "at_first_stand": {
+  "success": {
+   "step": 25.113,
+   "com_off_xy": 0.249,
+   "com_z": 0.584,
+   "foot_sep": 0.811,
+   "foot_z": 0.108,
+   "pelvis_vz": 0.79,
+   "pelvis_vxy": 0.876,
+   "torso_angvel": 5.538,
+   "feet_contact": 0.262,
+   "arm_force": 0.0,
+   "jvel_norm": 20.489,
+   "n": 256
+  },
+  "stood_then_fell": null
+ },
+ "note": "features sampled at the first step the standing criterion is met (pelvis>=0.60 m, tilt<=26 deg); com_off_xy = horizontal distance between whole-body COM and the midpoint of the two feet (m)"
+}
