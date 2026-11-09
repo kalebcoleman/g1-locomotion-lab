@@ -100,3 +100,71 @@ def strict_gate(run_s, hold_steps, h, up, p: M.Params = M.P):
     """EXPLORATORY gate (not criteria v3): supported stand held >= hold_steps with pelvis >= 0.60 m and up >= 0.90, no validity clauses. Used only to show what the v3 validity
     clauses (flight, limits, torque, launch, stance) cost; never the headline."""
     return (run_s >= hold_steps) & (h >= p.stand_h) & (up >= p.stand_up)
+
+
+# ---------------------------------------------------------------------------------------------------------------------
+# M2b: configurable hand-over variants (evaluation only; no policy weights change). The official criteria-v3 stand result is always tracked
+# separately (HandoverController.v3_first / v3_at_handover) and stays the headline; the readiness check below is a different, clearly labelled check.
+READY_SPEED = 0.20       # m/s, 3D pelvis speed
+READY_ANGVEL = 0.5       # rad/s, pelvis angular speed
+READY_HOLD_STEPS = 50    # 1 s
+
+
+def ready_check(h, up, supported, speed3d, angspeed, p: M.Params = M.P, max_speed=READY_SPEED, max_angvel=READY_ANGVEL):
+    """HAND-OVER READINESS (not criteria v3): supported stance (both feet loaded, near the floor), pelvis >= 0.60 m, upright >= 0.90,
+    base linear speed < max_speed and angular speed < max_angvel. Must hold for READY_HOLD_STEPS consecutive steps. No validity clauses (flight, limits, torque)."""
+    return supported & (h >= p.stand_h) & (up >= p.stand_up) & (speed3d < max_speed) & (angspeed < max_angvel)
+
+
+class HandoverController:
+    """Decides WHEN the recovery policy hands over, and shapes the transition. Batched, pure torch.
+    trigger  'v3'    : fire when the official window gate (criteria v3 stand/hold) passes (M2 behaviour)
+             'ready' : fire when the readiness check has held for ready_hold steps (labelled separately from v3)
+    settle   steps between the trigger and the actual switch; the recovery policy (or a hold of the current joint positions) keeps acting. If the robot stops being
+             stable (supported, pelvis >= 0.60 m, up >= 0.90) during the settle, the trigger is cancelled and must fire again.
+    blend    during the last `blend` steps of the settle the commanded action is ramped linearly from the policy/hold action to the default stance (action 0).
+    ramp     after the switch the commanded forward velocity ramps linearly from 0 to the target over `ramp` steps.
+    With trigger='v3', settle=blend=ramp=0 the behaviour equals M2."""
+
+    def __init__(self, n, device, trigger="v3", ready_hold=READY_HOLD_STEPS, settle=0, blend=0, ramp=0):
+        assert trigger in ("v3", "ready") and blend <= settle or blend == 0
+        self.n, self.dev = n, device
+        self.trigger, self.ready_hold, self.settle, self.blend, self.ramp = trigger, ready_hold, settle, blend, ramp
+        self.trig_step = torch.full((n,), -1, device=device, dtype=torch.long)
+        self.ready_run = torch.zeros(n, device=device, dtype=torch.long)
+        self.v3_first = torch.full((n,), -1, device=device, dtype=torch.long)          # first step the official v3 window gate passed (while recovering)
+        self.ready_first = torch.full((n,), -1, device=device, dtype=torch.long)
+        self.v3_at_handover = torch.zeros(n, device=device, dtype=torch.bool)          # v3 gate true at the step the switch happened
+        self.cancels = torch.zeros(n, device=device, dtype=torch.long)
+
+    def update(self, k, in_recover, v3_ok, ready_now, stable_now):
+        """Call once per step AFTER the physics step. Returns gate_ok (N,) bool: True for envs whose settle has finished at step k (hand over now)."""
+        self.ready_run = torch.where(ready_now, self.ready_run + 1, torch.zeros_like(self.ready_run))
+        ready_ok = self.ready_run >= self.ready_hold
+        self.v3_first = torch.where(in_recover & v3_ok & (self.v3_first < 0), torch.full_like(self.v3_first, k), self.v3_first)
+        self.ready_first = torch.where(in_recover & ready_ok & (self.ready_first < 0), torch.full_like(self.ready_first, k), self.ready_first)
+        cond = v3_ok if self.trigger == "v3" else ready_ok
+        fire = in_recover & cond & (self.trig_step < 0)
+        self.trig_step = torch.where(fire, torch.full_like(self.trig_step, k), self.trig_step)
+        cancel = in_recover & (self.trig_step >= 0) & ~stable_now & (self.trig_step < k)
+        self.cancels += cancel.long()
+        self.trig_step = torch.where(cancel, torch.full_like(self.trig_step, -1), self.trig_step)
+        done = in_recover & (self.trig_step >= 0) & ((k - self.trig_step) >= self.settle)
+        self.v3_at_handover = torch.where(done, v3_ok, self.v3_at_handover)
+        return done
+
+    def settling(self, in_recover):
+        return in_recover & (self.trig_step >= 0)
+
+    def blend_alpha(self, k, in_recover):
+        """(N,) weight of the default stance in the commanded action for the NEXT step (0 outside the blend window)."""
+        if self.blend <= 0: return torch.zeros(self.n, device=self.dev)
+        s = (k + 1 - self.trig_step).float()                                       # steps since the trigger, as seen by the action taken at step k+1
+        a = ((s - (self.settle - self.blend)) / self.blend).clamp(0.0, 1.0)
+        return torch.where(self.settling(in_recover), a, torch.zeros_like(a))
+
+    def command_scale(self, k, handover_step, in_walk2):
+        """(N,) factor on the commanded forward velocity for the action taken at step k+1."""
+        if self.ramp <= 0: return torch.ones(self.n, device=self.dev)
+        sc = ((k + 1 - handover_step).float() / self.ramp).clamp(0.0, 1.0)
+        return torch.where(in_walk2, sc, torch.ones_like(sc))
