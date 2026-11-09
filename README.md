@@ -44,7 +44,7 @@
 | **Getting up** | **68.2%** of 256 held-out poses pass all checks (mean 174.7 of 256), up from 50.5% (129.3) | checkpoint `recC`, assist off, one seed; by direction (of 64 each) side A 52, prone 52, side B 36, supine 35, against 31, 47, 19, 33 before |
 | **Hand-over, getting up to walking** | 6 of 250 robots pass the strict check when handed to the walking policy straight away; **28.7%** with a blend of the upper body; **99.9%** when the hand-over waits for a readiness check instead | zero re-falls with the blend; the readiness gate is not the same test as the strict check ([M2b](pilots/m2b_handover_fixes_20261108/README.md)) |
 | **Pushes** | half of the robots fall at about 2.2 m/s of added speed (M50 2.16 m/s) | training used pushes up to 0.5 m/s; weakest to the left and rear-left (about 1.4 m/s), strongest forward-right (3.4 to 3.6) ([M4](pilots/m4_robustness_20261108/README.md)) |
-| **Low friction** | M50 falls from 2.16 m/s at friction 1.0 to 1.45 at 0.3 | walking alone survives 99% of the first 3 s down to 0.4 and 56% at 0.2 |
+| **Low friction** | M50 falls from 2.16 m/s at friction 1.0 to 1.45 at 0.3 | walking alone survives 98-99% of the first 3 s down to 0.4 and 56% at 0.2 |
 | **Terrain** | at least 80% survival on 19 degree downhill, 9 degree uphill, 5.8 cm steps down, 2.8 cm steps up, 8 cm rough noise | blind walking, no height scan; the policy was trained on flat ground ([M3](pilots/m3_terrain_baseline_20261108/README.md)) |
 | **What "passes" means** | supported 2 s stand, no launch or flight, joint, torque and self-penetration limits, normal stance, still up at the end | details in [recovery/README.md](recovery/README.md) |
 
