@@ -1,6 +1,6 @@
 {
  "task": "G1-Host-Supine-Eval-v0",
- "checkpoint": "/home/kacolem8@ad.asu.edu/isaac-workspace/projects/g1-locomotion-lab-integrated/runs/host_Supine/model_700.pt",
+ "checkpoint": "<workspace>/projects/g1-locomotion-lab-integrated/runs/host_Supine/model_700.pt",
  "num_envs": 256,
  "episode_s": 10.0,
  "steps": 500,

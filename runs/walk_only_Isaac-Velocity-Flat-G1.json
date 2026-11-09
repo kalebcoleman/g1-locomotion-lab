@@ -1,7 +1,7 @@
 {
  "task": "Isaac-Velocity-Flat-G1",
  "robot_model": "minimal-collision g1_minimal.usd",
- "checkpoint": "/home/kacolem8@ad.asu.edu/isaac-workspace/projects/g1-locomotion-lab-integrated/checkpoints/walking_newton_it1499.pt",
+ "checkpoint": "<workspace>/projects/g1-locomotion-lab-integrated/checkpoints/walking_newton_it1499.pt",
  "num_envs": 256,
  "pushes_m_s": 0.0,
  "protocol": "3 s settle (zero cmd), 10 s walk vx=0.80, 8 s turn wz=0.80; walk ok = no fall AND >=3 m along heading AND >=0.5 m/s",

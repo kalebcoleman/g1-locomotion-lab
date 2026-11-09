@@ -1,6 +1,6 @@
 {
  "label": "sitting",
- "checkpoint": "/home/kacolem8@ad.asu.edu/isaac-workspace/projects/g1-locomotion-lab-integrated/recovery/checkpoints/laneA_v1_situp_it999.pt",
+ "checkpoint": "<workspace>/projects/g1-locomotion-lab-integrated/recovery/checkpoints/laneA_v1_situp_it999.pt",
  "seconds": 8.0,
  "num_envs": 16,
  "all_body_names": [

@@ -76,7 +76,7 @@ R4 vs R4n: assist made no visible difference at this stage (assist level stayed 
 | R7m | pelvis height x (0.25 + 0.75 upright_full) (HoST: orientation x height) | same, multiplicatively |
 | R7u warm from R6c@350 (`init/R6cS_fold_it350.pt`) | R7u, starting from the fold | can the fold be a stepping stone? |
 
-**Documentation (23:22):** added `docs/SYSTEM_OVERVIEW.md` and dark diagrams in `docs/figures/`. No run was changed or restarted.
+**Documentation (23:22):** added the system overview and dark diagrams (now under `recovery/architecture/`; originally `docs/`). No run was changed or restarted.
 
 ## v15 check (2026-11-06 23:28 onward), DEV, assist off, criteria v2.1, uncut video review (`media/20261106_235_chkv15_*`, `results/chk_v15_*`)
 Columns: v2.1 passes, strict 2 s supported stands, soft-limit %, hard-limit %, peak pelvis upward speed mean/max (m/s), then robots reaching seated, fold, crouch on feet, high on feet, any supported stand, supported 1 s.

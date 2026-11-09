@@ -2,7 +2,7 @@ Visual material specified for ground plane but no diffuse color found. Preservin
 I: Initializing Version 2.74.0-release.7316+gl.ec99a64b
 I: Client ID: UD1KDBHD
 I: ThreadId(02) hub_client::client::Client::new Launching client mode=Shared with_cleaner=false cache_path=None cache_size=None
-I: ThreadId(03) launch self=Launcher { discovery_lock: RwLock { lock: RwLock { inner: File { fd: 55, path: "/tmp/hub-kacolem8@ad.asu.edu.lock", read: false, write: true } } }, mode: Shared, with_cleaner: false, config_file: "/tmp/hub-kacolem8@ad.asu.edu-28B21721.config.json" } cmd="hub" "--mode=shared" "--write-config" "/tmp/hub-kacolem8@ad.asu.edu-28B21721.config.json" "--"
+I: ThreadId(03) launch self=Launcher { discovery_lock: RwLock { lock: RwLock { inner: File { fd: 55, path: "/tmp/hub-<user>.lock", read: false, write: true } } }, mode: Shared, with_cleaner: false, config_file: "/tmp/hub-<user>-28B21721.config.json" } cmd="hub" "--mode=shared" "--write-config" "/tmp/hub-<user>-28B21721.config.json" "--"
 I: Not using Hub: Hub not found
 I: Successfully created S3 provider for https://omniverse-content-production.s3-us-west-2.amazonaws.com
 I: Using CloudFront http://dcb18d6mfegct.cloudfront.net/, List = No

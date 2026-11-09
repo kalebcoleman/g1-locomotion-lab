@@ -1,6 +1,6 @@
 {
  "task": "G1-Recovery-R2-Eval-v0",
- "checkpoint": "/home/kacolem8@ad.asu.edu/isaac-workspace/envs/lab-3.0.0-src/logs/rsl_rl/g1_recovery_r/init/laneA_v1_situp_it999.pt",
+ "checkpoint": "<workspace>/envs/lab-3.0.0-src/logs/rsl_rl/g1_recovery_r/init/laneA_v1_situp_it999.pt",
  "action_scale": 0.5,
  "pose_set": "dev_v1.npz",
  "num_envs": 256,
