@@ -1,0 +1,78 @@
+{
+ "name": "g4j2",
+ "init": "<workspace>/projects/g1-locomotion-lab-integrated/pilots/g4_humanlike_getup_20261108/ckpt/g4g1_w8p0_it1350.pt",
+ "baseline_ckpt": "<workspace>/projects/g1-locomotion-lab-integrated/checkpoints/R9hg_it1100_candidate.pt",
+ "seed": 92,
+ "num_envs": 16384,
+ "iters": 50,
+ "save_interval": 25,
+ "eval_every": 25,
+ "budget_hours_cap": 7.0,
+ "select": "best",
+ "target": {
+  "peak_spread_m": 0.8,
+  "rate_vs_baseline": 0.9
+ },
+ "stages": [
+  {
+   "name": "b1p5",
+   "overrides": [
+    "env.rewards.stance.weight=-8.0",
+    "env.rewards.stance.params.pelvis_h=0.12",
+    "env.rewards.stance.params.free=0.45",
+    "env.rewards.stance.params.full=1.5",
+    "env.rewards.dof_limits_body.weight=-100.0",
+    "agent.algorithm.learning_rate=3e-5",
+    "env.actions.joint_pos.clip={'.*_hip_roll_joint':[-1.5,1.5],'.*_hip_yaw_joint':[-1.5,1.5],'.*_hip_pitch_joint':[-1.6,1.6]}"
+   ]
+  },
+  {
+   "name": "b1p2",
+   "overrides": [
+    "env.rewards.stance.weight=-8.0",
+    "env.rewards.stance.params.pelvis_h=0.12",
+    "env.rewards.stance.params.free=0.45",
+    "env.rewards.stance.params.full=1.5",
+    "env.rewards.dof_limits_body.weight=-100.0",
+    "agent.algorithm.learning_rate=3e-5",
+    "env.actions.joint_pos.clip={'.*_hip_roll_joint':[-1.2,1.2],'.*_hip_yaw_joint':[-1.2,1.2],'.*_hip_pitch_joint':[-1.6,1.6]}"
+   ]
+  },
+  {
+   "name": "b0p9",
+   "overrides": [
+    "env.rewards.stance.weight=-8.0",
+    "env.rewards.stance.params.pelvis_h=0.12",
+    "env.rewards.stance.params.free=0.45",
+    "env.rewards.stance.params.full=1.5",
+    "env.rewards.dof_limits_body.weight=-100.0",
+    "agent.algorithm.learning_rate=3e-5",
+    "env.actions.joint_pos.clip={'.*_hip_roll_joint':[-0.9,0.9],'.*_hip_yaw_joint':[-0.9,0.9],'.*_hip_pitch_joint':[-1.6,1.6]}"
+   ]
+  },
+  {
+   "name": "b0p7",
+   "overrides": [
+    "env.rewards.stance.weight=-8.0",
+    "env.rewards.stance.params.pelvis_h=0.12",
+    "env.rewards.stance.params.free=0.45",
+    "env.rewards.stance.params.full=1.5",
+    "env.rewards.dof_limits_body.weight=-100.0",
+    "agent.algorithm.learning_rate=3e-5",
+    "env.actions.joint_pos.clip={'.*_hip_roll_joint':[-0.7,0.7],'.*_hip_yaw_joint':[-0.7,0.7],'.*_hip_pitch_joint':[-1.6,1.6]}"
+   ]
+  },
+  {
+   "name": "b0p5",
+   "overrides": [
+    "env.rewards.stance.weight=-8.0",
+    "env.rewards.stance.params.pelvis_h=0.12",
+    "env.rewards.stance.params.free=0.45",
+    "env.rewards.stance.params.full=1.5",
+    "env.rewards.dof_limits_body.weight=-100.0",
+    "agent.algorithm.learning_rate=3e-5",
+    "env.actions.joint_pos.clip={'.*_hip_roll_joint':[-0.5,0.5],'.*_hip_yaw_joint':[-0.5,0.5],'.*_hip_pitch_joint':[-1.6,1.6]}"
+   ]
+  }
+ ]
+}

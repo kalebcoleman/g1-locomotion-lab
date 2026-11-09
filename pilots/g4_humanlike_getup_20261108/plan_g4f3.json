@@ -1,0 +1,62 @@
+{
+ "name": "g4f3",
+ "init": "<workspace>/projects/g1-locomotion-lab-integrated/checkpoints/R9hg_it1100_candidate.pt",
+ "baseline_ckpt": "<workspace>/projects/g1-locomotion-lab-integrated/checkpoints/R9hg_it1100_candidate.pt",
+ "seed": 53,
+ "num_envs": 16384,
+ "iters": 50,
+ "save_interval": 25,
+ "eval_every": 25,
+ "budget_hours_cap": 7.0,
+ "select": "best",
+ "target": {
+  "peak_spread_m": 0.8,
+  "rate_vs_baseline": 0.9
+ },
+ "stages": [
+  {
+   "name": "w10",
+   "overrides": [
+    "env.rewards.stance.weight=-1.0",
+    "env.rewards.stance.params.pelvis_h=0.12",
+    "env.rewards.stance.params.free=0.45",
+    "env.rewards.stance.params.full=0.85",
+    "env.rewards.dof_limits_body.weight=-100.0",
+    "agent.algorithm.learning_rate=3e-5"
+   ]
+  },
+  {
+   "name": "w30",
+   "overrides": [
+    "env.rewards.stance.weight=-3.0",
+    "env.rewards.stance.params.pelvis_h=0.12",
+    "env.rewards.stance.params.free=0.45",
+    "env.rewards.stance.params.full=0.85",
+    "env.rewards.dof_limits_body.weight=-100.0",
+    "agent.algorithm.learning_rate=3e-5"
+   ]
+  },
+  {
+   "name": "w80",
+   "overrides": [
+    "env.rewards.stance.weight=-8.0",
+    "env.rewards.stance.params.pelvis_h=0.12",
+    "env.rewards.stance.params.free=0.45",
+    "env.rewards.stance.params.full=0.85",
+    "env.rewards.dof_limits_body.weight=-100.0",
+    "agent.algorithm.learning_rate=3e-5"
+   ]
+  },
+  {
+   "name": "w150",
+   "overrides": [
+    "env.rewards.stance.weight=-15.0",
+    "env.rewards.stance.params.pelvis_h=0.12",
+    "env.rewards.stance.params.free=0.45",
+    "env.rewards.stance.params.full=0.85",
+    "env.rewards.dof_limits_body.weight=-100.0",
+    "agent.algorithm.learning_rate=3e-5"
+   ]
+  }
+ ]
+}

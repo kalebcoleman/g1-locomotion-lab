@@ -1,0 +1,100 @@
+{
+ "name": "g4b",
+ "init": "<workspace>/projects/g1-locomotion-lab-integrated/checkpoints/R9hg_it1100_candidate.pt",
+ "seed": 32,
+ "num_envs": 16384,
+ "iters": 75,
+ "budget_hours_cap": 7.0,
+ "target": {
+  "peak_spread_m": 0.8,
+  "rate_vs_baseline": 0.9
+ },
+ "stages": [
+  {
+   "name": "ctrl",
+   "overrides": [
+    "agent.algorithm.learning_rate=3e-5"
+   ]
+  },
+  {
+   "name": "w025",
+   "overrides": [
+    "env.rewards.stance.weight=-0.25",
+    "env.rewards.stance.params.pelvis_h=0.12",
+    "env.rewards.stance.params.free=0.45",
+    "env.rewards.stance.params.full=0.85",
+    "agent.algorithm.learning_rate=3e-5"
+   ]
+  },
+  {
+   "name": "w05",
+   "overrides": [
+    "env.rewards.stance.weight=-0.5",
+    "env.rewards.stance.params.pelvis_h=0.12",
+    "env.rewards.stance.params.free=0.45",
+    "env.rewards.stance.params.full=0.85",
+    "agent.algorithm.learning_rate=3e-5"
+   ]
+  },
+  {
+   "name": "w1",
+   "overrides": [
+    "env.rewards.stance.weight=-1.0",
+    "env.rewards.stance.params.pelvis_h=0.12",
+    "env.rewards.stance.params.free=0.45",
+    "env.rewards.stance.params.full=0.85",
+    "agent.algorithm.learning_rate=3e-5"
+   ]
+  },
+  {
+   "name": "w2",
+   "overrides": [
+    "env.rewards.stance.weight=-2.0",
+    "env.rewards.stance.params.pelvis_h=0.12",
+    "env.rewards.stance.params.free=0.45",
+    "env.rewards.stance.params.full=0.85",
+    "agent.algorithm.learning_rate=3e-5"
+   ]
+  },
+  {
+   "name": "w3",
+   "overrides": [
+    "env.rewards.stance.weight=-3.0",
+    "env.rewards.stance.params.pelvis_h=0.12",
+    "env.rewards.stance.params.free=0.45",
+    "env.rewards.stance.params.full=0.85",
+    "agent.algorithm.learning_rate=3e-5"
+   ]
+  },
+  {
+   "name": "w4",
+   "overrides": [
+    "env.rewards.stance.weight=-4.0",
+    "env.rewards.stance.params.pelvis_h=0.12",
+    "env.rewards.stance.params.free=0.45",
+    "env.rewards.stance.params.full=0.85",
+    "agent.algorithm.learning_rate=3e-5"
+   ]
+  },
+  {
+   "name": "w6",
+   "overrides": [
+    "env.rewards.stance.weight=-6.0",
+    "env.rewards.stance.params.pelvis_h=0.12",
+    "env.rewards.stance.params.free=0.45",
+    "env.rewards.stance.params.full=0.85",
+    "agent.algorithm.learning_rate=3e-5"
+   ]
+  },
+  {
+   "name": "w8",
+   "overrides": [
+    "env.rewards.stance.weight=-8.0",
+    "env.rewards.stance.params.pelvis_h=0.12",
+    "env.rewards.stance.params.free=0.45",
+    "env.rewards.stance.params.full=0.85",
+    "agent.algorithm.learning_rate=3e-5"
+   ]
+  }
+ ]
+}
