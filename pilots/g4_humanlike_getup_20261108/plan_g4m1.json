@@ -1,0 +1,51 @@
+{
+ "name": "g4m1",
+ "init": "<workspace>/envs/lab-3.0.0-src/logs/rsl_rl/g1_recovery_r/init/R6cS_fold_it350.pt",
+ "baseline_ckpt": "<workspace>/projects/g1-locomotion-lab-integrated/checkpoints/R9hg_it1100_candidate.pt",
+ "seed": 101,
+ "num_envs": 16384,
+ "iters": 250,
+ "save_interval": 50,
+ "eval_every": 50,
+ "budget_hours_cap": 7.0,
+ "select": "last",
+ "target": {
+  "peak_spread_m": 0.8,
+  "rate_vs_baseline": 0.9
+ },
+ "stages": [
+  {
+   "name": "s1",
+   "iters": 250,
+   "overrides": [
+    "env.rewards.stance.weight=-1.0",
+    "env.rewards.stance.params.pelvis_h=0.12",
+    "env.rewards.stance.params.free=0.45",
+    "env.rewards.stance.params.full=1.5",
+    "env.rewards.dof_limits_body.weight=-100.0"
+   ]
+  },
+  {
+   "name": "s2",
+   "iters": 200,
+   "overrides": [
+    "env.rewards.stance.weight=-4.0",
+    "env.rewards.stance.params.pelvis_h=0.12",
+    "env.rewards.stance.params.free=0.45",
+    "env.rewards.stance.params.full=1.5",
+    "env.rewards.dof_limits_body.weight=-100.0"
+   ]
+  },
+  {
+   "name": "s3",
+   "iters": 200,
+   "overrides": [
+    "env.rewards.stance.weight=-8.0",
+    "env.rewards.stance.params.pelvis_h=0.12",
+    "env.rewards.stance.params.free=0.45",
+    "env.rewards.stance.params.full=1.5",
+    "env.rewards.dof_limits_body.weight=-100.0"
+   ]
+  }
+ ]
+}

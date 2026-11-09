@@ -1,0 +1,21 @@
+{
+ "name": "g4c1",
+ "init": "<workspace>/projects/g1-locomotion-lab-integrated/checkpoints/R9hg_it1100_candidate.pt",
+ "seed": 33,
+ "num_envs": 16384,
+ "iters": 75,
+ "budget_hours_cap": 7.0,
+ "target": {
+  "peak_spread_m": 0.8,
+  "rate_vs_baseline": 0.9
+ },
+ "stages": [
+  {
+   "name": "ctrl",
+   "overrides": [
+    "agent.algorithm.learning_rate=3e-6",
+    "agent.algorithm.entropy_coef=0.0"
+   ]
+  }
+ ]
+}

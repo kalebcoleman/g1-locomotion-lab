@@ -1,0 +1,70 @@
+{
+ "name": "g4i2",
+ "init": "<workspace>/projects/g1-locomotion-lab-integrated/pilots/g4_humanlike_getup_20261108/ckpt/g4g1_w4p0_it1323.pt",
+ "baseline_ckpt": "<workspace>/projects/g1-locomotion-lab-integrated/checkpoints/R9hg_it1100_candidate.pt",
+ "seed": 82,
+ "num_envs": 16384,
+ "iters": 50,
+ "save_interval": 25,
+ "eval_every": 25,
+ "budget_hours_cap": 7.0,
+ "select": "best",
+ "target": {
+  "peak_spread_m": 0.8,
+  "rate_vs_baseline": 0.9
+ },
+ "stages": [
+  {
+   "name": "a0",
+   "overrides": [
+    "env.rewards.stance.weight=-8.0",
+    "env.rewards.stance.params.pelvis_h=0.12",
+    "env.rewards.stance.params.free=0.45",
+    "env.rewards.stance.params.full=1.5",
+    "env.rewards.dof_limits_body.weight=-100.0",
+    "agent.algorithm.learning_rate=3e-5",
+    "env.rewards.dof_acc.weight=-1e-06",
+    "env.rewards.action_rate.weight=-0.03"
+   ]
+  },
+  {
+   "name": "a1",
+   "overrides": [
+    "env.rewards.stance.weight=-8.0",
+    "env.rewards.stance.params.pelvis_h=0.12",
+    "env.rewards.stance.params.free=0.45",
+    "env.rewards.stance.params.full=1.5",
+    "env.rewards.dof_limits_body.weight=-100.0",
+    "agent.algorithm.learning_rate=3e-5",
+    "env.rewards.dof_acc.weight=-3e-06",
+    "env.rewards.action_rate.weight=-0.05"
+   ]
+  },
+  {
+   "name": "a2",
+   "overrides": [
+    "env.rewards.stance.weight=-8.0",
+    "env.rewards.stance.params.pelvis_h=0.12",
+    "env.rewards.stance.params.free=0.45",
+    "env.rewards.stance.params.full=1.5",
+    "env.rewards.dof_limits_body.weight=-100.0",
+    "agent.algorithm.learning_rate=3e-5",
+    "env.rewards.dof_acc.weight=-1e-05",
+    "env.rewards.action_rate.weight=-0.1"
+   ]
+  },
+  {
+   "name": "a3",
+   "overrides": [
+    "env.rewards.stance.weight=-8.0",
+    "env.rewards.stance.params.pelvis_h=0.12",
+    "env.rewards.stance.params.free=0.45",
+    "env.rewards.stance.params.full=1.5",
+    "env.rewards.dof_limits_body.weight=-100.0",
+    "agent.algorithm.learning_rate=3e-5",
+    "env.rewards.dof_acc.weight=-3e-05",
+    "env.rewards.action_rate.weight=-0.2"
+   ]
+  }
+ ]
+}

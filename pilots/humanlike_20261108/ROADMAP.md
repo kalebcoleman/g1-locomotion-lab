@@ -1,5 +1,5 @@
 # G1 human-like get-up: staged roadmap (lab thread, simulation only)
-Rules: existing scripts/config only until a source change is approved; no hardware, no paid services, no merge, nothing counted as published until a commit/PR exists. Baseline `R9hg it1100` stays the reference; the failed pilot is a negative result, not a base to continue.
+Rules: existing scripts/config only until a source change is approved; no hardware, no paid services, no merge, nothing counted as published until a commit/PR exists. Get-up baseline: `recC` (adopted 2026-11-09, `recovery/checkpoints/getup_baseline_recC_it1425.pt`; HELDOUT v3 174.7 of 256 against 129.3 for the previous baseline `R9hg it1100`, which stays preserved in `recovery/checkpoints/R9hg_it1100_previous_baseline.pt`). The M2 and M2b results below were measured with `R9hg it1100`. The failed pilot is a negative result, not a base to continue.
 
 | stage | goal | state |
 |---|---|---|
