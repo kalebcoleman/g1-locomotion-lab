@@ -1,0 +1,5 @@
+env.rewards.stance.weight=-8.0
+env.rewards.action_rate.weight=-0.03
+env.rewards.dof_acc.weight=-1.0e-6
+env.rewards.dof_limits_body.weight=-15.0
+agent.save_interval=10
