@@ -40,6 +40,9 @@ The earlier evaluator (v1) used the legacy stand tracker, 1 m Euclidean displace
 ## Stage 3: continuous walk -> disturbance -> fall -> recover -> walk/turn (stretch)
 One uncut episode, physics always active, no reset/teleport/hidden support; disturbance = impulsive base velocity set through the task's push mechanism (magnitude/direction logged, fixed list in advance, defined when this stage is implemented), fall = pelvis < 0.45 m or tilt > 60 deg; then Stage 1 plausibility from the first ground contact, supported stand, resumed walking >= 3 m and a >= 90 deg yaw turn within 8 s. Switching rules must be fixed functions of observable state.
 
+
+**Implemented (M2, DEV, evaluation only):** `recovery/scripts/eval_fall_handover.py` with the state machine in `recovery/g1_recovery/fall_handover.py`. One uncut episode, no reset (a reset is a failure); push = horizontal base-velocity impulse of 2.5 / 3.5 / 4.5 m/s in a random direction at 3 s; debounced fall detection (0.45 m / 0.5 for 0.2 s); criteria-v3 stand gate over the get-up window; one-way hand-over with hysteresis; 10 s of walking with the Stage 2 rule. No turn is required in this version. Results and limits: `pilots/m2_fall_handover_20261108/README.md`.
+
 ## Statistics
 Each final candidate: >= 3 independent evaluations (the evaluation is not bit-repeatable: one checkpoint scored 3-8/256) on HELDOUT; robustness claims need >= 3 independently trained seeds; report mean and range, attempts and successes. Training budgets for method comparisons are matched in transitions; wall time/throughput are reported separately (shared GPU).
 

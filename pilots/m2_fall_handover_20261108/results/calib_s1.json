@@ -1,0 +1,590 @@
+{
+ "protocol": "M2 continuous fall/hand-over (EVAL_PROTOCOL.md Stage 3, DEV, evaluation only)",
+ "task": "G1-Recovery-R9hg-v0",
+ "checkpoint": "<workspace>/projects/g1-locomotion-lab-integrated/checkpoints/R9hg_it1100_candidate.pt",
+ "walk_checkpoint": "<workspace>/projects/g1-locomotion-lab-integrated/checkpoints/walking_newton_it1499.pt",
+ "seed": 1,
+ "num_envs": 16,
+ "timeline": {
+  "push_s": 3.0,
+  "nofall_s": 3.0,
+  "det_steps": 10,
+  "fall_h": 0.45,
+  "fall_up": 0.5,
+  "recover_max_s": 10.0,
+  "walk_s": 10.0,
+  "fwd_cmd": 0.8,
+  "total_s": 27.0,
+  "dt": 0.02
+ },
+ "fall_induction": {
+  "method": "horizontal root-velocity impulse added to the base velocity at push_s, random direction per env (seeded)",
+  "magnitudes_m_s": [
+   0.0,
+   1.5,
+   3.0,
+   4.5
+  ],
+  "magnitude_0": "no-push control"
+ },
+ "gate": "fall_handover.window_gate (criteria v3 stand/hold over the get-up window; 3b self-penetration not applied)",
+ "env_resets_total": 0,
+ "overall": {
+  "n": 16,
+  "push_applied": 12,
+  "fell_induced": 7,
+  "spontaneous_falls": 0,
+  "detection_latency_s": {
+   "n": 7,
+   "mean": 0.6399999856948853,
+   "median": 0.5600000023841858,
+   "p90": 0.8679999828338625,
+   "max": 1.059999942779541
+  },
+  "stand_gate_pass": 3,
+  "handover_rate_of_induced": 0.4285714328289032,
+  "getup_time_s": {
+   "n": 3,
+   "mean": 5.333333333333333,
+   "median": 6.0,
+   "p90": 6.0,
+   "max": 6.0
+  },
+  "strict_hold_time_s": {
+   "n": 7,
+   "mean": 4.048571314130511,
+   "median": 2.9800000190734863,
+   "p90": 6.0599997520446784,
+   "max": 7.139999866485596
+  },
+  "completed_walk_window": 2,
+  "refell_after_handover": 1,
+  "env_resets": 0,
+  "along_heading_m": {
+   "n": 3,
+   "mean": 2.78951104482015,
+   "median": 3.4774680137634277,
+   "p90": 5.20278959274292,
+   "max": 5.634119987487793
+  },
+  "walk_time_without_refall_s": {
+   "n": 3,
+   "mean": 7.206666668256124,
+   "median": 10.0,
+   "p90": 10.0,
+   "max": 10.0
+  },
+  "episode_success": 1,
+  "episode_success_rate_of_induced": 0.1428571492433548,
+  "outcomes": {
+   "walk": 4,
+   "recover": 0,
+   "walk_resumed": 0,
+   "done": 2,
+   "no_fall_after_push": 5,
+   "no_stand_gate": 4,
+   "refell_after_handover": 1,
+   "env_reset": 0
+  },
+  "chain_failure_reasons": {
+   "success": 1,
+   "never_handed_over": 4,
+   "implausible_recovery": 0,
+   "timeout_window_incomplete": 1,
+   "fell_after_handover": 0,
+   "insufficient_progress_along_heading": 0,
+   "too_slow": 1
+  }
+ },
+ "by_push_magnitude": {
+  "0.0": {
+   "n": 4,
+   "push_applied": 0,
+   "fell_induced": 0,
+   "spontaneous_falls": 0,
+   "detection_latency_s": null,
+   "stand_gate_pass": 0,
+   "handover_rate_of_induced": 0.0,
+   "getup_time_s": null,
+   "strict_hold_time_s": null,
+   "completed_walk_window": 0,
+   "refell_after_handover": 0,
+   "env_resets": 0,
+   "along_heading_m": null,
+   "walk_time_without_refall_s": null,
+   "episode_success": 0,
+   "episode_success_rate_of_induced": 0.0,
+   "outcomes": {
+    "walk": 4,
+    "recover": 0,
+    "walk_resumed": 0,
+    "done": 0,
+    "no_fall_after_push": 0,
+    "no_stand_gate": 0,
+    "refell_after_handover": 0,
+    "env_reset": 0
+   },
+   "chain_failure_reasons": {
+    "success": 0,
+    "never_handed_over": 0,
+    "implausible_recovery": 0,
+    "timeout_window_incomplete": 0,
+    "fell_after_handover": 0,
+    "insufficient_progress_along_heading": 0,
+    "too_slow": 0
+   }
+  },
+  "1.5": {
+   "n": 4,
+   "push_applied": 4,
+   "fell_induced": 0,
+   "spontaneous_falls": 0,
+   "detection_latency_s": null,
+   "stand_gate_pass": 0,
+   "handover_rate_of_induced": 0.0,
+   "getup_time_s": null,
+   "strict_hold_time_s": null,
+   "completed_walk_window": 0,
+   "refell_after_handover": 0,
+   "env_resets": 0,
+   "along_heading_m": null,
+   "walk_time_without_refall_s": null,
+   "episode_success": 0,
+   "episode_success_rate_of_induced": 0.0,
+   "outcomes": {
+    "walk": 0,
+    "recover": 0,
+    "walk_resumed": 0,
+    "done": 0,
+    "no_fall_after_push": 4,
+    "no_stand_gate": 0,
+    "refell_after_handover": 0,
+    "env_reset": 0
+   },
+   "chain_failure_reasons": {
+    "success": 0,
+    "never_handed_over": 0,
+    "implausible_recovery": 0,
+    "timeout_window_incomplete": 0,
+    "fell_after_handover": 0,
+    "insufficient_progress_along_heading": 0,
+    "too_slow": 0
+   }
+  },
+  "3.0": {
+   "n": 4,
+   "push_applied": 4,
+   "fell_induced": 3,
+   "spontaneous_falls": 0,
+   "detection_latency_s": {
+    "n": 3,
+    "mean": 0.7866666515668234,
+    "median": 0.7400000095367432,
+    "p90": 0.9959999561309815,
+    "max": 1.059999942779541
+   },
+   "stand_gate_pass": 3,
+   "handover_rate_of_induced": 1.0,
+   "getup_time_s": {
+    "n": 3,
+    "mean": 5.333333333333333,
+    "median": 6.0,
+    "p90": 6.0,
+    "max": 6.0
+   },
+   "strict_hold_time_s": {
+    "n": 3,
+    "mean": 2.8999999364217124,
+    "median": 2.8999998569488525,
+    "p90": 2.9480000019073485,
+    "max": 2.9600000381469727
+   },
+   "completed_walk_window": 2,
+   "refell_after_handover": 1,
+   "env_resets": 0,
+   "along_heading_m": {
+    "n": 3,
+    "mean": 2.78951104482015,
+    "median": 3.4774680137634277,
+    "p90": 5.20278959274292,
+    "max": 5.634119987487793
+   },
+   "walk_time_without_refall_s": {
+    "n": 3,
+    "mean": 7.206666668256124,
+    "median": 10.0,
+    "p90": 10.0,
+    "max": 10.0
+   },
+   "episode_success": 1,
+   "episode_success_rate_of_induced": 0.3333333432674408,
+   "outcomes": {
+    "walk": 0,
+    "recover": 0,
+    "walk_resumed": 0,
+    "done": 2,
+    "no_fall_after_push": 1,
+    "no_stand_gate": 0,
+    "refell_after_handover": 1,
+    "env_reset": 0
+   },
+   "chain_failure_reasons": {
+    "success": 1,
+    "never_handed_over": 0,
+    "implausible_recovery": 0,
+    "timeout_window_incomplete": 1,
+    "fell_after_handover": 0,
+    "insufficient_progress_along_heading": 0,
+    "too_slow": 1
+   }
+  },
+  "4.5": {
+   "n": 4,
+   "push_applied": 4,
+   "fell_induced": 4,
+   "spontaneous_falls": 0,
+   "detection_latency_s": {
+    "n": 4,
+    "mean": 0.5299999862909317,
+    "median": 0.5099999904632568,
+    "p90": 0.6159999907016754,
+    "max": 0.6399999856948853
+   },
+   "stand_gate_pass": 0,
+   "handover_rate_of_induced": 0.0,
+   "getup_time_s": null,
+   "strict_hold_time_s": {
+    "n": 4,
+    "mean": 4.909999847412109,
+    "median": 4.759999752044678,
+    "p90": 6.599999809265137,
+    "max": 7.139999866485596
+   },
+   "completed_walk_window": 0,
+   "refell_after_handover": 0,
+   "env_resets": 0,
+   "along_heading_m": null,
+   "walk_time_without_refall_s": null,
+   "episode_success": 0,
+   "episode_success_rate_of_induced": 0.0,
+   "outcomes": {
+    "walk": 0,
+    "recover": 0,
+    "walk_resumed": 0,
+    "done": 0,
+    "no_fall_after_push": 0,
+    "no_stand_gate": 4,
+    "refell_after_handover": 0,
+    "env_reset": 0
+   },
+   "chain_failure_reasons": {
+    "success": 0,
+    "never_handed_over": 4,
+    "implausible_recovery": 0,
+    "timeout_window_incomplete": 0,
+    "fell_after_handover": 0,
+    "insufficient_progress_along_heading": 0,
+    "too_slow": 0
+   }
+  }
+ },
+ "control_no_push": {
+  "n": 4,
+  "fell": 0,
+  "still_walking_at_end": 4
+ },
+ "movement_during_getup": {
+  "spread_peak_m": {
+   "n": 7,
+   "mean": 1.399954046521868,
+   "median": 1.3930493593215942,
+   "p90": 1.4292615890502929,
+   "max": 1.4366142749786377
+  },
+  "spread_peak_gated_m": {
+   "n": 7,
+   "mean": 1.3221552882875716,
+   "median": 1.3238134384155273,
+   "p90": 1.3322648525238037,
+   "max": 1.332566261291504
+  },
+  "spread_peak_time_s": {
+   "n": 7,
+   "mean": 0.8542856850794384,
+   "median": 0.3400000035762787,
+   "p90": 1.967999935150147,
+   "max": 2.6399998664855957
+  },
+  "spread_final_m": {
+   "n": 7,
+   "mean": 0.4513311130659921,
+   "median": 0.43193742632865906,
+   "p90": 0.5072554230690003,
+   "max": 0.5377645492553711
+  },
+  "spread_wide_frac": {
+   "n": 7,
+   "mean": 0.5426558841552053,
+   "median": 0.32692307233810425,
+   "p90": 1.0,
+   "max": 1.0
+  },
+  "hip_roll_peak_abs": {
+   "n": 7,
+   "mean": 1.4209009579249792,
+   "median": 1.3888262510299683,
+   "p90": 1.522887659072876,
+   "max": 1.5843985080718994
+  },
+  "hip_yaw_peak_abs": {
+   "n": 7,
+   "mean": 1.4058637704168047,
+   "median": 1.2562538385391235,
+   "p90": 2.099400281906128,
+   "max": 2.1281535625457764
+  },
+  "hip_roll_final_abs": {
+   "n": 7,
+   "mean": 0.14585800149611064,
+   "median": 0.1344248354434967,
+   "p90": 0.17283874750137332,
+   "max": 0.20098379254341125
+  },
+  "hip_yaw_final_abs": {
+   "n": 7,
+   "mean": 0.2588493653706142,
+   "median": 0.25968867540359497,
+   "p90": 0.2734545826911926,
+   "max": 0.2773916721343994
+  },
+  "action_rate_mean": {
+   "n": 7,
+   "mean": 0.21465972917420523,
+   "median": 0.2095446139574051,
+   "p90": 0.2513147026300431,
+   "max": 0.27895990014076233
+  },
+  "joint_acc_rms": {
+   "n": 7,
+   "mean": 80.52966417585101,
+   "median": 75.79130554199219,
+   "p90": 100.0473846435547,
+   "max": 116.55941009521484
+  },
+  "joint_acc_p99": {
+   "n": 7,
+   "mean": 372.8589346749442,
+   "median": 340.5888671875,
+   "p90": 455.10737304687507,
+   "max": 540.1493530273438
+  },
+  "joint_jerk_p99": {
+   "n": 7,
+   "mean": 16001.828125,
+   "median": 14884.25390625,
+   "p90": 19601.707421875002,
+   "max": 22733.41796875
+  }
+ },
+ "movement_note": "M1 metrics over [detect, hand-over) per env; spread/hip peak use h>0.12 gating inside the window",
+ "per_env": {
+  "mag": [
+   0.0,
+   1.5,
+   3.0,
+   4.5,
+   0.0,
+   1.5,
+   3.0,
+   4.5,
+   0.0,
+   1.5,
+   3.0,
+   4.5,
+   0.0,
+   1.5,
+   3.0,
+   4.5
+  ],
+  "angle_rad": [
+   2.212,
+   0.189,
+   0.557,
+   5.906,
+   3.543,
+   3.62,
+   1.314,
+   0.314,
+   3.963,
+   5.864,
+   4.564,
+   3.519,
+   4.472,
+   0.657,
+   4.912,
+   5.657
+  ],
+  "state": [
+   "walk",
+   "no_fall_after_push",
+   "no_fall_after_push",
+   "no_stand_gate",
+   "walk",
+   "no_fall_after_push",
+   "done",
+   "no_stand_gate",
+   "walk",
+   "no_fall_after_push",
+   "done",
+   "no_stand_gate",
+   "walk",
+   "no_fall_after_push",
+   "refell_after_handover",
+   "no_stand_gate"
+  ],
+  "impulse_step": [
+   -1,
+   150,
+   150,
+   150,
+   -1,
+   150,
+   150,
+   150,
+   -1,
+   150,
+   150,
+   150,
+   -1,
+   150,
+   150,
+   150
+  ],
+  "fall_onset_step": [
+   -1,
+   -1,
+   -1,
+   173,
+   -1,
+   -1,
+   169,
+   164,
+   -1,
+   -1,
+   178,
+   169,
+   -1,
+   -1,
+   194,
+   164
+  ],
+  "detect_step": [
+   -1,
+   -1,
+   -1,
+   182,
+   -1,
+   -1,
+   178,
+   173,
+   -1,
+   -1,
+   187,
+   178,
+   -1,
+   -1,
+   203,
+   173
+  ],
+  "handover_step": [
+   -1,
+   -1,
+   -1,
+   -1,
+   -1,
+   -1,
+   478,
+   -1,
+   -1,
+   -1,
+   487,
+   -1,
+   -1,
+   -1,
+   403,
+   -1
+  ],
+  "end_step": [
+   -1,
+   300,
+   300,
+   682,
+   -1,
+   300,
+   978,
+   673,
+   -1,
+   300,
+   987,
+   678,
+   -1,
+   300,
+   484,
+   673
+  ],
+  "getup_s": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   6.0,
+   null,
+   null,
+   null,
+   6.0,
+   null,
+   null,
+   null,
+   4.0,
+   null
+  ],
+  "along_m": [
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   3.48,
+   0.0,
+   0.0,
+   0.0,
+   5.63,
+   0.0,
+   0.0,
+   0.0,
+   -0.74,
+   0.0
+  ],
+  "success": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   1,
+   0,
+   0,
+   0,
+   0,
+   0
+  ]
+ }
+}
