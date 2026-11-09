@@ -132,6 +132,82 @@ def test_strict_gate_is_weaker_than_v3_gate():
     assert not _gate(flight_steps=30) and bool(F.strict_gate(z(120, torch.int32), 100, z(0.72), z(0.98))[0]), "a window the v3 gate rejects for flight still passes the strict stand gate"
 
 
+# ---- M2b: readiness check, settle, blend, ramp -------------------------------------------------------------------------------------------------
+def _hc(n=1, **kw):
+    d = dict(trigger="ready", ready_hold=3, settle=0, blend=0, ramp=0); d.update(kw)
+    return F.HandoverController(n, DEV, **d)
+def _t(v, d=torch.bool): return torch.as_tensor(v, dtype=d).reshape(-1)
+def drive(c, seq, start=0):
+    """seq of dicts: rec, v3, ready, stable (bools). returns list of gate_ok per step."""
+    return [bool(c.update(start + i, _t(e.get("rec", True)), _t(e.get("v3", False)), _t(e.get("ready", False)), _t(e.get("stable", True)))[0]) for i, e in enumerate(seq)]
+
+
+def test_ready_check_clauses():
+    z = lambda v: torch.tensor([v], dtype=torch.float32)
+    good = dict(h=z(0.72), up=z(0.98), supported=torch.tensor([True]), speed3d=z(0.05), angspeed=z(0.1))
+    assert bool(F.ready_check(**good)[0])
+    for k, v in (("h", z(0.55)), ("up", z(0.85)), ("supported", torch.tensor([False])), ("speed3d", z(0.3)), ("angspeed", z(0.9))):
+        assert not bool(F.ready_check(**{**good, k: v})[0]), k
+
+
+def test_ready_trigger_needs_hold_steps_and_resets_on_a_break():
+    c = _hc(ready_hold=3); R = {"ready": True}; N_ = {"ready": False}
+    assert drive(c, [R, R, N_, R, R, R]) == [False, False, False, False, False, True]          # the break at step 2 restarts the 3-step hold
+
+
+def test_v3_trigger_ignores_readiness_and_vice_versa():
+    c = _hc(trigger="v3"); assert drive(c, [{"ready": True}] * 5) == [False] * 5                 # ready but v3 never passes: no hand-over
+    assert drive(c, [{"v3": True}], start=5) == [True]
+    c2 = _hc(trigger="ready", ready_hold=2); assert drive(c2, [{"v3": True}] * 4) == [False] * 4  # v3 alone does not hand over under the readiness trigger
+
+
+def test_official_v3_result_is_tracked_separately_from_the_trigger():
+    c = _hc(trigger="ready", ready_hold=2)
+    drive(c, [{"v3": False, "ready": True}, {"v3": False, "ready": True}])                        # hands over on readiness while v3 is False
+    assert int(c.v3_first[0]) == -1 and not bool(c.v3_at_handover[0])
+    c2 = _hc(trigger="ready", ready_hold=2); drive(c2, [{"v3": True, "ready": True}, {"v3": True, "ready": True}])
+    assert int(c2.v3_first[0]) == 0 and bool(c2.v3_at_handover[0])
+
+
+def test_settle_delays_the_switch_by_exactly_n_steps_and_matches_m2_at_zero():
+    c = _hc(trigger="v3", settle=0); assert drive(c, [{"v3": True}]) == [True]               # settle 0 = M2 behaviour
+    c = _hc(trigger="v3", settle=3); g = drive(c, [{"v3": False}, {"v3": True}] + [{"v3": True}] * 5)
+    assert g == [False, False, False, False, True, True, True]                                  # fires at step 1, switches at step 4 (trigger + 3)
+    assert int(c.trig_step[0]) == 1
+
+
+def test_settle_is_cancelled_when_the_robot_stops_being_stable():
+    c = _hc(trigger="v3", settle=4); g = drive(c, [{"v3": True}, {"v3": True}, {"v3": True, "stable": False}, {"v3": False}, {"v3": True}, {"v3": True}])
+    assert g == [False] * 6 and int(c.cancels[0]) == 1 and int(c.trig_step[0]) == 4            # cancelled at step 2, re-fired at step 4
+    assert drive(c, [{"v3": True}] * 4, start=6) == [False, False, True, True]               # switches at trigger + 4 = step 8
+
+
+def test_blend_alpha_ramps_only_in_the_last_blend_steps_of_the_settle():
+    c = _hc(trigger="v3", settle=4, blend=2); drive(c, [{"v3": True}])                          # fires at step 0
+    a = [float(c.blend_alpha(k, _t(True))[0]) for k in range(0, 5)]                              # alpha for the action at step k+1 (1..5 steps since trigger)
+    assert a[0] == 0.0 and a[1] == 0.0 and abs(a[2] - 0.5) < 1e-6 and a[3] == 1.0 and a[4] == 1.0
+    assert float(c.blend_alpha(2, _t(False))[0]) == 0.0, "no blend outside RECOVER"
+    assert float(_hc(settle=4, blend=0).blend_alpha(0, _t(True))[0]) == 0.0
+
+
+def test_command_ramp_goes_from_zero_to_one_after_handover_only():
+    c = _hc(ramp=4); ho = torch.tensor([10])
+    sc = [float(c.command_scale(k, ho, _t(True))[0]) for k in range(10, 16)]
+    assert sc[0] == 0.25 and sc[1] == 0.5 and sc[2] == 0.75 and sc[3] == 1.0 and sc[5] == 1.0
+    assert float(c.command_scale(12, ho, _t(False))[0]) == 1.0, "ramp only applies while walking after the hand-over"
+    assert float(_hc(ramp=0).command_scale(10, ho, _t(True))[0]) == 1.0
+
+
+def test_controller_with_fsm_a_reset_during_settle_is_still_a_failure():
+    f = mk(); c = _hc(trigger="v3", settle=5)
+    for k, (h, up, v3, rst) in enumerate([(0.75, 0.98, False, False)] * 2 + [(0.2, 0.2, False, False)] * 3 + [(0.75, 0.98, True, False), (0.75, 0.98, True, True)]):
+        inrec = f.state == F.RECOVER
+        g = c.update(k, inrec, _t(v3), _t(False), _t(True))
+        f.step(k, _t(h, torch.float32), _t(up, torch.float32), g, _t(rst))
+    assert int(f.state[0]) == F.F_RESET and int(f.handover_step[0]) == -1
+
+
+
 if __name__ == "__main__":
     n = 0
     for k, v in list(globals().items()):

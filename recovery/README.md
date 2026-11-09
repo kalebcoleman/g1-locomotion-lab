@@ -2,6 +2,8 @@
 
 Work in progress. Simulation only: Isaac Lab 3.0.0 with Newton / MuJoCo-Warp, Unitree G1 (full collision, self-collision on, Unitree's real torque limits). Every clip is an uncut 10 s episode from a fixed evaluation pose with the training assist off. Contact sheets show t = 0.5, 1, 2, 4, 6 and 9 s.
 
+**Status (2026-11-09):** the get-up baseline is now **recC** (`checkpoints/getup_baseline_recC_it1425.pt`, see `checkpoints/README.md`): the full validity criteria v3 pass on 174.7 of 256 held-out poses on average over three evaluations (176 / 174 / 174; 68.2%), against 129.3 (50.5%) for the previous baseline R9hg it1100. One training lineage and one seed; the straddle in the first second of the rise is unchanged (peak foot spread 1.39 m), so this is a better get-up, not a more human-like one. The status of 2026-11-07 below describes the previous baseline.
+
 **Status (2026-11-07):** the best policy (R9hg, iteration 1100) passes the full validity criteria v3 on 127-129 of 256 held-out poses (49.6-50.4%) across three evaluations. That is one seed, produced by a warm-start chain; prone about 78%, side A about 50%, supine about 46%, side B about 27%. The reserved TEST set is untouched, and the hand-over to the walking policy has not been tested yet. Replication on two more seeds and a port of HoST are training.
 
 **Criteria v3** (all required): pelvis at least 0.60 m with the torso within 26 degrees of vertical and both feet carrying load, held for 2 s; no launch (upward pelvis speed at most 2 m/s); at most 2% of steps without ground contact; joint speed limits broken on at most 2% of steps; soft joint limits on at most 10% and hard limits on at most 3% of steps (at most 0.10 rad past); torque within Unitree's limits on at least 97% of steps; no limb passing through the body; feet at most 0.60 m apart; still standing in the final second; no assist force.
@@ -26,7 +28,15 @@ Plain-language overview, PPO settings and version names: [architecture/SYSTEM_OV
 
 ![Anatomy of the rejected R7m iteration-350 stands](media/20261106_235_chkv15_R7m_it350_anatomy.png)
 
-## Current best: R9hg, iteration 1100
+## Current baseline: recC (adopted 2026-11-09)
+
+Contact sheets of the first 16 HELDOUT poses, previous baseline then recC, same camera (uncut 10 s; t = 0.5, 1, 2, 4, 6, 9 s). Both start with the same wide straddle; recC stands more of them with fewer joint-limit violations (numbers in `checkpoints/README.md`).
+
+| baseline R9hg it1100 | recC |
+|---|---|
+| <img src="../pilots/g4_humanlike_getup_20261108/media/g4_base_heldout16_sheet.png" width="420"> | <img src="../pilots/g4_humanlike_getup_20261108/media/g4_recC_heldout16_sheet.png" width="420"> |
+
+## Previous baseline: R9hg, iteration 1100
 
 | contact sheet | video | what it shows | verdict |
 |---|---|---|---|

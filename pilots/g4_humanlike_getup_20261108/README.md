@@ -1,5 +1,7 @@
 # Goal 4: human-like get-up (training): target not met, a better get-up found
 
+**Adopted 2026-11-09:** `recC` is now the get-up baseline (`recovery/checkpoints/README.md`).
+
 **Target** (set before the run): peak foot spread below 0.8 m with the pelvis above 0.12 m, while the v3 HELDOUT stand rate stays at 90% or more of the baseline `R9hg_it1100`.
 **Result: not met.** No checkpoint reduced the peak spread (1.38 m for the baseline, 1.39-1.41 m for every candidate). **A different result came out of the work:** the training setup that makes continued training stable also raises HELDOUT v3 from 129.3 to 174.7 of 256 (+35%) with fewer limit violations.
 

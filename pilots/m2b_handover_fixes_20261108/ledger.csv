@@ -1,0 +1,83 @@
+m2b_base_s2,1794197008,1794197036,28,rc=0,
+m2b_base_s3,1794197036,1794197071,35,rc=0,
+m2b_base_s4,1794197071,1794197098,27,rc=0,
+m2b_settle25_s2,1794197098,1794197126,28,rc=0,--settle 25
+m2b_settle25_s3,1794197126,1794197154,28,rc=0,--settle 25
+m2b_settle25_s4,1794197154,1794197187,33,rc=0,--settle 25
+m2b_settle50_s2,1794197187,1794197215,28,rc=0,--settle 50
+m2b_settle50_s3,1794197215,1794197243,28,rc=0,--settle 50
+m2b_settle50_s4,1794197243,1794197271,28,rc=0,--settle 50
+m2b_settle100_s2,1794197271,1794197308,37,rc=0,--settle 100
+m2b_settle100_s3,1794197308,1794197344,36,rc=0,--settle 100
+m2b_settle100_s4,1794197344,1794197381,37,rc=0,--settle 100
+m2b_hold50_s2,1794197381,1794197417,36,rc=0,--settle 50 --settle_mode hold
+m2b_hold50_s3,1794197417,1794197457,40,rc=0,--settle 50 --settle_mode hold
+m2b_hold50_s4,1794197457,1794197493,36,rc=0,--settle 50 --settle_mode hold
+m2b_blendall50_s2,1794197493,1794197532,39,rc=0,--settle 50 --blend 50 --blend_joints all
+m2b_blendall50_s3,1794197532,1794197573,41,rc=0,--settle 50 --blend 50 --blend_joints all
+m2b_blendall50_s4,1794197573,1794197608,35,rc=0,--settle 50 --blend 50 --blend_joints all
+m2b_blendhands50_s2,1794197608,1794197649,41,rc=0,--settle 50 --blend 50 --blend_joints hands
+m2b_blendhands50_s3,1794197649,1794197691,42,rc=0,--settle 50 --blend 50 --blend_joints hands
+m2b_blendhands50_s4,1794197691,1794197731,40,rc=0,--settle 50 --blend 50 --blend_joints hands
+m2b_blendupper50_s2,1794197731,1794197768,37,rc=0,--settle 50 --blend 50 --blend_joints upper
+m2b_blendupper50_s3,1794197768,1794197800,32,rc=0,--settle 50 --blend 50 --blend_joints upper
+m2b_blendupper50_s4,1794197800,1794197839,39,rc=0,--settle 50 --blend 50 --blend_joints upper
+m2b_blendupper25_s2,1794197839,1794197872,33,rc=0,--settle 25 --blend 25 --blend_joints upper
+m2b_blendupper25_s3,1794197872,1794197904,32,rc=0,--settle 25 --blend 25 --blend_joints upper
+m2b_blendupper25_s4,1794197904,1794197937,33,rc=0,--settle 25 --blend 25 --blend_joints upper
+m2b_ramp50_s2,1794197937,1794197970,33,rc=0,--ramp 50
+m2b_ramp50_s3,1794197970,1794197998,28,rc=0,--ramp 50
+m2b_ramp50_s4,1794197998,1794198029,31,rc=0,--ramp 50
+m2b_ramp100_s2,1794198029,1794198058,29,rc=0,--ramp 100
+m2b_ramp100_s3,1794198058,1794198090,32,rc=0,--ramp 100
+m2b_ramp100_s4,1794198090,1794198123,33,rc=0,--ramp 100
+m2b_ready_s2,1794198123,1794198154,31,rc=0,--trigger ready
+m2b_ready_s3,1794198154,1794198186,32,rc=0,--trigger ready
+m2b_ready_s4,1794198186,1794198218,32,rc=0,--trigger ready
+m2b_ready_settle50_s2,1794198218,1794198268,50,rc=0,--trigger ready --settle 50
+m2b_base_r2_s2,1794198242,1794198297,55,rc=0,
+m2b_ready_settle50_s3,1794198268,1794198326,58,rc=0,--trigger ready --settle 50
+m2b_base_r2_s3,1794198297,1794198352,55,rc=0,
+m2b_ready_settle50_s4,1794198326,1794198378,52,rc=0,--trigger ready --settle 50
+m2b_base_r2_s4,1794198352,1794198404,52,rc=0,
+m2b_ready_upper50_s2,1794198378,1794198435,57,rc=0,--trigger ready --settle 50 --blend 50 --blend_joints upper
+m2b_blendupper50_r2_s2,1794198404,1794198460,56,rc=0,--settle 50 --blend 50 --blend_joints upper
+m2b_ready_upper50_s3,1794198435,1794198491,56,rc=0,--trigger ready --settle 50 --blend 50 --blend_joints upper
+m2b_blendupper50_r2_s3,1794198460,1794198516,56,rc=0,--settle 50 --blend 50 --blend_joints upper
+m2b_ready_upper50_s4,1794198491,1794198530,39,rc=0,--trigger ready --settle 50 --blend 50 --blend_joints upper
+m2b_blendupper50_r2_s4,1794198516,1794198547,31,rc=0,--settle 50 --blend 50 --blend_joints upper
+DONE _r2
+m2b_upper50_ramp50_s2,1794198530,1794198566,36,rc=0,--settle 50 --blend 50 --blend_joints upper --ramp 50
+m2b_base_r3_s2,1794198547,1794198583,36,rc=0,
+m2b_upper50_ramp50_s3,1794198566,1794198597,31,rc=0,--settle 50 --blend 50 --blend_joints upper --ramp 50
+m2b_base_r3_s3,1794198583,1794198613,30,rc=0,
+m2b_upper50_ramp50_s4,1794198597,1794198629,32,rc=0,--settle 50 --blend 50 --blend_joints upper --ramp 50
+m2b_base_r3_s4,1794198613,1794198644,31,rc=0,
+m2b_ready_upper50_ramp50_s2,1794198629,1794198664,35,rc=0,--trigger ready --settle 50 --blend 50 --blend_joints upper --ramp 50
+m2b_blendupper50_r3_s2,1794198644,1794198684,40,rc=0,--settle 50 --blend 50 --blend_joints upper
+m2b_ready_upper50_ramp50_s3,1794198664,1794198696,32,rc=0,--trigger ready --settle 50 --blend 50 --blend_joints upper --ramp 50
+m2b_blendupper50_r3_s3,1794198684,1794198715,31,rc=0,--settle 50 --blend 50 --blend_joints upper
+m2b_ready_upper50_ramp50_s4,1794198696,1794198729,33,rc=0,--trigger ready --settle 50 --blend 50 --blend_joints upper --ramp 50
+DONE 
+m2b_blendupper50_r3_s4,1794198715,1794198745,30,rc=0,--settle 50 --blend 50 --blend_joints upper
+DONE _r3
+m2b_base_s5,1794198745,1794198777,32,rc=0,
+m2b_base_s6,1794198777,1794198805,28,rc=0,
+m2b_base_s7,1794198805,1794198833,28,rc=0,
+m2b_blendupper50_s5,1794198833,1794198889,56,rc=0,--settle 50 --blend 50 --blend_joints upper
+m2b_blendupper50_s6,1794198889,1794198958,69,rc=0,--settle 50 --blend 50 --blend_joints upper
+m2b_ready_upper50_r2_s2,1794198925,1794199000,75,rc=0,--trigger ready --settle 50 --blend 50 --blend_joints upper
+m2b_blendupper50_s7,1794198958,1794199033,75,rc=0,--settle 50 --blend 50 --blend_joints upper
+DONE 
+m2b_ready_upper50_r2_s3,1794199000,1794199069,69,rc=0,--trigger ready --settle 50 --blend 50 --blend_joints upper
+m2b_ready_upper50_r2_s4,1794199069,1794199134,65,rc=0,--trigger ready --settle 50 --blend 50 --blend_joints upper
+DONE _r2
+m2b_ready_upper50_r3_s2,1794199134,1794199175,41,rc=0,--trigger ready --settle 50 --blend 50 --blend_joints upper
+m2b_ready_upper50_r3_s3,1794199175,1794199216,41,rc=0,--trigger ready --settle 50 --blend 50 --blend_joints upper
+m2b_ready_upper50_r3_s4,1794199216,1794199258,42,rc=0,--trigger ready --settle 50 --blend 50 --blend_joints upper
+DONE _r3
+m2b_ready_upper50_s5,1794199258,1794199317,59,rc=0,--trigger ready --settle 50 --blend 50 --blend_joints upper
+m2b_ready_upper50_s6,1794199317,1794199363,46,rc=0,--trigger ready --settle 50 --blend 50 --blend_joints upper
+m2b_ready_upper50_s7,1794199363,1794199436,73,rc=0,--trigger ready --settle 50 --blend 50 --blend_joints upper
+DONE 
+VIDEOS_DONE

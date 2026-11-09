@@ -1,13 +1,13 @@
 # G1 human-like get-up: staged roadmap (lab thread, simulation only)
-Rules: existing scripts/config only until a source change is approved; no hardware, no paid services, no merge, nothing counted as published until a commit/PR exists. Baseline `R9hg it1100` stays the reference; the failed pilot is a negative result, not a base to continue.
+Rules: existing scripts/config only until a source change is approved; no hardware, no paid services, no merge, nothing counted as published until a commit/PR exists. Get-up baseline: `recC` (adopted 2026-11-09, `recovery/checkpoints/getup_baseline_recC_it1425.pt`; HELDOUT v3 174.7 of 256 against 129.3 for the previous baseline `R9hg it1100`, which stays preserved in `recovery/checkpoints/R9hg_it1100_previous_baseline.pt`). The M2 and M2b results below were measured with `R9hg it1100`. The failed pilot is a negative result, not a base to continue.
 
 | stage | goal | state |
 |---|---|---|
 | M0 | reproducible commands, provenance, resume/checkpoint/gate validation, document negative pilot | done; committed on branch `m1-metrics-and-m0-docs` (local, not pushed) |
 | M1 | movement-quality telemetry + early-rise spread knobs | implemented and validated on the frozen baseline (`eval_recovery.py`, `diag_trace.py`, `metrics.movement_metrics`, `lane_a.STANCE_DEFAULTS`); committed on the branch, not pushed |
 | M2 | frozen walk -> actual fall -> get-up -> stable stand -> walk, resets never credited | implemented as an evaluation (`eval_fall_handover.py`); 6 of 250 induced falls complete the sequence under the v3 gate, 25 of 248 under a strict-stand gate; see `pilots/m2_fall_handover_20261108/README.md` |
-| M3 | rough terrain, same 37-joint morphology | later; needs obs (123-d) and action (37-d) compatibility check against the walking policy (same dims confirmed for the recovery policy; terrain obs may add height scan) |
-| M4 | pushes, friction randomisation | later; base env already has friction/mass startup events, pushes disabled in recovery |
+| M3 | rough terrain, same 37-joint morphology | baseline measured (evaluation only, blind walking, 123-d observation unchanged): hardest level with >= 80% survival is 19 deg (slope down), 9 deg (slope up), 5.8 cm (steps down), 2.8 cm (steps up), 8 cm noise (rough ground); see `pilots/m3_terrain_baseline_20261108/README.md` |
+| M4 | pushes, friction randomisation | measured (evaluation only): push M50 = 2.16 m/s [2.08, 2.24] at friction 1.0, falling to 1.68 m/s at 0.4 and below that quickly; see `pilots/m4_robustness_20261108/README.md` |
 | imitation | human reference tracking | gated: legal data (LAFAN1 NC-ND), morphology (no waist roll/pitch in this env), trainer (none usable); see `REFERENCE_DATA_RESEARCH.md` |
 
 ## M0 evidence (CPU-only, read-only; files in `m0/`)
