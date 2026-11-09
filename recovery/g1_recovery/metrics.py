@@ -113,3 +113,47 @@ def posture_flags(h, up, feet_force, feet_z, trunk_force, speed3d, run_s, step_d
 
 
 CHAIN_REASONS = ["success", "never_handed_over", "implausible_recovery", "timeout_window_incomplete", "fell_after_handover", "insufficient_progress_along_heading", "too_slow"]
+
+
+# ---- Movement-quality metrics (M1). Pure functions over per-step traces; none of them changes a success criterion. ----
+def movement_metrics(spread, h, hip_q, jvel, act, dt, rise_end=None, gate_low=0.12, gate=0.40, wide=0.45, final_s=1.0):
+    """Per-robot movement descriptors from per-step traces. Time-major inputs, T steps, N robots.
+    spread (T,N): floor-plane distance between the two ankle-roll links, m.  h (T,N): pelvis height above floor, m.
+    hip_q (T,N,4): joint positions, order [hip_roll_left, hip_roll_right, hip_yaw_left, hip_yaw_right], rad (default pose is 0).
+    jvel (T,N,J): body-joint velocities, rad/s (hand joints excluded by the caller).  act (T,N,A): policy actions applied at each step.
+    rise_end (N,) long: first step NOT in the rising window (start of the counted hold; T if there was none). Default: T.
+    Returns a dict of (N,) tensors:
+      spread_peak_m          max spread over steps with h > gate_low (excludes the lying start); NaN if the pelvis never exceeds gate_low
+      spread_peak_gated_m    same with h > gate (the stance penalty's gate); NaN if never
+      spread_peak_time_s     time of spread_peak_m
+      spread_final_m         mean spread over the last final_s seconds
+      spread_wide_frac       share of steps with h > gate that have spread > wide
+      hip_roll_peak_abs, hip_yaw_peak_abs      max over steps and both sides of |q|, rad
+      hip_roll_final_abs, hip_yaw_final_abs    mean over the last final_s seconds and both sides of |q|, rad
+      action_rate_mean       mean over the rising window and action dims of |a_t - a_(t-1)|  (policy-output units)
+      joint_acc_rms, joint_acc_p99    RMS and 99th percentile of |d jvel / dt| over the rising window and joints, rad/s^2
+      joint_jerk_p99         99th percentile of |d^2 jvel / dt^2| over the same, rad/s^3
+    Joint acceleration is a finite difference of consecutive control-step velocities (dt = control step), so it under-reads accelerations shorter than dt."""
+    T, N = spread.shape
+    nan = torch.tensor(float("nan"), device=spread.device)
+    re = torch.full((N,), T, device=spread.device, dtype=torch.long) if rise_end is None else rise_end.clamp(2, T)
+    idx = torch.arange(T, device=spread.device)[:, None]
+    g_low, g = h > gate_low, h > gate
+    sp = torch.where(g_low, spread, torch.full_like(spread, float("-inf"))); pk, pk_i = sp.max(0)
+    spg = torch.where(g, spread, torch.full_like(spread, float("-inf"))).max(0).values
+    fn = max(1, int(round(final_s / dt)))
+    q = hip_q.abs()
+    win = idx < re[None]                                                    # (T,N) rising window
+    acc = (jvel[1:] - jvel[:-1]).abs() / dt; jerk = (acc[1:] - acc[:-1]).abs() / dt     # acc[k] belongs to step k+1
+    am = (idx[1:] < re[None])[..., None].expand_as(acc).float(); acc_rms = ((acc ** 2 * am).sum((0, 2)) / am.sum((0, 2)).clamp(min=1)).sqrt()
+    da = (act[1:] - act[:-1]).abs().mean(-1); dm = (idx[1:] < re[None]).float()
+    def wq2(x, mask_off, qq):                                               # x (T-k,N,J) with step offset mask_off
+        m = (idx[mask_off: x.shape[0] + mask_off] < re[None])[..., None].expand_as(x)
+        flat = torch.where(m, x, torch.full_like(x, float("nan"))).permute(1, 0, 2).reshape(N, -1)
+        return torch.nanquantile(flat, qq, dim=1)
+    return dict(spread_peak_m=torch.where(torch.isfinite(pk), pk, nan), spread_peak_gated_m=torch.where(torch.isfinite(spg), spg, nan),
+                spread_peak_time_s=torch.where(torch.isfinite(pk), pk_i.float() * dt, nan), spread_final_m=spread[-fn:].mean(0),
+                spread_wide_frac=((spread > wide) & g).float().sum(0) / g.float().sum(0).clamp(min=1),
+                hip_roll_peak_abs=q[..., :2].amax((0, 2)), hip_yaw_peak_abs=q[..., 2:].amax((0, 2)),
+                hip_roll_final_abs=q[-fn:, :, :2].mean((0, 2)), hip_yaw_final_abs=q[-fn:, :, 2:].mean((0, 2)),
+                action_rate_mean=(da * dm).sum(0) / dm.sum(0).clamp(min=1), joint_acc_rms=acc_rms, joint_acc_p99=wq2(acc, 1, 0.99), joint_jerk_p99=wq2(jerk, 2, 0.99))

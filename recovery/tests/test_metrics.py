@@ -105,6 +105,50 @@ def test_reason_priority():
     assert _chain(handed_over=B(False), fell_in_window=B(True), along_disp=T(0.0)) == (False, 1)
 
 
+
+
+def _trace(T=100, N=3, J=4, dt=0.02):
+    spread = torch.full((T, N), 0.30); h = torch.full((T, N), 0.75)
+    h[:5] = 0.10                                    # lying start: below the low gate
+    hip = torch.zeros(T, N, 4); jv = torch.zeros(T, N, J); act = torch.zeros(T, N, 5)
+    return spread, h, hip, jv, act, dt
+
+
+def test_spread_peak_excludes_lying_start_and_reports_time():
+    s, h, hip, jv, act, dt = _trace(); s[2, 0] = 1.4; s[20, 1] = 0.9; s[:, 2] = 0.2      # robot 0: spike while lying (excluded); robot 1: spike at step 20 at h=0.75
+    m = M.movement_metrics(s, h, hip, jv, act, dt)
+    assert abs(m["spread_peak_m"][0].item() - 0.30) < 1e-6 and abs(m["spread_peak_m"][1].item() - 0.9) < 1e-6
+    assert abs(m["spread_peak_time_s"][1].item() - 20 * dt) < 1e-6 and abs(m["spread_final_m"][1].item() - 0.30) < 1e-6
+
+
+def test_spread_never_risen_is_nan_and_wide_fraction():
+    s, h, hip, jv, act, dt = _trace(); h[:, 0] = 0.1; s[10:30, 1] = 0.6                  # robot 0 never rises; robot 1 wide for 20 of 95 gated steps
+    m = M.movement_metrics(s, h, hip, jv, act, dt)
+    assert torch.isnan(m["spread_peak_m"][0]) and torch.isnan(m["spread_peak_gated_m"][0])
+    assert abs(m["spread_wide_frac"][1].item() - 20 / 95) < 1e-6
+
+
+def test_hip_peak_and_final_use_absolute_value_of_both_sides():
+    s, h, hip, jv, act, dt = _trace(); hip[10, 0, 1] = -0.5; hip[-50:, 1, 2] = 0.2; hip[-50:, 1, 3] = -0.4   # robot 0 right roll -0.5 peak; robot 1 final yaw 0.2/-0.4
+    m = M.movement_metrics(s, h, hip, jv, act, dt)
+    assert abs(m["hip_roll_peak_abs"][0].item() - 0.5) < 1e-6 and abs(m["hip_yaw_final_abs"][1].item() - 0.3) < 1e-6 and m["hip_yaw_final_abs"][2].item() == 0.0
+
+
+def test_acceleration_of_ramped_velocity_and_zero_jerk():
+    s, h, hip, jv, act, dt = _trace(); jv[:, 0, :] = torch.arange(100)[:, None] * dt * 5.0       # d v / dt = 5 rad/s^2 on every joint
+    m = M.movement_metrics(s, h, hip, jv, act, dt)
+    assert abs(m["joint_acc_rms"][0].item() - 5.0) < 1e-3 and abs(m["joint_acc_p99"][0].item() - 5.0) < 1e-3 and m["joint_jerk_p99"][0].item() < 0.05 and m["joint_acc_rms"][1].item() == 0.0
+
+
+def test_rising_window_limits_smoothness_and_action_rate():
+    s, h, hip, jv, act, dt = _trace(); act[50:, 0, :] = torch.arange(50)[:, None] % 2 * 1.0       # chattering action only after step 50
+    re = torch.tensor([40, 100, 100])
+    m = M.movement_metrics(s, h, hip, jv, act, dt, rise_end=re)
+    assert m["action_rate_mean"][0].item() == 0.0 and m["action_rate_mean"][1].item() == 0.0
+    m2 = M.movement_metrics(s, h, hip, jv, act, dt, rise_end=torch.tensor([100, 100, 100]))
+    assert m2["action_rate_mean"][0].item() > 0.4
+
+
 if __name__ == "__main__":
     for k, v in list(globals().items()):
         if k.startswith("test_"): v(); print("ok", k)

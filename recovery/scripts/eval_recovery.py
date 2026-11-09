@@ -65,9 +65,12 @@ with launch_simulation(env_cfg, args):
     # Amendment 3 and rising-window measurements (additive; the v2.1 verdicts above them are unchanged)
     _lim = torch.tensor([M.real_torque_limit(n) for n in r.joint_names], device=dev); _bj = torch.isfinite(_lim); _org = u.scene.env_origins
     _A = {k: [] for k in ["supp", "stance", "soft", "hard", "over", "air_last", "air_all"] + (["air_ground"] if GROUND else [])}; _tmax = torch.zeros(N, device=dev)
+    _hip = [r.joint_names.index(n) for n in ("left_hip_roll_joint", "right_hip_roll_joint", "left_hip_yaw_joint", "right_hip_yaw_joint")]; _bji = torch.nonzero(_bj).squeeze(-1)   # M1 movement metrics: per-step traces
+    _Mv = {k: [] for k in ["h", "hip", "jv", "act"]}
     for s in range(steps):
         with torch.inference_mode():
-            obs, _, dones, _ = env.step(policy(obs))
+            _act = policy(obs)
+            obs, _, dones, _ = env.step(_act)
         _f = torch.linalg.norm(_sens.data.net_forces_w.torch, dim=-1)
         _pf = M.posture_flags(r.data.root_pos_w.torch[:, 2] - u.scene.env_origins[:, 2], -r.data.projected_gravity_b.torch[:, 2], _f[:, _feet], r.data.body_pos_w.torch[:, _fb, 2] - u.scene.env_origins[:, 2:3], _f[:, _tr].sum(-1), torch.linalg.norm(r.data.root_lin_vel_w.torch, dim=-1), t.run_s, u.step_dt)
         _first = torch.where(_pf & (_first < 0), torch.full_like(_first, s * u.step_dt), _first); reached |= _pf
@@ -75,6 +78,7 @@ with launch_simulation(env_cfg, args):
         _pfeet = r.data.body_pos_w.torch[:, _fb, :2]; _A["stance"].append(torch.linalg.norm(_pfeet[:, 0] - _pfeet[:, 1], dim=-1)); _A["supp"].append(_pf[:, M.POSTURES.index("supported_stand_any")])
         _A["soft"].append(((torch.maximum(_sl[..., 0] - _q, _q - _sl[..., 1]) > 0) & _bj).any(-1)); _A["hard"].append(((torch.maximum(_hl[..., 0] - _q, _q - _hl[..., 1]) > 0) & _bj).any(-1)); _A["over"].append(((_ratio > 1.0) & _bj).any(-1))
         _tmax = torch.maximum(_tmax, (_ratio * _bj).max(-1).values)
+        _Mv["h"].append(r.data.root_pos_w.torch[:, 2] - _org[:, 2]); _Mv["hip"].append(_q[:, _hip]); _Mv["jv"].append(r.data.joint_vel.torch[:, _bji]); _Mv["act"].append(_act.clone())
         _fh = torch.linalg.norm(_sens.data.net_forces_w_history.torch, dim=-1).sum(-1)    # (N, history) total contact force over the last physics substeps
         _A["air_last"].append(_fh[:, 0] < 1.0); _A["air_all"].append((_fh < 1.0).all(-1))
         if GROUND:
@@ -141,6 +145,16 @@ with launch_simulation(env_cfg, args):
         stance_hold_m_of_strict=_sv(t.succ_s, _stance)[:256], by_category_v21_torque={CAT: int(a3a[cat == i].sum()) for i, CAT in enumerate(K.CATEGORIES)},
         rise_window_of_strict=dict(seconds_mean=float((_rn[t.succ_s] * dt).mean()) if t.succ_s.any() else None, soft_frac_mean=float(_rf["soft"][t.succ_s].mean()) if t.succ_s.any() else None, hard_frac_mean=float(_rf["hard"][t.succ_s].mean()) if t.succ_s.any() else None, torque_over_frac_mean=float(_rf["over"][t.succ_s].mean()) if t.succ_s.any() else None,
                                   soft_le_10pct=int((_rf["soft"][t.succ_s] <= 0.10).sum()), hard_le_3pct=int((_rf["hard"][t.succ_s] <= 0.03).sum())))
+    # M1 movement metrics (definitions in metrics.movement_metrics; these never enter a success criterion)
+    _re = torch.where(t.succ_s, _hs.clamp(2, steps), torch.full_like(_hs, steps))          # rising window ends where the counted hold starts (whole episode if none)
+    _mm = M.movement_metrics(_B["stance"], torch.stack(_Mv["h"], 0), torch.stack(_Mv["hip"], 0), torch.stack(_Mv["jv"], 0), torch.stack(_Mv["act"], 0), dt, rise_end=_re)
+    def _agg(x, m=None):
+        x = x.float(); x = x if m is None else x[m]; x = x[torch.isfinite(x)]
+        return None if x.numel() == 0 else dict(n=int(x.numel()), mean=float(x.mean()), median=float(x.median()), p90=float(torch.quantile(x, 0.9)), max=float(x.max()))
+    _v3m = _v3_g if GROUND else a3full
+    res["movement"] = dict(definition=M.movement_metrics.__doc__, windows="spread/hip metrics over the whole 10 s episode (peak after the pelvis exceeds 0.12 m); acceleration, jerk and action rate over each robot's rising window (reset to start of the counted strict hold, else the whole episode)",
+        all_robots={k: _agg(v) for k, v in _mm.items()}, by_category={CAT: {k: _agg(v, cat == i) for k, v in _mm.items()} for i, CAT in enumerate(K.CATEGORIES)},
+        v3_pass_robots={k: _agg(v, _v3m) for k, v in _mm.items()}, per_env={k: [None if not torch.isfinite(x) else round(float(x), 4) for x in _mm[k]] for k in ["spread_peak_m", "spread_peak_gated_m", "spread_final_m", "hip_roll_peak_abs", "hip_yaw_peak_abs", "joint_acc_rms", "action_rate_mean"]})
     res["pose_set"] = os.path.basename(xa.heldout)
     res["postures_reached"] = {n: dict(envs=int(reached[:, i].sum()), first_time_s_mean=round(float(_first[:, i][reached[:, i]].mean()), 2) if reached[:, i].any() else None, by_category={CAT: int(reached[:, i][cat == j].sum()) for j, CAT in enumerate(K.CATEGORIES)}) for i, n in enumerate(M.POSTURES)}
     res["per_env"] = dict(strict=ok_s.int().tolist(), v3_before_selfpen=a3full.int().tolist(), **({"v3g_before_selfpen": _v3_g.int().tolist(), "flight_frac_ground": [round(float(x), 3) for x in (_air_g.float() / steps)]} if GROUND else {}), v3_a4_before_selfpen=_v3_a4.int().tolist(), flight_frac_all_substeps=[round(float(x), 3) for x in _air_all], torque_over_frac=[round(float(x), 3) for x in (_over_steps.float() / steps)], persist_tail=[round(float(x), 3) for x in _tail], stance_hold=[round(float(x), 3) for x in _stance], plausible_v2=plaus_v2.int().tolist(), plausible_v21=plaus_v21.int().tolist(), vel_viol_frac=[round(float(x), 3) for x in vvf], flight_frac=[round(float(x), 3) for x in (t.flight_steps.float() / steps)],

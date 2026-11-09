@@ -361,6 +361,9 @@ class RewardsR8f(RewardsR8):
     prop = RewTerm(func=prop_force, weight=-2.0)
 
 
+STANCE_DEFAULTS = {"free": 0.45, "full": 0.90, "pelvis_h": 0.40}   # declared on the RewTerms so Hydra can override e.g. env.rewards.stance.params.pelvis_h=0.15 (new keys cannot be added from the command line); must equal the function defaults below
+
+
 def stance_excess(env, free=0.45, full=0.90, pelvis_h=0.40):
     """Distance between the feet above `free` m, scaled to 1 at `full` m, once the pelvis is above `pelvis_h` (lying and early rising stay free)."""
     r = env.scene["robot"]
@@ -374,7 +377,7 @@ def stance_excess(env, free=0.45, full=0.90, pelvis_h=0.40):
 @configclass
 class RewardsR8w(RewardsR8):
     """E5: R8 + stance-width penalty (single change vs R8)."""
-    stance = RewTerm(func=stance_excess, weight=-5.0)
+    stance = RewTerm(func=stance_excess, weight=-5.0, params=dict(STANCE_DEFAULTS))
 
 
 class SettleJointPositionAction(JointPositionAction):
@@ -462,7 +465,7 @@ class G1RecoveryR8tEnvCfg(G1RecoveryBaseEnvCfg):
 class RewardsR9h(RewardsR7h):
     """R7h height reward + stand bonus on the feet-supported mask + stance-width penalty. A candidate combining several changes, not a controlled single change."""
     stand = RewTerm(func=standing_bonus_supported, weight=5.0)
-    stance = RewTerm(func=stance_excess, weight=-5.0)
+    stance = RewTerm(func=stance_excess, weight=-5.0, params=dict(STANCE_DEFAULTS))
 
 
 @configclass

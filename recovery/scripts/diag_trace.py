@@ -52,9 +52,12 @@ with launch_simulation(env_cfg, args):
     org = u.scene.env_origins
     tr = {k: [] for k in ["h", "up", "spd", "vz", "foot_z_max", "stance", "soft_ex", "hard_ex", "tau_ratio", "supp", "x", "y", "tau_over"] + ["f_" + g for g in G]}
     body_p, body_q = [], []; tau_max = torch.zeros(N, len(r.joint_names), device=dev); tau_over_j = torch.zeros(N, len(r.joint_names), device=dev); hard_j = torch.zeros(N, len(r.joint_names), device=dev); hard_ex_j = torch.zeros(N, len(r.joint_names), device=dev); q_end = None
+    _hip = [r.joint_names.index(n) for n in ("left_hip_roll_joint", "right_hip_roll_joint", "left_hip_yaw_joint", "right_hip_yaw_joint")]; _bji = torch.nonzero(body_j.reshape(-1, body_j.shape[-1])[0] if body_j.dim() > 1 else body_j).squeeze(-1); _pa = None; _pv = None   # M1 movement traces
+    for k in ["hip_roll_l", "hip_roll_r", "hip_yaw_l", "hip_yaw_r", "act_rate", "acc_rms"]: tr[k] = []
     for s in range(steps):
         with torch.inference_mode():
-            obs, _, _, _ = env.step(policy(obs))
+            _act = policy(obs)
+            obs, _, _, _ = env.step(_act)
         h = r.data.root_pos_w.torch[:, 2] - org[:, 2]; up = -r.data.projected_gravity_b.torch[:, 2]; v = r.data.root_lin_vel_w.torch
         F = torch.linalg.norm(sens.data.net_forces_w.torch, dim=-1); q = r.data.joint_pos.torch
         pf = r.data.body_pos_w.torch[:, fb]; sl = r.data.soft_joint_pos_limits.torch; hl = r.data.joint_pos_limits.torch
@@ -62,6 +65,9 @@ with launch_simulation(env_cfg, args):
         over = (ratio > 1.0) & body_j
         tau_max = torch.maximum(tau_max, tau); tau_over_j += over.float()
         _hx = torch.maximum(hl[..., 0] - q, q - hl[..., 1]).clamp(min=0) * body_j; hard_j += (_hx > 0).float(); hard_ex_j = torch.maximum(hard_ex_j, _hx); q_end = q.clone()
+        _q4 = q[:, _hip]; [tr[k].append(_q4[:, i]) for i, k in enumerate(["hip_roll_l", "hip_roll_r", "hip_yaw_l", "hip_yaw_r"])]
+        _jv = r.data.joint_vel.torch[:, _bji]
+        tr["act_rate"].append(torch.zeros(N, device=dev) if _pa is None else (_act - _pa).abs().mean(-1)); tr["acc_rms"].append(torch.zeros(N, device=dev) if _pv is None else (((_jv - _pv) / u.step_dt) ** 2).mean(-1).sqrt()); _pa = _act.clone(); _pv = _jv.clone()
         tr["h"].append(h); tr["up"].append(up); tr["spd"].append(torch.linalg.norm(v, dim=-1)); tr["vz"].append(v[:, 2])
         tr["foot_z_max"].append((pf[:, :, 2] - org[:, 2:3]).max(-1).values); tr["stance"].append(torch.linalg.norm(pf[:, 0, :2] - pf[:, 1, :2], dim=-1))
         tr["soft_ex"].append((torch.maximum(sl[..., 0] - q, q - sl[..., 1]).clamp(min=0) * body_j).max(-1).values)
