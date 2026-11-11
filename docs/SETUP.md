@@ -53,9 +53,12 @@ A get-up evaluation with the current baseline:
 ```bash
 cd recovery
 ./scripts/run.sh eval_recovery.py --task G1-Recovery-R9hg-v0 \
-    --checkpoint checkpoints/getup_baseline_recC_it1425.pt \
-    --num_envs 256 --heldout sets/heldout_v2.npz --out /tmp/eval.json physics=newton_mjwarp
+    --checkpoint "$PWD/checkpoints/getup_baseline_recC_it1425.pt" \
+    --num_envs 256 --heldout "$PWD/sets/heldout_v2.npz" --out /tmp/eval.json physics=newton_mjwarp
 ```
+
+Note the absolute input paths: `run.sh` changes into the Isaac Lab checkout before starting Python, so relative file
+arguments would resolve there.
 
 Training the walking policy uses Isaac Lab's own trainer from the checkout; the exact command is in
 [WALKING.md](WALKING.md#reproducing). The pilots wrap the same pattern for their own experiments (for example
