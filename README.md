@@ -87,6 +87,6 @@ Built on [Isaac Lab](https://github.com/isaac-sim/IsaacLab) by the Isaac Lab Pro
 contributors), the Unitree G1 robot by Unitree Robotics, [rsl_rl](https://github.com/leggedrobotics/rsl_rl)
 (ETH Zurich / NVIDIA), [Newton](https://github.com/newton-physics/newton),
 [MuJoCo-Warp](https://github.com/google-deepmind/mujoco_warp) and NVIDIA Warp. PPO: Schulman et al., 2017.
-Licenses: [LICENSE](walking/LICENSE) covers only my original material (BSD-3-Clause, Copyright (c) 2026 Kaleb Coleman).
+Licenses: [LICENSE](LICENSE) covers only my original material (BSD-3-Clause, Copyright (c) 2026 Kaleb Coleman); see [NOTICE.md](NOTICE.md).
 Third-party code, models and tools keep their own licenses: see [NOTICE.md](walking/NOTICE.md) and the full texts in
 [`THIRD_PARTY_LICENSES/`](walking/THIRD_PARTY_LICENSES/). Not affiliated with or endorsed by NVIDIA or Unitree.
