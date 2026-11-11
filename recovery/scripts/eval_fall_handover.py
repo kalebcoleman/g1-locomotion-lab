@@ -33,6 +33,8 @@ ex.add_argument("--settle_mode", choices=["recovery", "hold"], default="recovery
 ex.add_argument("--blend_joints", choices=["all", "hands", "upper"], default="all", help="which joints the blend drives to the default stance: all, hands (finger joints only), upper (shoulders, elbows and fingers; legs and torso untouched)")
 ex.add_argument("--ramp", type=int, default=0, help="steps over which the commanded forward velocity ramps from 0 to --fwd after the switch")
 ex.add_argument("--record_dir", default=None); ex.add_argument("--label", default="m2")
+# recording camera only (defaults = the M2/M2b camera, unchanged). --eye/--lookat are the fixed world-space camera position and target.
+ex.add_argument("--eye", default="0,-11,9"); ex.add_argument("--lookat", default="0,0,0.3"); ex.add_argument("--cam_focal", type=float, default=12.0)
 xa, rest = ex.parse_known_args(sys.argv[1:])
 args = P._parse_args(rest); args.train_env_cfg = True
 if xa.record_dir: args.enable_cameras = True
@@ -48,7 +50,8 @@ DT = 0.02; STEPS = int(round(xa.total_s / DT))
 if xa.record_dir:
     from isaaclab_visualizers.kit import KitVisualizerCfg
     from isaaclab.envs.utils.video_recorder_cfg import VideoRecorderCfg
-    env_cfg.sim.visualizer_cfgs = [KitVisualizerCfg(headless=True, window_width=1280, window_height=720, eye=(0, -11, 9), lookat=(0, 0, 0.3))]
+    env_cfg.sim.visualizer_cfgs = [KitVisualizerCfg(headless=True, window_width=1280, window_height=720, focal_length=xa.cam_focal,
+                                                     eye=tuple(float(v) for v in xa.eye.split(",")), lookat=tuple(float(v) for v in xa.lookat.split(",")))]
     env_cfg.video_recorders = [VideoRecorderCfg(source="visualizer:kit", output_dir=xa.record_dir, video_length=STEPS, video_interval=STEPS, output_filename_prefix=xa.label)]
 with launch_simulation(env_cfg, args):
     agent_cfg = P.cli_args.update_rsl_rl_cfg(agent_cfg, args)
