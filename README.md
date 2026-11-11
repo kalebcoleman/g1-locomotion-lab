@@ -102,9 +102,9 @@ Two policies share one interface: the same 123-value observation in, the same 37
 |---|---|
 | `walking/` | The walking project as first published: configs, scripts, results, media, diagnostics, licences |
 | `recovery/` | Get-up project: task package `g1_recovery/`, scripts, tests, criteria, media, architecture diagrams ([README](recovery/README.md)) |
-| `pilots/` | Dated, bounded experiments, each with its own README: [humanlike](pilots/humanlike_20261108/ROADMAP.md) (negative reward-only pilot and the roadmap), [m2](pilots/m2_fall_handover_20261108/README.md) / [m2b](pilots/m2b_handover_fixes_20261108/README.md) (hand-over), [m3](pilots/m3_terrain_baseline_20261108/README.md) (terrain), [m4](pilots/m4_robustness_20261108/README.md) (pushes, friction), [g4](pilots/g4_humanlike_getup_20261108/README.md) (get-up training, recC) |
+| `pilots/` | Dated, bounded experiments, each with its own README ([index](pilots/README.md)): [humanlike](pilots/humanlike_20261108/ROADMAP.md) (negative reward-only pilot and the roadmap), [m2](pilots/m2_fall_handover_20261108/README.md) / [m2b](pilots/m2b_handover_fixes_20261108/README.md) (hand-over), [m3](pilots/m3_terrain_baseline_20261108/README.md) (terrain), [m4](pilots/m4_robustness_20261108/README.md) (pushes, friction), [g4](pilots/g4_humanlike_getup_20261108/README.md) (get-up training, recC) |
 | `docs/` | [Walking write-up](docs/WALKING.md), [contributions](docs/CONTRIBUTIONS.md), [results](docs/RESULTS.md), [setup](docs/SETUP.md) |
-| `archive/` | Historical experiment outputs: result JSON, run logs and videos from earlier runs |
+| `archive/` | Historical experiment outputs: result JSON, run logs and videos from earlier runs ([README](archive/README.md)) |
 | `EVAL_PROTOCOL.md`, `EXPERIMENT_LOG.md`, `STATUS.md`, `PROVENANCE.md` | Evaluation protocol (criteria v3), dated experiment log, current status, provenance of imported parts |
 
 ## Limitations and next steps
