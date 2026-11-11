@@ -1,4 +1,6 @@
 # G1 recovery (get-up) project: STATUS
+
+> **Historical snapshot (2026-11-06).** For the current project status see [the root STATUS.md](../STATUS.md).
 _Last updated: 2026-11-06 18:45 MST (lead agent)_
 
 ## Goal
