@@ -14,7 +14,7 @@ every number is one seed and one training run, and the held-out set was not used
   steps fell from 1.16% to 0.12%; self-penetration passes on 236 of 236 robots examined
   ([`recovery/checkpoints/README.md`](recovery/checkpoints/README.md)).
 - **Hand-over, get-up then walking.** Measured with the **previous** baseline `R9hg_it1100`, the policy the runs
-  used: **6 of 250** induced falls complete the sequence under the v3 gate, **29.4%** with the arms and fingers
+  used: **6 of 250** induced falls complete the sequence under the v3 gate, **28.7%** (pooled over three repeats) with the arms and fingers
   blended to the stance, **99.9%** when the hand-over also waits for a readiness check (a looser check than v3)
   ([M2](pilots/m2_fall_handover_20261108/README.md), [M2b](pilots/m2b_handover_fixes_20261108/README.md)). A rerun
   with `recC` is in progress; no result is recorded yet.
