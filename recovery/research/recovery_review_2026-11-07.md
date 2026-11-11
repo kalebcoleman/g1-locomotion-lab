@@ -14,7 +14,7 @@ Under protocol v2.1 there is still no valid unassisted recovery. The R6c control
 | R7m height gated by orientation | 256 | 4.58 | 1.37 | 0.000 | 0.52 | 0.97 |
 | R7u warm from R6c fold | 605 / 1350 | 7.92 | 0.22 | 0.000 | 0.64 | 0.92 |
 
-V: R6c's height term implies a mean pelvis height near 0.62 m with the torso inverted. `runs/probeH_V.log`: pelvis 0.52 m, imu_link 0.38 m, pelvis up-vector -0.97 in the fold. `results/chk300_R6cS_dev_off.json` (it 350, DEV): 256/256 `rose_not_upright`, zero supported stands, soft position-limit violations on 40% of steps, peak pelvis vz mean 1.24 m/s. R7m was the only variant whose `pose` term and `lying_ever_supported` had moved off zero at that point.
+V: R6c's height term implies a mean pelvis height near 0.62 m with the torso inverted. `archive/runs/probeH_V.log`: pelvis 0.52 m, imu_link 0.38 m, pelvis up-vector -0.97 in the fold. `archive/results/chk300_R6cS_dev_off.json` (it 350, DEV): 256/256 `rose_not_upright`, zero supported stands, soft position-limit violations on 40% of steps, peak pelvis vz mean 1.24 m/s. R7m was the only variant whose `pose` term and `lying_ever_supported` had moved off zero at that point.
 
 ## 2. Why the policy stalls (ranked)
 
@@ -30,7 +30,7 @@ V: R6c's height term implies a mean pelvis height near 0.62 m with the torso inv
 - V: the stand bonus in every baked R recipe uses the legacy mask (`G1R_STRICT` unset in `common.standing_mask`). Training rewards an unsupported stand; evaluation requires both feet loaded. Shared by all arms; fix in the next recipe.
 - V: Isaac Lab `G1_CFG` gives the legs and the whole arm group, including the 14 finger joints, a 300 Nm effort limit, and `NewtonArticulationCfg(self_collision_enabled=False)`. Real G1 knee about 139 Nm, arm joints about 25 Nm (datasheet values as used in HoST and unitree_rl_gym configs; verify). No criterion checks torque against real limits or limb interpenetration. Proposed Amendment 3: torque within real limits on >= 97% of steps and no self-penetration, frozen now while no result can be favoured.
 - V: validity fractions are per 10 s episode. A 2 s rise plus 8 s hold can violate position limits for a full second and pass the 10% rule. Also report fractions over the rising window (reset to start of hold).
-- V: `torso_link` and `head_link` report the pelvis origin in this USD (`runs/probeH_stand.log`), so the assist force on `torso_link` is a pelvis-origin lift with no righting torque. Height now uses imu_link.
+- V: `torso_link` and `head_link` report the pelvis origin in this USD (`archive/runs/probeH_stand.log`), so the assist force on `torso_link` is a pelvis-origin lift with no righting torque. Height now uses imu_link.
 - V: DEV is the old held-out set and is used for pruning; HELDOUT is clean; TEST untouched. Evaluation runs with observation noise and is not bit-repeatable (3 to 8 of 256 spread); the protocol's three evaluations per checkpoint covers this.
 
 ## 4. Do the R6c/R7 comparisons isolate their changes?
@@ -75,4 +75,4 @@ See `REFERENCES.md` for links and licences. Summary:
 
 ## Files inspected
 
-`projects/g1-locomotion-lab-integrated/{STATUS.md,EXPERIMENT_LOG.md,EVAL_PROTOCOL.md}`; `recovery/g1_recovery/{lane_a.py,common.py,env_cfg.py,assist.py,metrics.py,agents.py,register.py}`; `recovery/scripts/{eval_recovery.py,train_recovery.py,mon.py,evalv2.sh}`; `recovery/{REPORT.md,CRITERIA.md}`; `recovery/research/*.md`; `results/chk300_R6cS_dev_off.json`, `results/chk300_R4nS_dev_off.json`; `runs/probeH_V.log`, `runs/probeH_stand.log`; `media/20261106_224419_chk300_R6cS_t1_3_6_9.png`; the five MCP job logs under `~/.local/share/isaac-mcp/jobs/`; Isaac Lab 3.0.0 `isaaclab_assets/robots/unitree.py`, `velocity_env_cfg.py`, `g1/flat_env_cfg.py`, `g1/agents/rsl_rl_ppo_cfg.py`, `mdp/rewards.py`, `isaaclab_rl/rsl_rl/rl_cfg.py`; rsl_rl `modules/distribution.py`.
+`projects/g1-locomotion-lab-integrated/{STATUS.md,EXPERIMENT_LOG.md,EVAL_PROTOCOL.md}`; `recovery/g1_recovery/{lane_a.py,common.py,env_cfg.py,assist.py,metrics.py,agents.py,register.py}`; `recovery/scripts/{eval_recovery.py,train_recovery.py,mon.py,evalv2.sh}`; `recovery/{REPORT.md,CRITERIA.md}`; `recovery/research/*.md`; `archive/results/chk300_R6cS_dev_off.json`, `archive/results/chk300_R4nS_dev_off.json`; `archive/runs/probeH_V.log`, `archive/runs/probeH_stand.log`; `archive/media/20261106_224419_chk300_R6cS_t1_3_6_9.png`; the five MCP job logs under `~/.local/share/isaac-mcp/jobs/`; Isaac Lab 3.0.0 `isaaclab_assets/robots/unitree.py`, `velocity_env_cfg.py`, `g1/flat_env_cfg.py`, `g1/agents/rsl_rl_ppo_cfg.py`, `mdp/rewards.py`, `isaaclab_rl/rsl_rl/rl_cfg.py`; rsl_rl `modules/distribution.py`.
