@@ -1,8 +1,8 @@
 {
  "protocol": "M2 continuous fall/hand-over (EVAL_PROTOCOL.md Stage 3, DEV, evaluation only)",
  "task": "G1-Recovery-R9hg-v0",
- "checkpoint": "/home/kacolem8@ad.asu.edu/.t3/worktrees/g1-locomotion-lab/t3-2e6722ec-f10a32782916eb84/recovery/checkpoints/getup_baseline_recC_it1425.pt",
- "walk_checkpoint": "/home/kacolem8@ad.asu.edu/.t3/worktrees/g1-locomotion-lab/t3-2e6722ec-f10a32782916eb84/checkpoints/walking_newton_it1499.pt",
+ "checkpoint": "recovery/checkpoints/getup_baseline_recC_it1425.pt",
+ "walk_checkpoint": "checkpoints/walking_newton_it1499.pt",
  "seed": 7,
  "num_envs": 128,
  "variant": {

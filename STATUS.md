@@ -16,8 +16,10 @@ every number is one seed and one training run, and the held-out set was not used
 - **Hand-over, get-up then walking.** Measured with the **previous** baseline `R9hg_it1100`, the policy the runs
   used: **6 of 250** induced falls complete the sequence under the v3 gate, **28.7%** (pooled over three repeats) with the arms and fingers
   blended to the stance, **99.9%** when the hand-over also waits for a readiness check (a looser check than v3)
-  ([M2](pilots/m2_fall_handover_20261108/README.md), [M2b](pilots/m2b_handover_fixes_20261108/README.md)). A rerun
-  with `recC` is in progress; no result is recorded yet.
+  ([M2](pilots/m2_fall_handover_20261108/README.md), [M2b](pilots/m2b_handover_fixes_20261108/README.md)).
+  Rerun with **`recC`** (M2c, same protocol): the blended v3 variant reaches **387 of 750 (51.6%, 95% CI 48.0-55.2)**,
+  49.4% on fresh seeds; without the blend success drops to 0.4% because 98% of the extra hand-overs re-fall
+  ([M2c](pilots/m2c_handover_recC_20261110/README.md)).
 - **Pushes.** Half the robots fall at about **2.2 m/s** of added speed (M50 2.16 m/s, 95% CI 2.08-2.24), about four
   times the largest training push. Left and rear-left pushes are weakest (about 1.4 m/s).
 - **Friction.** M50 falls from 2.16 m/s at friction 1.0 to 1.45 m/s at 0.3. Without pushes the policy still walks
@@ -35,13 +37,12 @@ every number is one seed and one training run, and the held-out set was not used
    survival; downward terrain is handled much better.
 3. **Single seed, single lineage.** Walking and get-up each have one training run. No run-to-run variance or
    confidence interval is claimed for either headline number.
-4. **The hand-over has not been re-measured with `recC`.** Its published numbers belong to the previous baseline, and
-   its 99.9% figure uses the looser readiness gate rather than the v3 result.
+4. **The hand-over is limited by the stand gate.** With `recC` and the blend every hand-over walks, but the v3 gate
+   passes for only about half of the induced falls, and the largest push (4.5 m/s) converts worst.
 
 ## Next
 
-- Rerun M2/M2b with `RECOVERY_CKPT=recovery/checkpoints/getup_baseline_recC_it1425.pt` and record the result next to
-  the previous one.
+- Train extra seeds for walking and get-up to measure run-to-run variance of the headline numbers.
 - Repeat the walking and get-up evaluations on fresh seeds before calling either number stable.
 - Test a reference-motion or imitation term for the straddle; reward shaping alone has been ruled out.
 - Leave `TEST` untouched until a method is frozen.

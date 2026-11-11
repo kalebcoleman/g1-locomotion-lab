@@ -12,7 +12,10 @@
 ![License](https://img.shields.io/badge/license-BSD--3--Clause-blue)
 [![Tests](https://github.com/kalebcoleman/g1-locomotion-lab/actions/workflows/tests.yml/badge.svg)](https://github.com/kalebcoleman/g1-locomotion-lab/actions/workflows/tests.yml)
 
-<!-- END-TO-END DEMO: fall -> get up -> walk (recC), added after rerun -->
+![A pushed G1 falls, gets up with the recC policy, and walks away with the walking policy](pilots/m2c_handover_recC_20261110/media/demo_fall_getup_walk.gif)
+
+<sub>One continuous run, no resets: a push knocks the robot over, the get-up policy stands it up, the upper body is blended to the walking stance, and the walking policy takes over.</sub>
+
 ![Unitree G1 policies at training iteration 0 (left) and 1499 (right), same scripted commands](walking/media/hero_before_after.gif)
 
 <sub>16 robots per side, same scripted stand, walk, turn and stop commands. Left: untrained. Right: final walking policy. Fallen robots are reset in place.</sub>
@@ -24,7 +27,7 @@
 - **237 / 256 robots (93%)** stay up through a 24 s stand, walk, turn and stop test with random pushes.
 - **Get-up success 50.5% → 68.2%** on held-out lying poses, after diagnosing a joint-limit training collapse.
 - **Pushes ≈4× larger than training**: half the robots fall at 2.16 m/s of added speed (M50), vs 0.5 m/s pushes in training.
-- **Hand-over strict success ≈2.5% → 28.7%** with an upper-body blend before the switch. <!-- HANDOVER-RECC --> (previous recovery checkpoint; recC rerun pending).
+- **Fall → get up → walk: 51.6%** of pushed-over robots complete the full sequence under the strict check (387 of 750), up from 2.5%, by adding an upper-body blend before the hand-over and the better get-up policy.
 
 ## Walking and getting up
 
@@ -76,7 +79,7 @@ Two policies share one interface: the same 123-value observation in, the same 37
 |---|---|
 | Walking, 24 s pushed test | 237 / 256 robots stay up (reruns 231, 233) |
 | Get-up, 256 held-out poses | 68.2% pass all checks, up from 50.5% |
-| Hand-over, strict end-to-end | 28.7% with the upper-body blend, up from ≈2.5% |
+| Fall → get up → walk, strict check | 51.6% (387 / 750), up from 2.5%; 49.4% on fresh seeds |
 | Push robustness | half fall at 2.16 m/s added speed (M50), ~4× the training push |
 | Friction 0.3 | M50 falls from 2.16 to 1.45 m/s |
 | Terrain, blind on flat-trained policy | ≥80% survival to 19° downhill, 9° uphill, 5.8 cm steps down, 2.8 cm up, 8 cm noise |
@@ -114,7 +117,7 @@ Two policies share one interface: the same 123-value observation in, the same 37
 - **One training seed** everywhere; evaluation is not bit-repeatable (walking-test reruns gave 231–237 of 256).
 - **Simulation only**: no physical robot, no sim-to-real work.
 
-Next: more seeds, the recC end-to-end rerun, terrain-aware walking.
+Next: more training seeds, a less wide get-up, terrain-aware walking.
 
 ## Credits and licenses
 

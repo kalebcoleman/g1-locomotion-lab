@@ -33,10 +33,11 @@ Self-penetration (3b): 236 of 236 examined robots are within the 3% rule for rec
 |---|---|
 | Hand over to walking immediately (M2) | 6 of 250 induced falls (2.4%) |
 | Baseline behaviour re-run (M2b, pooled over seeds 2–4) | 19 of 746 (2.5%) |
-| Settle 0.5 s + upper-body blend, v3 gate | **215 of 749 (28.7%)** pooled; 28.2% on fresh seeds 5–7; **0 re-falls in every run** |
+| Settle 1 s + upper-body blend, v3 gate | **215 of 749 (28.7%)** pooled; 28.2% on fresh seeds 5–7; **0 re-falls in every run** |
+| **Settle 1 s + upper-body blend, v3 gate, recC get-up (M2c)** | **387 of 750 (51.6%, 95% CI 48.0–55.2%)** pooled; 49.4% on fresh seeds 5–7; 0 re-falls |
 | Readiness gate + settle + blend | 753 of 754 (99.9%) pooled — **not the same test as the strict check**: the readiness gate has no validity clauses, and at hand-over the official v3 gate was true for only 1–3 robots |
 
-Evaluation only — no training, no weight changes; measured with the *previous* recovery checkpoint (R9hg it1100), so a recC rerun is pending. Pushes of 2.5 / 3.5 / 4.5 m/s, 128 envs per seed, seeds 2–4 plus fresh seeds 5–7. Run-to-run spread matters: the baseline's three runs gave 0.8%, 2.4% and 4.4%. Write-ups: [M2](../pilots/m2_fall_handover_20261108/README.md), [M2b](../pilots/m2b_handover_fixes_20261108/README.md).
+Evaluation only — no training, no weight changes; rows without "recC" use the *previous* recovery checkpoint (R9hg it1100). With recC (M2c) the v3 gate fires for 56% of falls instead of 33%; without the blend 98% of those hand-overs re-fall (0.4% success), with it none do. With recC the readiness variant reached 748 of 748. Pushes of 2.5 / 3.5 / 4.5 m/s, 128 envs per seed, seeds 2–4 plus fresh seeds 5–7. Run-to-run spread matters: the baseline's three runs gave 0.8%, 2.4% and 4.4%. Write-ups: [M2](../pilots/m2_fall_handover_20261108/README.md), [M2b](../pilots/m2b_handover_fixes_20261108/README.md), [M2c](../pilots/m2c_handover_recC_20261110/README.md).
 
 ## Pushes (walking policy, friction 1.0)
 
