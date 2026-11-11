@@ -59,8 +59,8 @@ cd recovery
 
 Training the walking policy uses Isaac Lab's own trainer from the checkout; the exact command is in
 [WALKING.md](WALKING.md#reproducing). The pilots wrap the same pattern for their own experiments (for example
-`pilots/m2_fall_handover_20261108/run_batch.sh`), and all of them accept the environment overrides documented in
-their README.
+`pilots/m2_fall_handover_20261108/run_batch.sh`); see each pilot README and `recovery/checkpoints/README.md` for the
+checkpoints and overrides they use.
 
 Checkpoints are large binary files and are gitignored by default. The small, referenced baselines are tracked:
 `checkpoints/walking_newton_it1499.pt` (walking) and `recovery/checkpoints/*.pt` (get-up).
