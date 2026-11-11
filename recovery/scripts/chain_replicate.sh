@@ -8,7 +8,7 @@ export PYTHONPATH=$ROOT/recovery${PYTHONPATH:+:$PYTHONPATH}
 stage(){ # task max_its want_iteration [resume_ckpt]
   local before=$(ls -d $L/20* | sort | tail -1); local extra=""; [ -n "$4" ] && extra="--checkpoint $4 --no-resume_optimizer_state"
   echo "STAGE $1 seed $S start $(date +%T) resume ${4:-none}"
-  (cd $LAB && $PY scripts/reinforcement_learning/train.py --task $1 --num_envs 16384 --rl_library rsl_rl --max_iterations $2 --seed $S --viz none --external_callback=g1_recovery.register.register $extra > $ROOT/runs/chain_s${S}_$1.log 2>&1)
+  (cd $LAB && $PY scripts/reinforcement_learning/train.py --task $1 --num_envs 16384 --rl_library rsl_rl --max_iterations $2 --seed $S --viz none --external_callback=g1_recovery.register.register $extra > $ROOT/archive/runs/chain_s${S}_$1.log 2>&1)
   local d=""; for c in $(ls -d $L/20* | sort | awk -v b="$before" '$0>b'); do grep -q "^seed: $S$" $c/params/agent.yaml 2>/dev/null && grep -q "$2" /dev/null; grep -q "^seed: $S$" $c/params/agent.yaml 2>/dev/null && [ -s $c/model_$3.pt ] && d=$c; done
   CK=$L/init/chain_s${S}_$1_it$3.pt; cp $d/model_$3.pt $CK || { echo "MISSING $d/model_$3.pt"; exit 1; }
   echo "STAGE_DONE $1 seed $S dir $d ckpt $CK $(sha256sum $CK | cut -c1-16)"

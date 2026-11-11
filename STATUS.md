@@ -1,38 +1,51 @@
-# G1 Locomotion Lab (integrated, PRIVATE, local only): STATUS
-_Updated 2026-11-07 04:20 MST._ Nothing here has been pushed; the public repo `g1-locomotion-lab` is unchanged and must not receive private content without Kaleb's review.
+# G1 Locomotion Lab: current status
 
-## Goal
-Simulated Unitree G1 (Isaac Lab 3.0.0, Newton/MJWarp): walk -> fall -> recover unassisted -> stable stand -> resume walking/turning. Targets: >=50% plausible unassisted recoveries on a fixed held-out set; >=50% recovery->walking chains; stretch: continuous walk->push->fall->recover->walk/turn. These are goals, not results.
+_Last updated 2026-11-10. Simulation only. The repository is public and these results are merged. Unless noted,
+every number is one seed and one training run, and the held-out set was not used to choose checkpoints._
 
-## Verified so far
-- Walking baseline reproduced under one protocol on both robot models (3 s settle, 10 s at 0.8 m/s, no pushes, 256 envs): minimal-collision `Isaac-Velocity-Flat-G1` 253/256 (6.33 m along heading, tracking err 0.094), full-collision recovery robot 256/256 (6.37 m, 0.093): **no degradation** (`runs/walk_only_*.json`).
-- Compatibility (numerically, `runs/compat_*.json`): identical joint order (37), body names, obs terms/order/dims (123), action scale/offset, rates, default pose, joint limits, stiffness/damping/effort limits. Differences: collision shapes 3 vs 38, USD g1_minimal vs g1 (32.96 vs 33.18 kg), episode length, standing-env fraction.
-- Evaluator fixed (it used the legacy stand tracker, 1 m Euclidean displacement, no heading/speed/plausibility): `recovery/g1_recovery/metrics.py` + 13 passing tests; protocol v2, then v2.1 (hard-limit excursions, headline metric `plausible_v21`), frozen in `EVAL_PROTOCOL.md` (DEV/HELDOUT/TEST sets in `recovery/sets/`; position-limit validity added).
-- **Recovery:** NO plausible unassisted recovery under protocol v2. The earlier "2/256" (V11) fails v2 (joint position limits violated on 51% of steps); the seed-3 replicate has 0 supported stands on HELDOUT_v2 (assist off or on). A8c's 256/256 and A6's 4/256 chain are rejected (launch exploit).
+## Results
 
-## Running (Isaac MCP, 16384 envs, seed 3, no assist; monitor: `python3 recovery/scripts/mon.py 2352 0013 0025 0034 0224`)
-- v15, unchanged: `20261106-215641` R6c control; `-225219` R7u; `-225220` R7h; `-225222` R7m; `-225224` R7u warm.
-- v16 addition: `20261107-001356` R8w (E5 stance penalty, scratch); `-001359` R8w warm from R7m it500. R6c finished at iteration 1000.
-- E4: `20261107-002528` R8t (real torque limits, scratch). Candidate: `20261107-003416` R9h (warm from R7h it650, several changes, direct v3 attempt).
-- v17 addition: R9hg (ground-only flight penalty, warm from R9hc it1000).
-- v17: `20261107-022451` R9hc and `-022453` R8wc (self-collision on, warm starts). R7 runs and R7u warm finished.
-- v16, from the independent review: `20261106-235212` R8 control; `-235213` R8f (E1); `-235215` R8s (E2 supine); `-235216` R8p (E2 prone).
-Check rule for v16: DEV at iteration 300 with video, then audit any pass with `diag_trace.py` + `audit_trace.py`. HELDOUT only for the final comparison (3 evaluations each); TEST untouched.
-**Current get-up baseline (2026-11-09):** recC, `recovery/checkpoints/getup_baseline_recC_it1425.pt` (run `g4j1`, stage `b1p2`, it1425): full v3 on HELDOUT 176 / 174 / 174 of 256 (68.2%, mean 174.7) over three evaluations, hard-limit steps 0.12% (previous baseline 1.16%), 3b passes on all 236 robots examined. Peak foot spread unchanged (1.39 m). One seed, one lineage, TEST untouched. Details: `recovery/checkpoints/README.md`, `pilots/g4_humanlike_getup_20261108/README.md`.
-**Previous baseline, best verified result until 2026-11-09:** R9hg it1100 (`init/` not yet; run `2026-11-07_03-02-51/model_1100.pt`): full v3 on HELDOUT 127-129/256 (49.6-50.4%) over three evaluations, incl. self-penetration on all robots. By family: prone ~78%, side_a ~50%, supine ~46%, side_b ~27%. One seed, warm-start chain, TEST untouched, no walking chain yet.
-**Closest behaviour:** R7m and R7h iteration 500 hold a stable wide straddle from all directions (strict 255 and 256 of 256) but score 0 under v2.1, with an ankle roll at its hard stop on 75-83% of steps. Not counted.
-**Criteria:** v3 (v2.1 + Amendment 3), approved 2026-11-07. Under v3 every checkpoint so far scores 0. R7h iteration 650 passes the older v2.1 on 174/256 DEV poses but fails v3 on stance and torque.
+- **Walking.** The final policy keeps **237 of 256** robots up through a 24 s scripted stand, walk, turn and stop
+  test with random pushes (reruns 231 and 233); most remaining falls happen while turning
+  ([`docs/WALKING.md`](docs/WALKING.md#results-at-a-glance)).
+- **Getting up.** The baseline **`recC`** (`recovery/checkpoints/getup_baseline_recC_it1425.pt`) passes full
+  criteria v3 on **174.7 of 256 held-out poses (68.2%)**, mean of three evaluations (176 / 174 / 174), up from 129.3
+  (50.5%) for the previous baseline. By direction: side A 52, prone 52, side B 36, supine 35 of 64 each. Hard-limit
+  steps fell from 1.16% to 0.12%; self-penetration passes on 236 of 236 robots examined
+  ([`recovery/checkpoints/README.md`](recovery/checkpoints/README.md)).
+- **Hand-over, get-up then walking.** Measured with the **previous** baseline `R9hg_it1100`, the policy the runs
+  used: **6 of 250** induced falls complete the sequence under the v3 gate, **29.4%** with the arms and fingers
+  blended to the stance, **99.9%** when the hand-over also waits for a readiness check (a looser check than v3)
+  ([M2](pilots/m2_fall_handover_20261108/README.md), [M2b](pilots/m2b_handover_fixes_20261108/README.md)). A rerun
+  with `recC` is in progress; no result is recorded yet.
+- **Pushes.** Half the robots fall at about **2.2 m/s** of added speed (M50 2.16 m/s, 95% CI 2.08-2.24), about four
+  times the largest training push. Left and rear-left pushes are weakest (about 1.4 m/s).
+- **Friction.** M50 falls from 2.16 m/s at friction 1.0 to 1.45 m/s at 0.3. Without pushes the policy still walks
+  the first 3 s in 98-99% of cases down to friction 0.4, and in 56% at 0.2.
+- **Terrain.** Blind walking, no height scan, trained on flat ground: at least 80% survival on **19 degree downhill,
+  9 degree uphill, 5.8 cm steps down, 2.8 cm steps up and 8 cm rough ground**
+  ([M3](pilots/m3_terrain_baseline_20261108/README.md), [M4](pilots/m4_robustness_20261108/README.md)).
 
-## Notes
-- Isaac MCP jobs load the recovery tasks through `--external_callback g1_recovery.register.register`; this needs `g1_locomotion_lab_dev.pth` in the Lab venv site-packages (adds `recovery/` to sys.path; delete the file to undo). MCP checkpoints must live under the Lab logs dir (init copy: `envs/lab-3.0.0-src/logs/rsl_rl/g1_recovery_r/init/`). MCP job logs/checkpoints: `envs/lab-3.0.0-src/logs/rsl_rl/g1_recovery_r/<timestamp>/`.
-- Recipes are baked into task ids (no env vars): `G1-Recovery-R1-v0`, `R2-v0` and `-Eval-v0` variants (assist off).
+## Open problems
 
-## Documentation
-- `recovery/architecture/SYSTEM_OVERVIEW.md`: version names, active jobs and their controls, PPO settings, network architecture, reward weights, limitations, sources.
-- `recovery/architecture/figures/recovery_system_dark.png`, `recovery/architecture/figures/network_architecture_dark.png` (sources: `recovery/architecture/*_diagram.html`).
+1. **The get-up straddles.** Every standing policy in this lineage pushes its feet about 1.4 m apart, about 0.4 s into
+   the rise, before settling to a normal stance. Reward-only changes did not remove it (stance weights to -32,
+   smoothness penalties, joint-target bounds), and the current baseline leaves the peak spread unchanged.
+2. **Upward steps and steep climbs.** Upward stairs above 2.8 cm and uphill slopes above 9 degrees fall below 80%
+   survival; downward terrain is handled much better.
+3. **Single seed, single lineage.** Walking and get-up each have one training run. No run-to-run variance or
+   confidence interval is claimed for either headline number.
+4. **The hand-over has not been re-measured with `recC`.** Its published numbers belong to the previous baseline, and
+   its 99.9% figure uses the looser readiness gate rather than the v3 result.
 
 ## Next
-1. R8w warm: DEV after 100 new iterations; is the stance narrowing, and does it hold a stand?
-2. v16 DEV check at iteration 300; compare E1 and E2 with R8, per direction.
-3. E3 after stable supported stands; E4 (real torque limits) if approved; two more seeds for any winner.
-4. Stage 2 chain only after a stand passes the agreed criteria.
+
+- Rerun M2/M2b with `RECOVERY_CKPT=recovery/checkpoints/getup_baseline_recC_it1425.pt` and record the result next to
+  the previous one.
+- Repeat the walking and get-up evaluations on fresh seeds before calling either number stable.
+- Test a reference-motion or imitation term for the straddle; reward shaping alone has been ruled out.
+- Leave `TEST` untouched until a method is frozen.
+
+Details: [`README.md`](README.md) · [`EVAL_PROTOCOL.md`](EVAL_PROTOCOL.md) ·
+[`EXPERIMENT_LOG.md`](EXPERIMENT_LOG.md) · [`pilots/README.md`](pilots/README.md) ·
+[`recovery/STATUS.md`](recovery/STATUS.md) (frozen 2026-11-06 get-up snapshot).
