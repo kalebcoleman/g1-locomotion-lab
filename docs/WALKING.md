@@ -193,7 +193,7 @@ Turning had the most falls in all three samples (17 of 19, 23 of 30, 13 of 23), 
 Isaac Lab's config sets `deterministic_mode: not_guaranteed`, so a fixed seed does not give an identical run. Treat the published survivor counts as
 one sample (the three samples span 231-237), not exact values.
 
-**Checkpoints:** not included in this repository. Retrain with command 1 (about 40 minutes on the hardware above).
+**Checkpoint:** the final walking checkpoint is in this repository as [`checkpoints/walking_newton_it1499.pt`](../checkpoints/walking_newton_it1499.pt) (`sha256 daa544a8…`). To retrain it, use command 1 (about 40 minutes on the hardware above).
 **Not redistributable here (see NOTICE.md):** the Unitree G1 USD model and other NVIDIA assets (Isaac Lab fetches them at run
 time), Isaac Sim, and the raw MP4s (the public GIFs and PNGs in `media/` are derived from them).
 

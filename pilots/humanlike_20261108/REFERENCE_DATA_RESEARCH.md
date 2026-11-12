@@ -20,9 +20,9 @@ This env's G1 has 37 joints: 12 leg joints, **one** waist joint (`torso_joint`),
 - mjlab tracking task, https://github.com/mujocolab/mjlab/tree/main/src/mjlab/tasks/tracking (active; MuJoCo-Warp, Isaac-Lab-style manager API): closest to this repo's MJWarp backend, but a different framework. Licence not re-checked today. Using it means a separate environment, not an edit to `g1_recovery`.
 - Nothing in this repo tracks a reference: no loader, no tracking reward (`g1_recovery/` has HoST-style assist and a pose bank only).
 
-## Blockers and decision for the parent
+## Blockers and open decision
 1. Data: LAFAN1 get-up clips are the only real human data found; licence blocks redistribution of retargeted files (NoDerivatives). Local research use only, files kept out of git.
 2. Morphology: no waist roll/pitch in this env; needs re-targeting or a 29-DoF model.
 3. Coverage: back/front/side not verified; the eval needs all four directions, so a few clips cannot cover HELDOUT. Realistic scope: one or two reference clips used as a style target near the start state, not a replacement for the policy.
 4. Trainer: none in repo; BeyondMimic is archived and PhysX/2.1; mjlab is another framework.
-5. Next validation step (lightweight, no training): the parent confirms Kaleb accepts LAFAN1's non-commercial/no-derivatives terms for local use; then download Unitree's official CSVs locally, plot the 6 clips (root height, hip roll/yaw, foot spread) to see directions covered and whether the human motion itself keeps feet near shoulder width. No imitation run starts before that and before parent confirmation.
+5. Next validation step (lightweight, no training): confirm that LAFAN1's non-commercial/no-derivatives terms are acceptable for local use; then download Unitree's official CSVs locally, plot the 6 clips (root height, hip roll/yaw, foot spread) to see directions covered and whether the human motion itself keeps feet near shoulder width. No imitation run starts before that confirmation.

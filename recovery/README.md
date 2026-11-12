@@ -8,9 +8,17 @@ Work in progress. Simulation only: Isaac Lab 3.0.0 with Newton / MuJoCo-Warp, Un
 
 **Criteria v3** (all required): pelvis at least 0.60 m with the torso within 26 degrees of vertical and both feet carrying load, held for 2 s; no launch (upward pelvis speed at most 2 m/s); at most 2% of steps without ground contact; joint speed limits broken on at most 2% of steps; soft joint limits on at most 10% and hard limits on at most 3% of steps (at most 0.10 rad past); torque within Unitree's limits on at least 97% of steps; no limb passing through the body; feet at most 0.60 m apart; still standing in the final second; no assist force.
 
-<p align="center"><img src="media/recovery_best_close.gif" width="560" alt="Best policy so far, four lying starts"></p>
+<p align="center"><img src="media/recovery_recC_getup_16poses.gif" width="640" alt="The current get-up policy (recC) standing up 16 robots from lying poses, at half speed"></p>
 
-<p align="center"><img src="media/recovery_before_after.gif" alt="Earlier forward fold (left) and current best (right), same 16 starts"></p>
+<sub>The current policy (recC, 68%): 16 unseen lying poses, first 2 s at half speed, no assist.</sub>
+
+<p align="center"><img src="media/recovery_best_close.gif" width="560" alt="The previous get-up policy standing up four robots from lying poses, at half speed"></p>
+
+<sub>The previous policy (R9hg, 50%): four lying starts, the 1.5 s rise at half speed. The current policy reaches 68%.</sub>
+
+<p align="center"><img src="media/recovery_before_after.gif" alt="An earlier policy in a forward fold (left) and the first stand-up policy standing (right), same 16 starts"></p>
+
+<sub>Earlier forward fold (left) and the first stand-up policy (right, 50%); the current policy reaches 68%.</sub>
 
 ## Architecture
 
@@ -88,16 +96,16 @@ Contact sheets of the first 16 HELDOUT poses, previous baseline then recC, same 
 
 | image | what it shows |
 |---|---|
-| <img src="media/earlier/20261106_165529_heldout_poses_t0.3s.png" width="360"> | the held-out lying poses at 0.3 s |
-| <img src="media/earlier/20261106_171247_A_v1_failure.gif" width="360"> | Lane A v1: sits up, never stands |
-| <img src="media/earlier/20261106_171247_A_v1_failure_t9s.png" width="360"> | Lane A v1: sits up, never stands |
-| <img src="media/earlier/20261106_173906_level1_start_poses.png" width="360"> | sit-bank start poses used by the curriculum |
-| <img src="media/earlier/20261106_183606_A6_heldout_t3.5s.png" width="360"> | A6: rises by launching itself (rejected) |
-| <img src="media/earlier/20261106_190102_A8c_heldout_16poses.gif" width="360"> | A8c: the launch exploit that scored 256/256 under the first criteria (rejected: airborne at 0.3 s) |
-| <img src="media/earlier/20261106_190102_A8c_heldout_t0.3s.png" width="360"> | A8c: the launch exploit that scored 256/256 under the first criteria (rejected: airborne at 0.3 s) |
-| <img src="media/earlier/20261106_190102_A8c_heldout_t1.5s.png" width="360"> | A8c: the launch exploit that scored 256/256 under the first criteria (rejected: airborne at 0.3 s) |
-| <img src="media/earlier/20261106_205009_V11_unassisted_16poses.gif" width="360"> | V11 without assist: crouched hand-and-foot postures, no flight |
-| <img src="media/earlier/20261106_205009_V11_unassisted_t6s.png" width="360"> | V11 without assist: crouched hand-and-foot postures, no flight |
+| <img src="media/20261106_165529_heldout_poses_t0.3s.png" width="360"> | the held-out lying poses at 0.3 s |
+| <img src="media/20261106_171247_A_v1_failure.gif" width="360"> | Lane A v1: sits up, never stands |
+| <img src="media/20261106_171247_A_v1_failure_t9s.png" width="360"> | Lane A v1: sits up, never stands |
+| <img src="media/20261106_173906_level1_start_poses.png" width="360"> | sit-bank start poses used by the curriculum |
+| <img src="media/20261106_183606_A6_heldout_t3.5s.png" width="360"> | A6: rises by launching itself (rejected) |
+| <img src="media/20261106_190102_A8c_heldout_16poses.gif" width="360"> | A8c: the launch exploit that scored 256/256 under the first criteria (rejected: airborne at 0.3 s) |
+| <img src="media/20261106_190102_A8c_heldout_t0.3s.png" width="360"> | A8c: the launch exploit that scored 256/256 under the first criteria (rejected: airborne at 0.3 s) |
+| <img src="media/20261106_190102_A8c_heldout_t1.5s.png" width="360"> | A8c: the launch exploit that scored 256/256 under the first criteria (rejected: airborne at 0.3 s) |
+| <img src="media/20261106_205009_V11_unassisted_16poses.gif" width="360"> | V11 without assist: crouched hand-and-foot postures, no flight |
+| <img src="media/20261106_205009_V11_unassisted_t6s.png" width="360"> | V11 without assist: crouched hand-and-foot postures, no flight |
 
 </details>
 
@@ -107,7 +115,7 @@ Contact sheets of the first 16 HELDOUT poses, previous baseline then recC, same 
 - **Read first:** [`REPORT.md`](REPORT.md) (results, lessons, profiling), [`CRITERIA.md`](CRITERIA.md) (success definitions frozen before evaluation, v1), [`STATUS.md`](STATUS.md) (run log, commands, next steps). The current evaluation protocol (criteria v3) is [`../EVAL_PROTOCOL.md`](../EVAL_PROTOCOL.md); the dated experiment log is [`../EXPERIMENT_LOG.md`](../EXPERIMENT_LOG.md).
 - **Code:** `g1_recovery/` (task package: env, pose curriculum, success tracker, assist, lane rewards, movement metrics), `scripts/` (train / eval / record / diagnose, GPU launch logger), `tests/` (metric unit tests), `tools/`.
 - **Research notes:** `research/` (HoST, HumanUP and APEX assessments; [`recovery_review_2026-11-07.md`](research/recovery_review_2026-11-07.md) is an independent review of the R6c/R7 stall, with its linked references in [`REFERENCES.md`](research/REFERENCES.md)).
-- **Data:** `results/` (per-run eval and diagnostic JSON, training summaries, curves), pose sets in `sets/`, `heldout_poses.npz`, `bank_v1.npz`, two small checkpoints in `checkpoints/`.
+- **Data:** `results/` (per-run eval and diagnostic JSON, training summaries, curves), pose sets in `sets/`, `heldout_poses.npz` (the original pose set, byte-identical to `sets/dev_v1.npz`, so it is the DEV set despite its name), `bank_v1.npz`, two small checkpoints in `checkpoints/`.
 - **Newer work:** [`../pilots/humanlike_20261108/`](../pilots/humanlike_20261108/) (negative pilot, roadmap, movement metrics on the frozen baseline).
 - Needs Isaac Lab 3.0.0 (not included). Licences and credits: [`NOTICE.md`](NOTICE.md), BSD-3-Clause for original material.
 - The status line in the original version of this README ("only 2/256 held-out poses") predates the R9hg results above and is intentionally not repeated here.

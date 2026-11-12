@@ -65,7 +65,7 @@ See `REFERENCES.md` for links and licences. Summary:
 | FIRM (arXiv 2511.07407) | no code found | G1 23-DoF, sim and real | success = base > 0.7 m sustained; unifies fall and recovery; reference only |
 | APEX-humanoid | BSD-3 | PhysX Lab 1.3 | already assessed in `apex_standup_assessment.md`; prone-only, not portable |
 
-## 7. Recommendation given to the training agent
+## 7. Recommendation for the training runs
 
 1. Keep R6c and the R7 runs running; at iteration 300 evaluate all three scratch R7 variants on DEV with video; treat the warm R7u as a separate labelled arm.
 2. Pick R7* as the new control; launch E1 and E2 as single changes against it; add E3 only once a supported stand appears.
@@ -75,4 +75,4 @@ See `REFERENCES.md` for links and licences. Summary:
 
 ## Files inspected
 
-`projects/g1-locomotion-lab-integrated/{STATUS.md,EXPERIMENT_LOG.md,EVAL_PROTOCOL.md}`; `recovery/g1_recovery/{lane_a.py,common.py,env_cfg.py,assist.py,metrics.py,agents.py,register.py}`; `recovery/scripts/{eval_recovery.py,train_recovery.py,mon.py,evalv2.sh}`; `recovery/{REPORT.md,CRITERIA.md}`; `recovery/research/*.md`; `archive/results/chk300_R6cS_dev_off.json`, `archive/results/chk300_R4nS_dev_off.json`; `archive/runs/probeH_V.log`, `archive/runs/probeH_stand.log`; `archive/media/20261106_224419_chk300_R6cS_t1_3_6_9.png`; the five MCP job logs under `~/.local/share/isaac-mcp/jobs/`; Isaac Lab 3.0.0 `isaaclab_assets/robots/unitree.py`, `velocity_env_cfg.py`, `g1/flat_env_cfg.py`, `g1/agents/rsl_rl_ppo_cfg.py`, `mdp/rewards.py`, `isaaclab_rl/rsl_rl/rl_cfg.py`; rsl_rl `modules/distribution.py`.
+`projects/g1-locomotion-lab-integrated/{STATUS.md,EXPERIMENT_LOG.md,EVAL_PROTOCOL.md}`; `recovery/g1_recovery/{lane_a.py,common.py,env_cfg.py,assist.py,metrics.py,agents.py,register.py}`; `recovery/scripts/{eval_recovery.py,train_recovery.py,mon.py,evalv2.sh}`; `recovery/{REPORT.md,CRITERIA.md}`; `recovery/research/*.md`; `archive/results/chk300_R6cS_dev_off.json`, `archive/results/chk300_R4nS_dev_off.json`; `archive/runs/probeH_V.log`, `archive/runs/probeH_stand.log`; `recovery/media/20261106_224419_chk300_R6cS_t1_3_6_9.png`; the five MCP job logs under `~/.local/share/isaac-mcp/jobs/`; Isaac Lab 3.0.0 `isaaclab_assets/robots/unitree.py`, `velocity_env_cfg.py`, `g1/flat_env_cfg.py`, `g1/agents/rsl_rl_ppo_cfg.py`, `mdp/rewards.py`, `isaaclab_rl/rsl_rl/rl_cfg.py`; rsl_rl `modules/distribution.py`.

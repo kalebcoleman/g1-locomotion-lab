@@ -31,8 +31,7 @@ Self-penetration (3b): 236 of 236 examined robots are within the 3% rule for rec
 
 | Variant | v3-gated end-to-end success |
 |---|---|
-| Hand over to walking immediately (M2) | 6 of 250 induced falls (2.4%) |
-| Baseline behaviour re-run (M2b, pooled over seeds 2–4) | 19 of 746 (2.5%) |
+| Hand over to walking immediately (baseline; M2b, pooled over seeds 2–4) | 2.5% (19 of 746) |
 | Settle 1 s + upper-body blend, v3 gate | **215 of 749 (28.7%)** pooled; 28.2% on fresh seeds 5–7; **0 re-falls in every run** |
 | **Settle 1 s + upper-body blend, v3 gate, recC get-up (M2c)** | **387 of 750 (51.6%, 95% CI 48.0–55.2%)** pooled; 49.4% on fresh seeds 5–7; 0 re-falls |
 | Readiness gate + settle + blend | 753 of 754 (99.9%) pooled — **not the same test as the v3 stand gate**: the readiness gate has no validity clauses, and at hand-over the official v3 gate was true for only 1–3 robots |
@@ -41,7 +40,7 @@ Evaluation only — no training, no weight changes; rows without "recC" use the 
 
 ## Pushes (walking policy, friction 1.0)
 
-- **M50 (push at which half the standing robots fall): 2.16 m/s** logistic fit [95% bootstrap CI 2.08, 2.24]; 2.02 m/s interpolated. Training used random pushes up to **0.5 m/s**, so this is about **4× the training push**.
+- **M50 (push at which half the standing robots fall): 2.16 m/s** logistic fit [95% bootstrap CI 2.08, 2.24]; 2.02 m/s interpolated. Training used random pushes up to **0.5 m/s**, so this is about **3× the largest training push** (0.5 m/s per axis is about 0.71 m/s combined).
 - Survival pooled over directions: 97% at 1 m/s, 74% at 1.5, 52% at 2, 6% at 4 (Wilson intervals in the write-up).
 - By direction: weakest to the left (M50 1.43 / 1.48 m/s) and rear-left (1.35 / 1.40), strongest forward-right (3.62 / 3.44) and forward (2.58 / 2.85). Cells carry 11–12 robots at 2.0 m/s, so single directions have wide uncertainty.
 

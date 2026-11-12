@@ -1,5 +1,7 @@
 # G1 fall-recovery experiments: report (state as of 2026-11-06 ~21:45 MST)
 
+> **Historical snapshot.** This document describes the project as of 2026-11-06. Current results are in [docs/RESULTS.md](../docs/RESULTS.md).
+
 Simulation only (Isaac Lab 3.0.0, Newton/MJWarp, Unitree G1). Goal: **unassisted fall -> get up -> stable stand -> walk**, then walk -> disturbance -> fall -> recover -> walk/turn.
 **Status in one paragraph:** a *plausible* (no launch, feet-supported, unassisted) get-up has been demonstrated on only **2 of 256 held-out poses** so far (9 of 256 with a gated assist applied), at one seed. No stand->walk chain and no continuous disturbance sequence have been demonstrated under the plausibility criteria. Two earlier "successes" (A6's 4/256 chain, A8c's 256/256) were **rejected**: A8c launches itself upward (peak pelvis speed 3-6 m/s, joint speeds up to 2.5x the soft limit) and A6's stands were also launches. Runs v12 (longer training + seed replicate) were still training when this report was written.
 

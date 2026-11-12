@@ -6,9 +6,9 @@ reproducibility; it is not the current result set.
 
 | Path | Contents |
 |---|---|
-| `media/` | 51 dated clips and contact sheets from the get-up search (`20261106_*`, `20261107_*`). Many are duplicates of the curated, narrated gallery in `recovery/media/`. |
+| `media/` | 6 dated clips and contact sheets (HoST and chain checks). The other get-up clips and sheets from this search were byte-identical to files in `recovery/media/` and are only kept there. |
 | `results/` | 134 per-run evaluation JSONs, training summaries and the `linkcheck/` report (upper-body reference check). Walk reference: `results/walk_ref_limits.json`. |
-| `runs/` | 87 training/evaluation logs, memory samples, traces and a few raw MP4s from the same runs. |
+| `runs/` | 87 training/evaluation logs, memory samples, and traces from the same runs. |
 
 Where to look instead:
 

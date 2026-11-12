@@ -6,7 +6,7 @@ Licence readings are ours, not legal advice. Nothing here is vendored; ideas are
 
 | project | link | licence | stack | notes |
 |---|---|---|---|---|
-| HoST (Humanoid Standing-up Control) | https://github.com/InternRobotics/HoST | MIT | Isaac Gym, legged_gym, 23-DoF G1 | Paper arXiv:2502.08378, RSS 2025; project page https://taohuang13.github.io/humanoid-standingup.github.io/ ; PDF https://www.roboticsproceedings.org/rss21/p064.pdf |
+| HoST (Humanoid Standing-up Control) | https://github.com/InternRobotics/HoST | MIT | Isaac Gym, legged_gym, 23-DoF G1 | Paper arXiv:2502.08378, RSS 2025; https://arxiv.org/abs/2502.08378 ; PDF https://www.roboticsproceedings.org/rss21/p064.pdf |
 | HumanUP (Learning Getting-Up Policies) | https://github.com/RunpeiDong/HumanUP | Apache-2.0 | Isaac Gym, G1 | Paper arXiv:2502.12152, RSS 2025; page https://humanoid-getup.github.io/ |
 | HoST-pytorch | https://github.com/lucidrains/HoST-pytorch | MIT | PyTorch only | algorithm reference, no simulator |
 | g1-humanoid-rl | https://github.com/chaoticcuriosity-io/g1-humanoid-rl | MIT | mjlab (MuJoCo-Warp), G1 | Chapter 14 get-up from scratch: https://github.com/chaoticcuriosity-io/g1-humanoid-rl/blob/main/docs/reports/14-building-get-up-from-scratch.md ; task source in `recovery-task/` |
