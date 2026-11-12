@@ -58,6 +58,7 @@ Survival alone overstates the up-slope result: at 9 deg, 92% survive but cover o
 - Slope and stair surfaces are meshes of 20 m patches; the stairs keep rising for the whole walk (more than 2 m of rise by the end of the walk at the top levels), so a failure may come from any step during 10 s, not the first.
 - One walking checkpoint; the policy was never trained on terrain, so this is a baseline for a future terrain fine-tune, not a verdict on the method.
 - In the video a robot that falls is reset by the environment's termination, so later frames show it back at its start; the statistics use each robot's first termination only.
+- `media/slope_down_19deg.gif` and `media/steps_up_4cm.gif` (with `media/portfolio_slope19_steps43_sheet.png`): two illustrative 8-robot runs recorded for the README (seed 5, `--only slope_down:5` and `--only steps_up:1`, `--reps 8`, `--cam 0,-14,11`): 8 of 8 survived the 19 degree down-slope (10 s); 1 of 8 survived the 4.3 cm step-ups. The pooled evaluation above is the result; these are single runs. Fallen robots are reset by the environment, so later frames show them back at the start.
 - The video is one 16-robot run (seed 5, 4 robots on each of slope down 12 / 16 deg and slope up 12 / 16 deg), uncut. The terrain renders pale, so the robots are small; the sheet is evidence of behaviour only (2 of 4 survive on each up-slope, 4 of 4 on each down-slope in that run).
 
 ## Reproduce

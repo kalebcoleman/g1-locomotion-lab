@@ -16,9 +16,9 @@ Work in progress. Simulation only: Isaac Lab 3.0.0 with Newton / MuJoCo-Warp, Un
 
 <sub>The previous policy (R9hg, 50%): four lying starts, the 1.5 s rise at half speed. The current policy reaches 68%.</sub>
 
-<p align="center"><img src="media/recovery_before_after.gif" alt="An earlier policy in a forward fold (left) and the first stand-up policy standing (right), same 16 starts"></p>
+<p align="center"><img src="media/recovery_before_after.gif" alt="An earlier policy in a forward fold (left) and the previous best policy standing (right), same 16 starts"></p>
 
-<sub>Earlier forward fold (left) and the first stand-up policy (right, 50%); the current policy reaches 68%.</sub>
+<sub>Earlier forward fold (left) and the previous best policy (R9hg, right, 50%); the current policy reaches 68%.</sub>
 
 ## Architecture
 
