@@ -49,13 +49,13 @@ Selection rule: successive halving on `Curriculum/lying_ever_supported`, `lying_
 ## Throughput
 1 job: ~160 k/s (while two 4096-env jobs ran). 3 jobs: ~300 k/s combined (~100 k each). 6 jobs: ~43 k/s each (~260-300 k/s combined). Combined throughput saturates near 300 k/s at the GPU's 300 W cap, so more than ~3 jobs only divides it. VRAM ~7.7 GB per 16384-env job.
 
-## Action-scale verification (2026-11-06; requested by Kaleb), `results/actdiag_*.json`, on real simulated DEV-set states
+## Action-scale verification (2026-11-06; requested by Kaleb), `archive/results/actdiag_*.json`, on real simulated DEV-set states
 - Mean equivalence of the scale-1.0 checkpoint (`laneA_v1_situp_it999_scale1p0.pt`) vs the original at scale 0.5: joint-target difference max 2.4e-6 rad, mean 3e-7 rad. Confirmed at t=0 only; R5's training then diverges by design.
 - Distribution (both, same in rad): target offset |mean| 0.25 rad, p99 1.6 rad. Raw |a| at scale 0.5: mean 0.49, p99 3.21, max 10.56; at scale 1.0: mean 0.25, p99 1.6, max 5.06. Output layer is linear and `clip_actions` is null, so the network itself never saturates; the effective saturation is joint targets beyond limits: 1.7% of joint-steps beyond soft, 1.0% beyond hard, up to 2.66 rad beyond soft (right elbow).
 - **Correction:** I had claimed a deep knee tuck was out of reach because it needs a mean action near 3.4 at scale 0.5. Raw actions already reach p99 3.2 and max 10.6, so reach of the MEAN is not the bottleneck. R5 tests only doubled exploration noise (0.16 -> 0.32 rad) plus any learning-dynamics effect of the rescaled output. To re-check on R5's trained checkpoints with `scripts/diag_actions.py`.
 - Sit-up policy past HARD limits on 9.5% of steps (any joint), up to 0.22 rad (hip pitch); soft 16.5%. Led to criteria v2.1.
 
-## Check at iteration 300 (from-scratch runs; 2026-11-06 ~22:40), DEV set, assist OFF, criteria v2.1, plus video review (`media/20261106_224419_chk300_*`)
+## Check at iteration 300 (from-scratch runs; 2026-11-06 ~22:40), DEV set, assist OFF, criteria v2.1, plus video review (`archive/media/20261106_224419_chk300_*`)
 | run | ckpt | legacy | strict | v2 | v2.1 | ever supported | never rose | rose not upright | peak vz | pos-limit steps | past-hard steps | behaviour on video |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
 | R4 | 1300 | 0 | 0 | 0 | 0 | 0 | 168 | 88 | 0.63 | 0.00 | 0.0% | sits |
@@ -64,7 +64,7 @@ Selection rule: successive halving on `Curriculum/lying_ever_supported`, `lying_
 | R4n scratch | 300 | 0 | 0 | 0 | 0 | 0 | 109 | 147 | 0.65 | 0.01 | 0.0% | sits, torso upright |
 | R6b | 1300 | 0 | 0 | 0 | 0 | 0 | 0 | 256 | 1.13 | 0.05 | 0.2% | sprawled/folded, pelvis raised |
 | R6c scratch | 350 | 0 | 0 | 0 | 0 | 0 | 0 | 256 | 1.24 | 0.40 | 3.3% | **all robots in a forward fold within ~1 s, then hold it** |
-**No valid get-up.** Diagnosis of R6c (`runs/probeH_V.log`): pelvis 0.52 m, imu_link 0.38 m, feet near the floor, pelvis up-vector **-0.97** (torso upside down). `upright = clamp(up, 0, 1)` is exactly 0 there: no gradient to uncurl. head_link/torso_link report the pelvis origin in this USD (`runs/probeH_stand.log`), imu_link does not (0.846 m standing).
+**No valid get-up.** Diagnosis of R6c (`archive/runs/probeH_V.log`): pelvis 0.52 m, imu_link 0.38 m, feet near the floor, pelvis up-vector **-0.97** (torso upside down). `upright = clamp(up, 0, 1)` is exactly 0 there: no gradient to uncurl. head_link/torso_link report the pelvis origin in this USD (`archive/runs/probeH_stand.log`), imu_link does not (0.846 m standing).
 R4 vs R4n: assist made no visible difference at this stage (assist level stayed 1.0, no supported stands). R6 vs R4: the height-dominant reward moved the failure from "sits" to "fold": every pose rises above 0.35 m, none is upright.
 **Pruned (mine; checkpoints kept):** R4, R4n, R5, R4n-scratch, R6b. **Kept as control:** R6c scratch.
 
@@ -78,7 +78,7 @@ R4 vs R4n: assist made no visible difference at this stage (assist level stayed 
 
 **Documentation (23:22):** added the system overview and dark diagrams (now under `recovery/architecture/`; originally `docs/`). No run was changed or restarted.
 
-## v15 check (2026-11-06 23:28 onward), DEV, assist off, criteria v2.1, uncut video review (`media/20261106_235_chkv15_*`, `results/chk_v15_*`)
+## v15 check (2026-11-06 23:28 onward), DEV, assist off, criteria v2.1, uncut video review (`archive/media/20261106_235_chkv15_*`, `archive/results/chk_v15_*`)
 Columns: v2.1 passes, strict 2 s supported stands, soft-limit %, hard-limit %, peak pelvis upward speed mean/max (m/s), then robots reaching seated, fold, crouch on feet, high on feet, any supported stand, supported 1 s.
 | checkpoint | v2.1 | 2 s | soft | hard | peak vz | seated | fold | crouch | high | any | 1 s |
 |---|---|---|---|---|---|---|---|---|---|---|---|
@@ -97,7 +97,7 @@ Reward effect (R7x vs R6c, same seed, envs, PPO and starts): R7u did not change 
 Warm start: R7u warm stayed in the fold, same as R7u from scratch after 300 new iterations; more soft-limit steps (56% vs 42%), fewer hard-limit steps (1.2% vs 7.4%). It's a separate arm, not a matched comparison: its critic trained on the R6 reward and it carries 350 extra iterations.
 Reward magnitude per episode (latest logged, R6c it960, R7u it501, R7h it501, R7m it502, R7u warm it849): height 8.69, 8.22, 9.27, 8.36, 8.43; upright 0.00, 0.32, 1.81, 1.75, 0.17; stand 0, 0, 2.58, 2.41, 0; action rate -0.51, -0.59, -1.08, -1.28, -0.47; position limits -0.23, -0.11, -0.23, -0.26, -0.07; flight -0.13, -0.16, -0.41, -0.58, -0.10.
 
-**Audit of R7m it350 (`recovery/scripts/diag_trace.py`, `audit_trace.py`, `results/audit_R7m_it350.json`). NOT counted as a recovery.** A retest scored 21 v2.1 and 73 strict (first run 29 and 76). Of the 21: all weight on the feet during the hold (about 200 N + 146 N; hands, arms, knees, trunk 0 N), no assist, no flight or launch breach. But the feet are 0.87-0.90 m apart during the hold, after a splay to about 1.3 m within 0.5 s; pelvis about 0.62 m against 0.69 m for a normal stand; longest supported run 2.0-3.7 s; 18 of 21 no longer supported at the end, most dropping to a kneel at about 8 s (pelvis 0.44 m, feet 0.37 m apart); peak torque 3.2-6.1x Unitree's limits, above them on 5.8-11.8% of steps, so 0 of 21 meet the proposed 3a. Supine: 0 of 64 in both evaluations. Iteration 400 fell to 0 passes, so the behaviour isn't stable across training either.
+**Audit of R7m it350 (`recovery/scripts/diag_trace.py`, `audit_trace.py`, `archive/results/audit_R7m_it350.json`). NOT counted as a recovery.** A retest scored 21 v2.1 and 73 strict (first run 29 and 76). Of the 21: all weight on the feet during the hold (about 200 N + 146 N; hands, arms, knees, trunk 0 N), no assist, no flight or launch breach. But the feet are 0.87-0.90 m apart during the hold, after a splay to about 1.3 m within 0.5 s; pelvis about 0.62 m against 0.69 m for a normal stand; longest supported run 2.0-3.7 s; 18 of 21 no longer supported at the end, most dropping to a kneel at about 8 s (pelvis 0.44 m, feet 0.37 m apart); peak torque 3.2-6.1x Unitree's limits, above them on 5.8-11.8% of steps, so 0 of 21 meet the proposed 3a. Supine: 0 of 64 in both evaluations. Iteration 400 fell to 0 passes, so the behaviour isn't stable across training either.
 Training stat: `lying_strict_hold` stays 0 while deterministic evaluation finds 2 s holds, consistent with exploration noise (std about 0.9) preventing holds in training; this supports the reviewer's E3 once supported stands are stable.
 
 ## v16 (launched 2026-11-06 23:52; seed 3, 16384 envs, 1000 its, scratch), plan from Kaleb's independent review; R7* = R7m
@@ -109,10 +109,10 @@ Reviewer claims confirmed in code before acting: R1-R7 stand bonus uses the pelv
 | `20261106-235215` | R8s (E2) | R8 + supine family (phi 270 +- 30 deg) + 30-step passive settle | R8 on supine DEV poses |
 | `20261106-235216` | R8p (E2) | R8 + prone family (phi 90 +- 30 deg) + 30-step passive settle | R8 on prone DEV poses |
 Deviations from the review: control is R8 (with the stand fix), not an exact R7m replicate; the running R7m serves as R8's control. E2 changes two things together, as specified. Settle sets the target to the measured joint position instead of zero action, because zero action would drive stiffly to the default pose; target updates at 50 Hz, so stiffness isn't fully off (mean of per-robot largest joint torque over the 30 steps: 11 Nm, against 32-68 Nm afterwards).
-Verified on simulator states (`recovery/scripts/verify_r8.py`, `runs/verify_R8*.log`): family sampling (gravity along body x -0.94 supine, +0.94 prone), feet share 0.997 during supported stands, stand bonus 0 when unsupported, prop force 0 during those stands.
+Verified on simulator states (`recovery/scripts/verify_r8.py`, `archive/runs/verify_R8*.log`): family sampling (gravity along body x -0.94 supine, +0.94 prone), feet share 0.997 during supported stands, stand bonus 0 when unsupported, prop force 0 during those stands.
 Queued: E3 exploration schedule after stable supported stands. Proposed, not started: E4 train with Unitree's real torque limits, because nothing can pass 3a at scale while the model allows 300 Nm; E5 a stance-width term if the straddle returns.
 
-## Amendment 3 re-evaluation (2026-11-07 00:07, DEV, assist off; `results/a3_*`, `results/selfpen_R7m_it350.json`)
+## Amendment 3 re-evaluation (2026-11-07 00:07, DEV, assist off; `archive/results/a3_*`, `archive/results/selfpen_R7m_it350.json`)
 Headline stays v2.1. Columns: v2.1, strict 2 s, v2.1 + torque (3a), v2.1 + all draft clauses, strict + still supported in the final second, robots within torque limits, soft %, hard %, rising-window seconds.
 | checkpoint | v2.1 | strict | +3a | all | strict + persists | torque OK | soft | hard | rise s |
 |---|---|---|---|---|---|---|---|---|---|
@@ -135,7 +135,7 @@ R7m it350 across five evaluations: v2.1 18-29, strict 67-76.
 Self-penetration screen, a later R7m it350 trace: 22 of 22 v2.1 robots pass 3b (over 2 cm on at most 3% of frames), 10 have none; median worst depth 2.3 cm; most frequent pairs are ankle against fingers and hip against palm. Upper bound at 10 Hz.
 Rising window, R7m it350 strict robots: soft 8-9% of steps, hard about 1%, torque above Unitree's limits on about 15% (run-level means over 5 s, against about 10% over the whole episode).
 
-**R7m and R7h at iteration 500: a stable straddle, v2.1 = 0 (`media/20261107_001_*`, `runs/traces/R7[hm]_it500.npz`).** Strict supported stand on 255/256 and 256/256, all four directions, rising in about 1-1.5 s, still up at the end, no contact except the feet, pelvis 0.70 and 0.67 m, up 0.95 and 0.98, speed under 0.05 m/s. It fails v2.1 because one ankle roll sits at its hard stop (+-0.262 rad) on 75-83% of steps, 0.011-0.017 rad past it (95th percentile). The stance is why: feet 0.72 and 0.89 m apart at the end, so the foot lies flat only with the ankle at its stop. Also fails 3a and 3d; it passes 3c. Not counted, and the criteria are not being relaxed for it. It's the closest behaviour so far.
+**R7m and R7h at iteration 500: a stable straddle, v2.1 = 0 (`archive/media/20261107_001_*`, `archive/runs/traces/R7[hm]_it500.npz`).** Strict supported stand on 255/256 and 256/256, all four directions, rising in about 1-1.5 s, still up at the end, no contact except the feet, pelvis 0.70 and 0.67 m, up 0.95 and 0.98, speed under 0.05 m/s. It fails v2.1 because one ankle roll sits at its hard stop (+-0.262 rad) on 75-83% of steps, 0.011-0.017 rad past it (95th percentile). The stance is why: feet 0.72 and 0.89 m apart at the end, so the foot lies flat only with the ankle at its stop. Also fails 3a and 3d; it passes 3c. Not counted, and the criteria are not being relaxed for it. It's the closest behaviour so far.
 
 ## v16 addition (launched 00:13): E5 stance-width penalty, because the straddle returned
 `stance_excess`: distance between the feet above 0.45 m, scaled to 1 at 0.90 m, above 0.40 m pelvis height; weight -5. Hypothesis: the wide stance is the cheapest stable stand, and narrowing it also removes the ankle-roll stop. Failure modes: refuses to rise, or returns to the fold (the fast splay is its route up). Verified on real states from R7m it500: penalty 0.75-0.98 during supported stands, so it does act on this behaviour.
@@ -146,9 +146,9 @@ Rising window, R7m it350 strict robots: soft 8-9% of steps, hard about 1%, torqu
 
 ## Criteria v3 approved, E4 real torque limits (2026-11-07 00:25)
 Kaleb approved Amendment 3 and the real-torque run. Headline is now v3 (`EVAL_PROTOCOL.md`); earlier results keep their labels.
-E4 `20261107-002528` R8t: R8 with real limits, scratch, seed 3, control R8. Hip pitch and yaw 88, hip roll and knee 139, ankle 50, torso 88, shoulder and elbow 25 Nm; fingers 5 Nm (assumption, no published Dex3 value found). Gains, position and velocity limits unchanged. Read back from the simulator (`runs/verify_R8t.log`).
+E4 `20261107-002528` R8t: R8 with real limits, scratch, seed 3, control R8. Hip pitch and yaw 88, hip roll and knee 139, ankle 50, torso 88, shoulder and elbow 25 Nm; fingers 5 Nm (assumption, no published Dex3 value found). Gains, position and velocity limits unchanged. Read back from the simulator (`archive/runs/verify_R8t.log`).
 
-**Walking policy under real limits** (`runs/walk_only_R8t_realtorque.json`, same protocol, 256 robots): walk 256/256, 6.08 m along heading, tracking error 0.088. Turn: 17 falls and 239 at 90 degrees or more, against 6 and 250 with the original limits. The walking policy was not retrained.
+**Walking policy under real limits** (`archive/runs/walk_only_R8t_realtorque.json`, same protocol, 256 robots): walk 256/256, 6.08 m along heading, tracking error 0.088. Turn: 17 falls and 239 at 90 degrees or more, against 6 and 250 with the original limits. The walking policy was not retrained.
 
 **DEV, assist off, no retraining.** v3 pre = v2.1 + 3a + 3c + 3d, before the offline 3b check.
 | checkpoint, limits | v2.1 | v3 pre | strict | persists | torque OK | soft | hard | flight | stance median | rise s |
@@ -159,7 +159,7 @@ E4 `20261107-002528` R8t: R8 with real limits, scratch, seed 3, control R8. Hip 
 | R7m it650, real | 0 | 0 | 256 | 256 | 256 | 89.7 | 59.3 | 4.24 | 0.75 | 2.45 |
 | **R7h it650, original** | **174** | 0 | 256 | 256 | 74 | 2.7 | 0.5 | 1.67 | 0.89 | 0.84 |
 | R7h it650, real | 13 | 0 | 225 | 225 | 256 | 17.3 | 6.6 | 4.51 | 0.87 | 2.19 |
-R7h it650 passes the old v2.1 on 174/256 but v3 on 0: its stance is 0.89 m, and 182 of 256 robots exceed Unitree's torque limits on more than 3% of steps. Under real limits it stays up but mostly fails v2.1 (flight, position limits). Audit in `results/audit_R7h_it650.json`.
+R7h it650 passes the old v2.1 on 174/256 but v3 on 0: its stance is 0.89 m, and 182 of 256 robots exceed Unitree's torque limits on more than 3% of steps. Under real limits it stays up but mostly fails v2.1 (flight, position limits). Audit in `archive/results/audit_R7h_it650.json`.
 
 ## Candidate R9h (launched 00:34), not a controlled comparison
 `20261107-003416` R9h: R7h's height reward + supported stand bonus + stance penalty + real torque limits, warm from R7h it650 (`init/R7h_stand_it650.pt`, sha256 bd9aff4d44a64dd8...), fresh optimiser, 500 iterations. A direct attempt at v3, changing several things at once; only DEV under v3 can judge it, and it can't attribute any effect to one change. Baseline: R7h it650 under real limits, table above.
@@ -184,11 +184,11 @@ E1 and E2 have not reached a supported stand by iteration 450. R8 (control) reac
 **Why standing robots fail v3** (R9h it900, 256 strict): airborne on more than 2% of steps 228, of which 128 fail only that rule; soft limits 48; hard steps 27; hard excess 68; stance 17; torque 0. Airborne steps come mostly during the rise, mostly single 20 ms samples (1046 of 1897 streaks are one step), highest foot about 6 cm up, pelvis speed about 0.85 m/s. The contact sensor stores the last 3 physics substeps; the frozen rule uses only the latest one.
 **Proposed Amendment 4 (measurement), NOT adopted, needs Kaleb's approval:** count a step airborne only if no contact on all 3 stored substeps. It would loosen an approved rule after seeing results, so it's reported separately: R9h it900 v3-before-3b 122/256 with it against 11-18 without; R8w warm it850 19 against 3.
 
-**3b self-penetration, the decisive check** (`results/selfpen_*.json`, 48 strict robots each): R9h it900: 0 of 48 pass; the left hand sits inside the right hip on about 97% of frames, up to 12 cm deep. R8w warm it850: 33 of 48 pass; overlaps are brief (torso against upper arm). R7h it650: 0 of 40, fingers inside the pelvis.
-**First full v3 passes:** in the R8w warm it850 trace, DEV poses 5 (prone) and 16 (side_a) pass every v3 clause including 3b. Uncut close-up `media/20261107_02_R8wW_it850_v3poses.mp4`: upright, moderate stance, no hand contact, up by about 1 s, holds to 10 s. That is 2 of the 48 robots checked for 3b, about 1% of DEV, one seed, DEV only. Not a headline result.
+**3b self-penetration, the decisive check** (`archive/results/selfpen_*.json`, 48 strict robots each): R9h it900: 0 of 48 pass; the left hand sits inside the right hip on about 97% of frames, up to 12 cm deep. R8w warm it850: 33 of 48 pass; overlaps are brief (torso against upper arm). R7h it650: 0 of 40, fingers inside the pelvis.
+**First full v3 passes:** in the R8w warm it850 trace, DEV poses 5 (prone) and 16 (side_a) pass every v3 clause including 3b. Uncut close-up `archive/media/20261107_02_R8wW_it850_v3poses.mp4`: upright, moderate stance, no hand contact, up by about 1 s, holds to 10 s. That is 2 of the 48 robots checked for 3b, about 1% of DEV, one seed, DEV only. Not a headline result.
 
 ## v17 (launched 02:24): self-collision on, because 3b is the binding constraint
-Self-collision verified to act: with R9h it900, robots with hand or elbow contact force went from 0-1 of 128 to 34-45 (`runs/verify_R9h*.log`). `nconmax` 80 -> 160.
+Self-collision verified to act: with R9h it900, robots with hand or elbow contact force went from 0-1 of 128 to 34-45 (`archive/runs/verify_R9h*.log`). `nconmax` 80 -> 160.
 | job | task | change | start |
 |---|---|---|---|
 | `20261107-022451` | R9hc | R9h + self-collision | warm from R9h it900 (`init/R9h_it900.pt`, sha256 b6f98eb7956b8fde...) |
@@ -219,14 +219,14 @@ The training flight penalty in R9hc/R8wc has the same loophole, which may have t
 | R9hc it1150 | 10 | 3, 2, 1, 4 | 137 | 255 | 0.43 | 9.5 | 1.7 |
 | R8wc it1100 | 3 | 0, 0, 2, 1 | 159 | 256 | 0.35 | 8.1 | 2.4 |
 | R8f it900 / R8p it900 / R8 it900 | 0 / 0 / 0 | - | 0 / 0 / 20 | 256 / 255 / 256 | 0.73 / 0.86 / 0.77 | 84 / 89 / 22 | 51 / 7 / 2 |
-R9hg it1100 3b: 64 of 64 checked robots pass. Single evaluation, one seed, DEV (used for selection). Video `media/20261107_03_R9hg_it1100_*`: rises in about 1 s, upright, normal stance, feet only.
+R9hg it1100 3b: 64 of 64 checked robots pass. Single evaluation, one seed, DEV (used for selection). Video `archive/media/20261107_03_R9hg_it1100_*`: rises in about 1 s, upright, normal stance, feet only.
 
 ## Kaleb's direction (2026-11-07 ~04:00): build on the referenced code itself
 The documents from the Fable review (`kalebcoleman/g1-recovery` PR #1: `research/recovery_review_2026-11-07.md`, `research/REFERENCES.md`) were meant as the code base to use, not only as ideas. Cloned read-only into `~/isaac-workspace/external_src/` (not vendored): g1-humanoid-rl @224d579 (MIT), HoST @70bb580 (MIT), HumanUP @7516e0f (Apache-2.0), mjlab @dcdf6ce (Apache-2.0).
 - **g1-humanoid-rl ch. 14** (`recovery-task/`): height ramp 10, upright 2, action rate -0.03, no success termination, four lying resets, and it keeps mjlab's G1 terms (pose, dof limits, body angular velocity -0.05, angular momentum -0.02, self-collision cost -1). Our R6 recipe already matches its core; its self-collision cost and smaller penalties were not used.
 - **HoST** is the full method our recipes only borrowed from. Ported in `g1_recovery/host_port.py` and `scripts/train_host.py`: four reward groups (task = orientation x head height; regularisation; style; post-task target) with HoST's terms and scales; a multi-critic PPO (one critic per group, per-critic advantage normalisation, group weights 2.5/0.1/1/1, smoothness regulariser, adaptive KL 0.01, 50 steps per env, 5 x 4 updates); relative joint targets recomputed every physics substep with the 1.0 -> 0.25 action-rescale curriculum; 30 unactuated steps; 200 N pulling force while upright with its decay curriculum (training only; evaluation tasks `G1-Host-*-Eval-v0` have it off); 6-step observation history; actor 512-256-128 (tanh), critics 512-256; init std 0.8, entropy 0.01; HoST PD gains; terminations at base speed 20 m/s or joint speed 300 rad/s; one policy per fall family (supine, prone) as in HoST.
 - Robot and protocol differences: 37 joints (fingers excluded from style and limit terms); real torque limits; self-collision on; our DEV-like start sampler restricted to one family (+-30 deg) instead of HoST's fixed quaternion; head point = torso_link + R(0, 0, 0.45) and foot corners from HoST's URDF offsets; target base height 0.72 m (HoST 0.75 m). No HoST domain randomisation beyond our env's friction and mass events. HoST trains 12,000 iterations on 4096 envs; these runs use 8192 envs and 6000 iterations.
-- Launched outside the Isaac MCP (`runs/host_Supine.log`, `runs/host_Prone.log`, checkpoints in `runs/host_*`), because `isaaclab__train` only runs Isaac Lab's rsl_rl script and cannot run a custom multi-critic trainer. MCP gap to fix: custom training entry points.
+- Launched outside the Isaac MCP (`archive/runs/host_Supine.log`, `archive/runs/host_Prone.log`, checkpoints in `archive/runs/host_*`), because `isaaclab__train` only runs Isaac Lab's rsl_rl script and cannot run a custom multi-critic trainer. MCP gap to fix: custom training entry points.
 - HumanUP's two-stage method (discovery, then tracking of the policy's own rollouts) is the next port if HoST stalls.
 
 ## Candidate R9hg it1100: DEV repeats, HELDOUT x3, self-penetration (2026-11-07 04:20)
@@ -237,7 +237,7 @@ DEV (selection set), v3 before 3b with ground-only flight: 94, 95, 97 / 256 (thr
 | 1 | 128 | 128 | 128 (50.0%) | 29 | 47 | 19 | 33 | 213 | 256 |
 | 2 | 127 | 127 | 127 (49.6%) | 35 | 48 | 15 | 29 | 208 | 255 |
 | 3 | 129 | 129 | 129 (50.4%) | 31 | 52 | 19 | 27 | 211 | 256 |
-3b from a separate HELDOUT trace of the same checkpoint (`results/selfpen_R9hg_it1100_HELDOUT.json`): 256/256 robots pass, median worst depth 4 mm (10 Hz, convex-hull bound).
+3b from a separate HELDOUT trace of the same checkpoint (`archive/results/selfpen_R9hg_it1100_HELDOUT.json`): 256/256 robots pass, median worst depth 4 mm (10 Hz, convex-hull bound).
 By family, out of 64: prone 47-52 (73-81%), side_a 29-35 (45-55%), supine 27-33 (42-52%), side_b 15-19 (23-30%). **The 50% is an average across families; it does not hold for side_b or supine.**
 HELDOUT is easier than DEV in limb noise: half its poses have 0.1 rad instead of 0.4 rad.
 Limitations: one seed, and a warm-start chain (R7h scratch it650 -> R9h -> R9hc -> R9hg), so nothing yet about seed robustness. TEST untouched. Not yet chained to walking.
@@ -256,12 +256,12 @@ Assist off: 0 supported stands for either policy. Own family, of 64: supine poli
 ## 08:40 check and chain replication
 - **HoST port it1200: evaluation bug found and fixed.** The evaluator ran the policy at action rescale 1.0, but training had annealed it to 0.32 (supine) / 0.50 (prone), so actions were 2-3x too large (ground-flight 57-61%). The evaluator now uses `G1R_HOST_RESCALE`; checkpoints from `train_host.py` will record `rescale_mean` from the next restart on (the running trainers use the old code; values come from `train_log.jsonl`). At the trained rescale, own family of 64: supported stand reached 54 (supine) / 64 (prone), 1 s 0, v3 0; soft limits 99%, hard 90-95% of steps, ground flight 15-20%. Force fully decayed (0 N).
 - **R9hg recipe from scratch, seeds 4 and 5: no stand by iteration 1000** (high_on_feet 0; v3 0). Cancelled. The seed-3 candidate depends on its warm-start chain.
-- **Exact chain replication** (`recovery/scripts/chain_replicate.sh 4|5`, logs `runs/chain_s*`): R7h scratch -> model_650 -> R9h -> model_900 -> R9hc -> model_1000 -> R9hg -> model_1100, hand-over iterations fixed in advance from seed 3 (no DEV look between stages). Run outside the MCP because stages must start automatically. My first two launches failed before training (run-folder matching between concurrent seeds, missing `OMNI_KIT_ACCEPT_EULA`); both fixed, training started 08:47.
+- **Exact chain replication** (`recovery/scripts/chain_replicate.sh 4|5`, logs `archive/runs/chain_s*`): R7h scratch -> model_650 -> R9h -> model_900 -> R9hc -> model_1000 -> R9hg -> model_1100, hand-over iterations fixed in advance from seed 3 (no DEV look between stages). Run outside the MCP because stages must start automatically. My first two launches failed before training (run-folder matching between concurrent seeds, missing `OMNI_KIT_ACCEPT_EULA`); both fixed, training started 08:47.
 
 ## 2026-11-07 09:40-12:30: interruptions and fixes
 - All training processes died together when the previous Claude Code session ended (no reboot; setsid did not protect them). Restarted as systemd user services (`systemctl --user list-units 'g1-*'`): HoST supine/prone resumed from model_1500 with the force (0 N) and rescale (0.26 / 0.25) restored via `G1R_HOST_FORCE_START` / `G1R_HOST_RESCALE` (optimiser state not saved); chains restarted from scratch.
 - The two chain drivers started in the same second, so Isaac Lab gave their first stages the same log folder and their checkpoints overwrote each other. The surviving chain ("replicate A", now in stage R9h) is a valid replicate from either seed 4 or seed 5, not attributable. Seed 5 restarted with `chain_replicate_v2.sh` (unique `--run_name` per seed and stage). The original script was restored byte-for-byte for the running driver after an edit while it was being read.
-- HoST prone it2200 trace (`runs/traces/host_prone.npz`): on its own family, joints sit past their hard limits on ~94% of steps (ankle roll, hip yaw +-2.75, hip pitch 3.05, ankle pitch, shoulder roll), 0 strict stands. Cause: MJWarp joint limits are compliant (HoST trained on PhysX with stiff limits), HoST's actions are offsets from the current position, and its -100 limit penalty sits in the 0.1-weighted regularisation group. Proposed fix (awaiting approval): clamp joint targets to the limits inside the action.
+- HoST prone it2200 trace (`archive/runs/traces/host_prone.npz`): on its own family, joints sit past their hard limits on ~94% of steps (ankle roll, hip yaw +-2.75, hip pitch 3.05, ankle pitch, shoulder roll), 0 strict stands. Cause: MJWarp joint limits are compliant (HoST trained on PhysX with stiff limits), HoST's actions are offsets from the current position, and its -100 limit penalty sits in the 0.1-weighted regularisation group. Proposed fix (awaiting approval): clamp joint targets to the limits inside the action.
 - Public repo: PR #1 (videos, pictures, architecture), #2 (short README) and #3 (badges, GIFs, results table) merged into kalebcoleman/g1-locomotion-lab main.
 
 ## Replication result (2026-11-07 23:10; all runs finished; criteria v3 with ground-only flight)
@@ -347,4 +347,5 @@ Overnight run; decisions made by the agent within the stated limits. Training GP
 - **Previous baseline preserved:** `R9hg_it1100`, sha256 `665a89f58b3a3d76a13197836c2eeacd78df7e59a34a661269ab55d1384fdcf8`. It was only on the lab host (`checkpoints/R9hg_it1100_candidate.pt`, untracked); a tracked copy with the same bytes is now `recovery/checkpoints/R9hg_it1100_previous_baseline.pt`. The lab-host file and every other checkpoint file were left untouched; nothing was deleted or overwritten.
 - **Docs updated (additions and relabelling only):** `STATUS.md` (current baseline line; the R9hg line is now labelled previous), `recovery/README.md` (new status line, "Current baseline: recC" section with the matched contact sheets, the old section relabelled "Previous baseline: R9hg"), `pilots/humanlike_20261108/ROADMAP.md` (header), `pilots/g4_humanlike_getup_20261108/README.md` (adoption note), and a new `recovery/checkpoints/README.md` (roles, hashes, provenance chain, training setup, metrics, limits).
 - **Default checkpoint pointers:** the repo has none (every script takes `--checkpoint`). The M2 and M2b scripts keep `checkpoints/R9hg_it1100_candidate.pt` because their recorded results were measured with it; `recovery/checkpoints/README.md` says how to repeat them with the new baseline. The environment task id stays `G1-Recovery-R9hg-v0` (the observation and action layout are unchanged).
+- **Update 2026-11-10:** the M2, M2b and Goal 4 scripts now default to the tracked copy `recovery/checkpoints/R9hg_it1100_previous_baseline.pt` (the lab-host candidate file never existed in the repo) and accept a `RECOVERY_CKPT` override, so they can be rerun with `recC` without editing. The note in `recovery/checkpoints/README.md` matches.
 - GPU-hours: 0.00 for this change.

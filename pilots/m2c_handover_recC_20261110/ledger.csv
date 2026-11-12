@@ -1,0 +1,54 @@
+name,start_epoch,end_epoch,duration_s,rc,variant_flags
+m2c_base_r1_s2,1794370092,1794370121,29,rc=0,
+m2c_base_r1_s3,1794370531,1794370559,28,rc=0,
+m2c_base_r1_s4,1794370559,1794370588,29,rc=0,
+DONE r1 base
+m2c_base_r2_s2,1794370588,1794370617,29,rc=0,
+m2c_base_r2_s3,1794370617,1794370645,28,rc=0,
+m2c_base_r2_s4,1794370645,1794370673,28,rc=0,
+DONE r2 base
+m2c_base_r3_s2,1794370673,1794370701,28,rc=0,
+m2c_base_r3_s3,1794370702,1794370730,28,rc=0,
+m2c_base_r3_s4,1794370730,1794370758,28,rc=0,
+DONE r3 base
+m2c_base_fresh_s5,1794370758,1794370786,28,rc=0,
+m2c_base_fresh_s6,1794370786,1794370814,28,rc=0,
+m2c_base_fresh_s7,1794370814,1794370842,28,rc=0,
+DONE fresh base
+m2c_blendupper50_r1_s2,1794370842,1794370871,29,rc=0,--settle 50 --blend 50 --blend_joints upper
+m2c_blendupper50_r1_s3,1794370871,1794370904,33,rc=0,--settle 50 --blend 50 --blend_joints upper
+m2c_blendupper50_r1_s4,1794370904,1794370933,29,rc=0,--settle 50 --blend 50 --blend_joints upper
+DONE r1 blendupper50
+m2c_blendupper50_r2_s2,1794370933,1794370961,28,rc=0,--settle 50 --blend 50 --blend_joints upper
+m2c_blendupper50_r2_s3,1794370961,1794370990,29,rc=0,--settle 50 --blend 50 --blend_joints upper
+m2c_blendupper50_r2_s4,1794370990,1794371018,28,rc=0,--settle 50 --blend 50 --blend_joints upper
+DONE r2 blendupper50
+m2c_blendupper50_r3_s2,1794371018,1794371047,29,rc=0,--settle 50 --blend 50 --blend_joints upper
+m2c_blendupper50_r3_s3,1794371047,1794371075,28,rc=0,--settle 50 --blend 50 --blend_joints upper
+m2c_blendupper50_r3_s4,1794371075,1794371103,28,rc=0,--settle 50 --blend 50 --blend_joints upper
+DONE r3 blendupper50
+m2c_blendupper50_fresh_s5,1794371103,1794371131,28,rc=0,--settle 50 --blend 50 --blend_joints upper
+m2c_blendupper50_fresh_s6,1794371131,1794371167,36,rc=0,--settle 50 --blend 50 --blend_joints upper
+m2c_blendupper50_fresh_s7,1794371167,1794371203,36,rc=0,--settle 50 --blend 50 --blend_joints upper
+DONE fresh blendupper50
+m2c_ready_upper50_r1_s2,1794371203,1794371239,36,rc=0,--trigger ready --settle 50 --blend 50 --blend_joints upper
+m2c_ready_upper50_r1_s3,1794371239,1794371276,37,rc=0,--trigger ready --settle 50 --blend 50 --blend_joints upper
+m2c_ready_upper50_r1_s4,1794371276,1794371312,36,rc=0,--trigger ready --settle 50 --blend 50 --blend_joints upper
+DONE r1 ready_upper50
+m2c_ready_upper50_r2_s2,1794371312,1794371348,36,rc=0,--trigger ready --settle 50 --blend 50 --blend_joints upper
+m2c_ready_upper50_r2_s3,1794371348,1794371383,35,rc=0,--trigger ready --settle 50 --blend 50 --blend_joints upper
+m2c_ready_upper50_r2_s4,1794371383,1794371419,36,rc=0,--trigger ready --settle 50 --blend 50 --blend_joints upper
+DONE r2 ready_upper50
+m2c_ready_upper50_r3_s2,1794371419,1794371455,36,rc=0,--trigger ready --settle 50 --blend 50 --blend_joints upper
+m2c_ready_upper50_r3_s3,1794371455,1794371491,36,rc=0,--trigger ready --settle 50 --blend 50 --blend_joints upper
+m2c_ready_upper50_r3_s4,1794371491,1794371527,36,rc=0,--trigger ready --settle 50 --blend 50 --blend_joints upper
+DONE r3 ready_upper50
+m2c_ready_upper50_fresh_s5,1794371527,1794371563,36,rc=0,--trigger ready --settle 50 --blend 50 --blend_joints upper
+m2c_ready_upper50_fresh_s6,1794371563,1794371600,37,rc=0,--trigger ready --settle 50 --blend 50 --blend_joints upper
+m2c_ready_upper50_fresh_s7,1794371600,1794371636,36,rc=0,--trigger ready --settle 50 --blend 50 --blend_joints upper
+DONE fresh ready_upper50
+SWEEP_DONE
+VIDEOS_DONE
+demo_blend_try1,seed=3,cam_env=0,rc=0
+demo1_s3,seed=3,level=3.5,rc=0
+demo2_s3,seed=3,level=3.5,rc=0

@@ -1,0 +1,12 @@
+# CPU-only development and CI dependencies for the unit tests.
+#
+# Isaac Lab and Isaac Sim are NOT pip-installable and are not needed by `make test`;
+# see docs/SETUP.md for the simulation setup.
+#
+# torch comes from the CPU wheel index so CI does not download the CUDA build:
+#   pip install torch==2.11.0 --index-url https://download.pytorch.org/whl/cpu
+#   pip install -r requirements-dev.txt
+
+numpy==2.5.4
+torch==2.11.0
+gymnasium==1.4.0        # imported by recovery/g1_recovery/__init__.py at test import time

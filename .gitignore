@@ -1,7 +1,14 @@
-media-raw/
+# Python
 __pycache__/
-*.pyc
+*.py[cod]
+.pytest_cache/
+
+# Model and video binaries (the small referenced files are force-added)
 *.pt
 *.mp4
-results/raw/
 !recovery/media/*.mp4
+
+# Large raw outputs and per-run scratch
+media-raw/
+**/results/raw/
+pilots/*/logs/

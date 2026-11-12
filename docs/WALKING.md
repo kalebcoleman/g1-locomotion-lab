@@ -166,7 +166,7 @@ python "$G1LAB/scripts/eval_g1.py" --task Isaac-Velocity-Flat-G1 \
     --checkpoint logs/rsl_rl/g1_flat/<run>/model_1499.pt --num_envs 256 --train_env_cfg \
     --push_vel 0.5 --push_interval 2.5 --out result.json physics=newton_mjwarp
 
-# 3. Or the whole ladder (output goes to $G1LAB/results/raw/)
+# 3. Or the whole ladder (output goes to $G1LAB/walking/results/raw/)
 "$G1LAB/scripts/eval_ladder.sh" logs/rsl_rl/g1_flat/<run> \
     newton_mjwarp 0 50 100 200 350 500 700 1000 1499
 ```

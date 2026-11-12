@@ -1,0 +1,122 @@
+M2c: recC get-up baseline, identical protocol/pushes/walking policy to M2b; 128 envs/seed (32 no-push controls + 96 pushed per seed); numbers summed per row
+variant | block | runs | induced falls | hand-overs | re-fell | mean t-to-refall s | walked 10 s | >=3 m | full success | rate (95% Wilson CI) | per-seed success | per-seed re-fell | v3 true at switch | success with v3 true | control walking
+base | seeds 2-4, run 1 | 3 | 249 | 138 | 135 | 0.94 | 3 | 3 | 0 | 0.0% (0.0-1.5%) | [0, 0, 0] | [45, 45, 45] | 138 | 0 | 96/96
+base | seeds 2-4, run 2 | 3 | 250 | 141 | 140 | 0.98 | 1 | 1 | 1 | 0.4% (0.1-2.2%) | [1, 0, 0] | [45, 51, 44] | 141 | 1 | 96/96
+base | seeds 2-4, run 3 | 3 | 250 | 141 | 137 | 0.95 | 4 | 4 | 2 | 0.8% (0.2-2.9%) | [1, 0, 1] | [44, 45, 48] | 141 | 2 | 96/96
+base | seeds 2-4, pooled | 9 | 749 | 420 | 412 | 0.96 | 8 | 8 | 3 | 0.4% (0.1-1.2%) | [0, 0, 0, 1, 0, 0, 1, 0, 1] | [45, 45, 45, 45, 51, 44, 44, 45, 48] | 420 | 3 | 288/288
+base | fresh seeds 5-7 | 3 | 242 | 132 | 130 | 0.98 | 2 | 2 | 0 | 0.0% (0.0-1.6%) | [0, 0, 0] | [40, 46, 44] | 132 | 0 | 96/96
+
+## base: post-hand-over walking distance (mean along-heading m per completed window, mean over runs) and control reference
+base | seeds 2-4, run 1 | along m: -0.49 | control 6.17
+base | seeds 2-4, run 2 | along m: -0.56 | control 6.17
+base | seeds 2-4, run 3 | along m: -0.43 | control 6.15
+base | seeds 2-4, pooled | along m: -0.49 | control 6.17
+base | fresh seeds 5-7 | along m: -0.54 | control 6.25
+
+## base / seeds 2-4, run 1 (by push magnitude, summed over seeds in the block)
+push m/s | episodes | fell | hand-over | re-fell | walked 10 s | full success
+0.0 | 96 | control | - | - | 96 still walking | -
+2.5 | 96 | 60 | 40 | 40 | 0 | 0
+3.5 | 96 | 93 | 61 | 60 | 1 | 0
+4.5 | 96 | 96 | 37 | 35 | 2 | 0
+
+## base / seeds 2-4, run 2 (by push magnitude, summed over seeds in the block)
+push m/s | episodes | fell | hand-over | re-fell | walked 10 s | full success
+0.0 | 96 | control | - | - | 96 still walking | -
+2.5 | 96 | 62 | 42 | 42 | 0 | 0
+3.5 | 96 | 92 | 61 | 60 | 1 | 1
+4.5 | 96 | 96 | 38 | 38 | 0 | 0
+
+## base / seeds 2-4, run 3 (by push magnitude, summed over seeds in the block)
+push m/s | episodes | fell | hand-over | re-fell | walked 10 s | full success
+0.0 | 96 | control | - | - | 96 still walking | -
+2.5 | 96 | 61 | 42 | 41 | 1 | 0
+3.5 | 96 | 93 | 62 | 62 | 0 | 0
+4.5 | 96 | 96 | 37 | 34 | 3 | 2
+
+## base / fresh seeds 5-7 (by push magnitude, summed over seeds in the block)
+push m/s | episodes | fell | hand-over | re-fell | walked 10 s | full success
+0.0 | 96 | control | - | - | 96 still walking | -
+2.5 | 96 | 56 | 42 | 42 | 0 | 0
+3.5 | 96 | 90 | 55 | 53 | 2 | 0
+4.5 | 96 | 96 | 35 | 35 | 0 | 0
+blendupper50 | seeds 2-4, run 1 | 3 | 248 | 112 | 0 | None | 112 | 112 | 112 | 45.2% (39.1-51.4%) | [32, 37, 43] | [0, 0, 0] | 112 | 112 | 96/96
+blendupper50 | seeds 2-4, run 2 | 3 | 249 | 136 | 0 | None | 136 | 136 | 136 | 54.6% (48.4-60.7%) | [38, 49, 49] | [0, 0, 0] | 136 | 136 | 96/96
+blendupper50 | seeds 2-4, run 3 | 3 | 253 | 139 | 0 | None | 139 | 139 | 139 | 54.9% (48.8-61.0%) | [38, 55, 46] | [0, 0, 0] | 139 | 139 | 96/96
+blendupper50 | seeds 2-4, pooled | 9 | 750 | 387 | 0 | None | 387 | 387 | 387 | 51.6% (48.0-55.2%) | [32, 37, 43, 38, 49, 49, 38, 55, 46] | [0, 0, 0, 0, 0, 0, 0, 0, 0] | 387 | 387 | 288/288
+blendupper50 | fresh seeds 5-7 | 3 | 247 | 122 | 0 | None | 122 | 122 | 122 | 49.4% (43.2-55.6%) | [37, 47, 38] | [0, 0, 0] | 122 | 122 | 96/96
+
+## blendupper50: post-hand-over walking distance (mean along-heading m per completed window, mean over runs) and control reference
+blendupper50 | seeds 2-4, run 1 | along m: 6.69 | control 6.18
+blendupper50 | seeds 2-4, run 2 | along m: 6.69 | control 6.16
+blendupper50 | seeds 2-4, run 3 | along m: 6.68 | control 6.18
+blendupper50 | seeds 2-4, pooled | along m: 6.69 | control 6.17
+blendupper50 | fresh seeds 5-7 | along m: 6.7 | control 6.23
+
+## blendupper50 / seeds 2-4, run 1 (by push magnitude, summed over seeds in the block)
+push m/s | episodes | fell | hand-over | re-fell | walked 10 s | full success
+0.0 | 96 | control | - | - | 96 still walking | -
+2.5 | 96 | 60 | 36 | 0 | 36 | 36
+3.5 | 96 | 92 | 53 | 0 | 53 | 53
+4.5 | 96 | 96 | 23 | 0 | 23 | 23
+
+## blendupper50 / seeds 2-4, run 2 (by push magnitude, summed over seeds in the block)
+push m/s | episodes | fell | hand-over | re-fell | walked 10 s | full success
+0.0 | 96 | control | - | - | 96 still walking | -
+2.5 | 96 | 61 | 40 | 0 | 40 | 40
+3.5 | 96 | 92 | 61 | 0 | 61 | 61
+4.5 | 96 | 96 | 35 | 0 | 35 | 35
+
+## blendupper50 / seeds 2-4, run 3 (by push magnitude, summed over seeds in the block)
+push m/s | episodes | fell | hand-over | re-fell | walked 10 s | full success
+0.0 | 96 | control | - | - | 96 still walking | -
+2.5 | 96 | 63 | 45 | 0 | 45 | 45
+3.5 | 96 | 94 | 64 | 0 | 64 | 64
+4.5 | 96 | 96 | 30 | 0 | 30 | 30
+
+## blendupper50 / fresh seeds 5-7 (by push magnitude, summed over seeds in the block)
+push m/s | episodes | fell | hand-over | re-fell | walked 10 s | full success
+0.0 | 96 | control | - | - | 96 still walking | -
+2.5 | 96 | 59 | 43 | 0 | 43 | 43
+3.5 | 96 | 92 | 52 | 0 | 52 | 52
+4.5 | 96 | 96 | 27 | 0 | 27 | 27
+ready_upper50 | seeds 2-4, run 1 | 3 | 249 | 249 | 0 | None | 249 | 249 | 249 | 100.0% (98.5-100.0%) | [85, 83, 81] | [0, 0, 0] | 13 | 13 | 96/96
+ready_upper50 | seeds 2-4, run 2 | 3 | 247 | 247 | 0 | None | 247 | 247 | 247 | 100.0% (98.5-100.0%) | [84, 79, 84] | [0, 0, 0] | 15 | 15 | 96/96
+ready_upper50 | seeds 2-4, run 3 | 3 | 252 | 252 | 0 | None | 252 | 252 | 252 | 100.0% (98.5-100.0%) | [83, 83, 86] | [0, 0, 0] | 14 | 14 | 96/96
+ready_upper50 | seeds 2-4, pooled | 9 | 748 | 748 | 0 | None | 748 | 748 | 748 | 100.0% (99.5-100.0%) | [85, 83, 81, 84, 79, 84, 83, 83, 86] | [0, 0, 0, 0, 0, 0, 0, 0, 0] | 42 | 42 | 288/288
+ready_upper50 | fresh seeds 5-7 | 3 | 246 | 246 | 0 | None | 246 | 246 | 246 | 100.0% (98.5-100.0%) | [81, 84, 81] | [0, 0, 0] | 15 | 15 | 96/96
+
+## ready_upper50: post-hand-over walking distance (mean along-heading m per completed window, mean over runs) and control reference
+ready_upper50 | seeds 2-4, run 1 | along m: 6.69 | control 6.17
+ready_upper50 | seeds 2-4, run 2 | along m: 6.71 | control 6.19
+ready_upper50 | seeds 2-4, run 3 | along m: 6.73 | control 6.16
+ready_upper50 | seeds 2-4, pooled | along m: 6.71 | control 6.17
+ready_upper50 | fresh seeds 5-7 | along m: 6.78 | control 6.25
+
+## ready_upper50 / seeds 2-4, run 1 (by push magnitude, summed over seeds in the block)
+push m/s | episodes | fell | hand-over | re-fell | walked 10 s | full success
+0.0 | 96 | control | - | - | 96 still walking | -
+2.5 | 96 | 62 | 62 | 0 | 62 | 62
+3.5 | 96 | 91 | 91 | 0 | 91 | 91
+4.5 | 96 | 96 | 96 | 0 | 96 | 96
+
+## ready_upper50 / seeds 2-4, run 2 (by push magnitude, summed over seeds in the block)
+push m/s | episodes | fell | hand-over | re-fell | walked 10 s | full success
+0.0 | 96 | control | - | - | 96 still walking | -
+2.5 | 96 | 60 | 60 | 0 | 60 | 60
+3.5 | 96 | 91 | 91 | 0 | 91 | 91
+4.5 | 96 | 96 | 96 | 0 | 96 | 96
+
+## ready_upper50 / seeds 2-4, run 3 (by push magnitude, summed over seeds in the block)
+push m/s | episodes | fell | hand-over | re-fell | walked 10 s | full success
+0.0 | 96 | control | - | - | 96 still walking | -
+2.5 | 96 | 63 | 63 | 0 | 63 | 63
+3.5 | 96 | 93 | 93 | 0 | 93 | 93
+4.5 | 96 | 96 | 96 | 0 | 96 | 96
+
+## ready_upper50 / fresh seeds 5-7 (by push magnitude, summed over seeds in the block)
+push m/s | episodes | fell | hand-over | re-fell | walked 10 s | full success
+0.0 | 96 | control | - | - | 96 still walking | -
+2.5 | 96 | 61 | 61 | 0 | 61 | 61
+3.5 | 96 | 90 | 90 | 0 | 90 | 90
+4.5 | 96 | 95 | 95 | 0 | 95 | 95

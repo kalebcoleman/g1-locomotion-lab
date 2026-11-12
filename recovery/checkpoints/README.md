@@ -25,4 +25,17 @@ Both baseline files load into the task `G1-Recovery-R9hg-v0` (123-d observation,
 - **What it does not do:** it does not reduce the straddle (peak spread unchanged), so it is a better get-up, not a more human-like one. The weakest directions are side B and supine. One training lineage and one seed. Details and all 22 runs: `pilots/g4_humanlike_getup_20261108/README.md`.
 
 ## Reproducibility note
-The M2 and M2b evaluation scripts (`pilots/m2_fall_handover_20261108/`, `pilots/m2b_handover_fixes_20261108/`) still point at `checkpoints/R9hg_it1100_candidate.pt`, because their recorded results were measured with that policy. They are left unchanged on purpose; to repeat them with the new baseline, pass `recovery/checkpoints/getup_baseline_recC_it1425.pt` as `--checkpoint`. No script in the repo has a default recovery checkpoint.
+The M2, M2b and Goal 4 evaluation scripts (`pilots/m2_fall_handover_20261108/run_batch.sh`,
+`pilots/m2b_handover_fixes_20261108/run_variants.sh`, `run_videos.sh` and the `run_confirm*.sh` wrappers, and
+`pilots/g4_humanlike_getup_20261108/final_eval.sh`) default to the tracked previous baseline
+`recovery/checkpoints/R9hg_it1100_previous_baseline.pt`, because their recorded results were measured with that
+policy. It has the same bytes as the lab host's `checkpoints/R9hg_it1100_candidate.pt`.
+
+All of them accept a `RECOVERY_CKPT` environment variable, so a rerun with the current baseline needs no edit:
+
+```bash
+RECOVERY_CKPT=$PWD/recovery/checkpoints/getup_baseline_recC_it1425.pt \
+  pilots/m2_fall_handover_20261108/run_batch.sh
+```
+
+The walking checkpoint is separate and still lives at `checkpoints/walking_newton_it1499.pt`.

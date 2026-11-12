@@ -150,5 +150,7 @@ def test_rising_window_limits_smoothness_and_action_rate():
 
 
 if __name__ == "__main__":
+    n = 0
     for k, v in list(globals().items()):
-        if k.startswith("test_"): v(); print("ok", k)
+        if k.startswith("test_"): v(); print("ok", k); n += 1
+    print(n, "passed")

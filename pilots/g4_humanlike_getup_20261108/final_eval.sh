@@ -1,7 +1,8 @@
 #!/bin/bash
 # Goal 4 final evaluation (evaluation only): baseline and a candidate checkpoint, HELDOUT x3 and DEV x1 with the movement metrics, then matched videos.
 # usage: final_eval.sh <candidate.pt> <tag>
-P=$(cd "$(dirname "$0")" && pwd); ROOT=$(cd "$P/../.." && pwd); R=$ROOT/recovery; CAND=$1; TAG=$2; BASE=$ROOT/checkpoints/R9hg_it1100_candidate.pt
+P=$(cd "$(dirname "$0")" && pwd); ROOT=$(cd "$P/../.." && pwd); R=$ROOT/recovery; CAND=$1; TAG=$2
+BASE=${RECOVERY_CKPT:-$ROOT/recovery/checkpoints/R9hg_it1100_previous_baseline.pt}   # override to compare against another baseline
 cd $R
 ev(){ L=$1; CK=$2; SET=$3; ./scripts/run.sh eval_recovery.py --task G1-Recovery-R9hg-v0 --checkpoint $CK --num_envs 256 --heldout $R/sets/$SET --out $P/results/final_${L}.json physics=newton_mjwarp > $P/logs/final_${L}.log 2>&1; echo "final_$L,$(date +%s),rc=$?" >> $P/ledger_eval.csv; }
 for i in 1 2 3; do ev base_heldout_r$i $BASE heldout_v2.npz; ev ${TAG}_heldout_r$i $CAND heldout_v2.npz; done
