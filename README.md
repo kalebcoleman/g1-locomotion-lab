@@ -12,7 +12,7 @@
 
 <img src="pilots/m2c_handover_recC_20261110/media/demo_fall_getup_walk.gif" width="560" alt="A simulated humanoid is pushed over, gets up on its own, and walks away">
 
-<sub>One illustrative run (single robot, seed 5, 3.5 m/s push, no resets): a push knocks the robot over, the learned get-up policy stands it up, and after the stand check passes the walking policy takes over. Not a measurement; the batch result is 52% of 750 induced falls.</sub>
+<sub>One illustrative run (single robot, seed 5, 3.5 m/s push, no resets): a push knocks the robot over, the current get-up policy (recC) stands it up, and after the stand check passes the walking policy takes over. Not a measurement; the batch result is 52% of 750 induced falls.</sub>
 
 [Results](docs/RESULTS.md) · [How it works](#how-it-works) · [Quickstart](#quickstart) · [Experiment write-ups](pilots/README.md) · [Glossary](docs/README.md#glossary)
 
