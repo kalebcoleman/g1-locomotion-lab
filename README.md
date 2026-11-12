@@ -27,7 +27,7 @@
 - **237 / 256 robots (93%)** stay up through a 24 s stand, walk, turn and stop test with random pushes.
 - **Get-up success 50.5% → 68.2%** on held-out lying poses, after diagnosing a joint-limit training collapse.
 - **Pushes ≈4× larger than training**: half the robots fall at 2.16 m/s of added speed (M50), vs 0.5 m/s pushes in training.
-- **Fall → get up → walk: 51.6%** of pushed-over robots complete the full sequence under the strict check (387 of 750), up from 2.5%, by adding an upper-body blend before the hand-over and the better get-up policy.
+- **Fall → get up → walk: 51.6%** of pushed-over robots complete the full sequence under the criteria-v3 stand gate (387 of 750), up from 2.5%, by adding an upper-body blend before the hand-over and the better get-up policy.
 
 ## Walking and getting up
 
@@ -79,17 +79,17 @@ Two policies share one interface: the same 123-value observation in, the same 37
 |---|---|
 | Walking, 24 s pushed test | 237 / 256 robots stay up (reruns 231, 233) |
 | Get-up, 256 held-out poses | 68.2% pass all checks, up from 50.5% |
-| Fall → get up → walk, strict check | 51.6% (387 / 750), up from 2.5%; 49.4% on fresh seeds |
+| Fall → get up → walk, criteria-v3 stand gate | 51.6% (387 / 750), up from 2.5%; 49.4% on fresh seeds |
 | Push robustness | half fall at 2.16 m/s added speed (M50), ~4× the training push |
 | Friction 0.3 | M50 falls from 2.16 to 1.45 m/s |
 | Terrain, blind on flat-trained policy | ≥80% survival to 19° downhill, 9° uphill, 5.8 cm steps down, 2.8 cm up, 8 cm noise |
 
-**These are single-seed results in simulation only.** Seeds, held-out vs TEST notes, per-direction breakdowns, confidence intervals and pilot write-ups: [docs/RESULTS.md](docs/RESULTS.md).
+**These are single-training-seed results in simulation only.** Seeds, held-out vs TEST notes, per-direction breakdowns, confidence intervals and pilot write-ups: [docs/RESULTS.md](docs/RESULTS.md).
 
 ## Reproduce
 
 - `make test` — CPU tests (metrics, hand-over state machine), no Isaac Lab needed. Isaac Lab setup: [docs/SETUP.md](docs/SETUP.md).
-- Walking: [train and evaluate](docs/WALKING.md#reproducing). Get-up: [recovery](recovery/README.md). Each pilot ([M2](pilots/m2_fall_handover_20261108/README.md), [M2b](pilots/m2b_handover_fixes_20261108/README.md), [M3](pilots/m3_terrain_baseline_20261108/README.md), [M4](pilots/m4_robustness_20261108/README.md), [G4](pilots/g4_humanlike_getup_20261108/README.md)) ends with its own Reproduce section.
+- Walking: [train and evaluate](docs/WALKING.md#reproducing). Get-up: [recovery](recovery/README.md). Each pilot ([M2](pilots/m2_fall_handover_20261108/README.md), [M2b](pilots/m2b_handover_fixes_20261108/README.md), [M3](pilots/m3_terrain_baseline_20261108/README.md), [M4](pilots/m4_robustness_20261108/README.md), [M2c](pilots/m2c_handover_recC_20261110/README.md), [G4](pilots/g4_humanlike_getup_20261108/README.md)) ends with its own Reproduce section.
 
 ## Explore
 

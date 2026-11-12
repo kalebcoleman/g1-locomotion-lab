@@ -66,7 +66,7 @@ Every run also has 96/96 no-push controls still walking (32 per seed; 288/288 pe
 
 ## Media
 - `media/demo_fall_getup_walk.gif` (7.3 MiB, 640 px, 12 fps, 11.4 s) and `media/demo_fall_getup_walk.mp4` (0.93 MiB, cropped H.264) - portfolio clip: 8 robots in the scene, fixed close camera on the robot that starts at the env-0 origin, `blendupper50` with recC. The env-0 robot is standing at 0.3 s (GIF time; push at 3.0 s sim time), flat on its back at 1.4 s (fall detected at 3.84 s), pushing up at 3.4 s, up and standing/holding at 5.4-7.5 s, then walking from 8.2 s (hand-over at 10.84 s sim time) and still in frame at 10.6 s. Frames inspected: 0.3, 1.4, 3.4, 5.4, 7.5, 10.6 s (`media/demo_fall_getup_walk_sheet.png` is the 3x2 contact sheet of exactly these). The other robots in the background make it a "few robots" shot, not a one-robot shot; the env-0 robot is the largest one, centre frame.
-- `media/m2c_recC_base_seed3_16envs_0000.mp4` (1.20 MiB) and `media/m2c_recC_blendupper50_seed3_16envs_0000.mp4` (1.30 MiB), recorded exactly like the M2b videos (`--num_envs 16 --seed 3 --levels 0,2.5,3.5,4.5`): base 11 falls, 5 hand-overs, all 5 re-fell, 0 successes; `blendupper50` 11 falls, 5 hand-overs, 0 re-fell, 5 successes. Uncut 27 s, 1280x720. The `.mp4` files are gitignored by the root `*.mp4` rule; they stay on disk next to the committed GIF.
+- `media/m2c_recC_base_seed3_16envs_0000.mp4` (1.20 MiB) and `media/m2c_recC_blendupper50_seed3_16envs_0000.mp4` (1.30 MiB), recorded exactly like the M2b videos (`--num_envs 16 --seed 3 --levels 0,2.5,3.5,4.5`): base 11 falls, 5 hand-overs, all 5 re-fell, 0 successes; `blendupper50` 11 falls, 5 hand-overs, 0 re-fell, 5 successes. Uncut 27 s, 1280x720. The `.mp4` files are gitignored by the root `*.mp4` rule and are not in the repo; only the GIF and contact sheet are committed.
 
 ## Caveats and limits
 - Simulation only (Isaac Lab 3.0 / Newton-MJWarp, G1 with self-collision and Unitree torque limits); no hardware.
@@ -76,10 +76,11 @@ Every run also has 96/96 no-push controls still walking (32 per seed; 288/288 pe
 - The demo clip is a single recording: it is illustrative, its counts differ from the batch, and two other demo recordings (one robot, close camera) were rejected because the pushed robot left the frame.
 
 ## Reproduce
+Run the first command from `recovery/` (`run.sh` changes into the Isaac Lab folder, so paths must be absolute).
 ```
 ./scripts/run.sh eval_fall_handover.py --task G1-Recovery-R9hg-v0 \
-    --checkpoint ../recovery/checkpoints/getup_baseline_recC_it1425.pt --walk_checkpoint ../checkpoints/walking_newton_it1499.pt \
-    --num_envs 128 --seed 3 --levels 0,2.5,3.5,4.5 --out out.json physics=newton_mjwarp      # base; add --settle 50 --blend 50 --blend_joints upper for blendupper50, --trigger ready for ready_upper50
+    --checkpoint "$PWD/checkpoints/getup_baseline_recC_it1425.pt" --walk_checkpoint "$PWD/../checkpoints/walking_newton_it1499.pt" \
+    --num_envs 128 --seed 3 --levels 0,2.5,3.5,4.5 --out /tmp/out.json physics=newton_mjwarp      # base; add --settle 50 --blend 50 --blend_joints upper for blendupper50, --trigger ready for ready_upper50
 pilots/m2c_handover_recC_20261110/run.sh r1 2,3,4 base blendupper50 ready_upper50                # one repeat on one seed block
 pilots/m2c_handover_recC_20261110/run_sweep.sh                                                   # the 36 runs reported here
 python3 pilots/m2c_handover_recC_20261110/aggregate_m2c.py --detail --dist base blendupper50 ready_upper50
