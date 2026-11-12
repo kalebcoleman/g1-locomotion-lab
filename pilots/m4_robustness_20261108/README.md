@@ -27,7 +27,7 @@ No training, no policy change. `checkpoints/walking_newton_it1499.pt` (sha256 `d
 | 3.5 | 11/94 | 12% [7, 20] |
 | 4 | 6/95 | 6% [3, 13] |
 
-**M50 at friction 1.0: 2.02 m/s interpolated, 2.16 m/s logistic [95% CI 2.08, 2.24].** Survival is 97% at 1 m/s, 74% at 1.5 m/s, 52% at 2 m/s and 6% at 4 m/s. Training used random pushes of up to 0.5 m/s in x and y every 10-15 s (the task's own `push_robot` event; `docs/WALKING.md`), so 2 m/s is about four times the training push.
+**M50 at friction 1.0: 2.02 m/s interpolated, 2.16 m/s logistic [95% CI 2.08, 2.24].** Survival is 97% at 1 m/s, 74% at 1.5 m/s, 52% at 2 m/s and 6% at 4 m/s. Training used random pushes of up to 0.5 m/s in x and y every 10-15 s (the task's own `push_robot` event; `docs/WALKING.md`), so the largest training push is about 0.71 m/s combined and 2.16 m/s is about three times that.
 
 ## By push direction (friction 1.0)
 | push direction (relative to heading) | M50 interpolated | M50 logistic | falls at 2.0 m/s |

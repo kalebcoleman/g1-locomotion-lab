@@ -1,6 +1,6 @@
 # Pilot handoff: reward-regularised warm-start from R9hg it1100 (simulation only)
 
-**Result: negative.** The pilot lowered success and did not change the early-rise leg flare. Nothing here has been committed, pushed or opened as a PR; the parent lands it.
+**Result: negative.** The pilot lowered success and did not change the early-rise leg flare. At the time of writing nothing here had been committed or pushed.
 Paths are relative to `projects/g1-locomotion-lab-integrated/` (base commit `330493f`; no source edits were made). Run folder `pilots/humanlike_20261108/`. Run date 2026-11-08, MST.
 Companion files: `IMPLEMENTATION_SPEC.md` (what to build, acceptance checks), `REFERENCE_DATA_RESEARCH.md` (imitation data route), `METHOD_NOTES.md` (citations).
 
@@ -99,7 +99,7 @@ The peak foot-spread numbers match the interim script (1.320 m, 0.427 m). Hip pe
 - "Human-like" is not measured by any metric. Foot spread is a proxy; the videos show no clear change.
 - 3b self-penetration not run for the pilot (the pilot failed anyway).
 
-## Needed from the parent (source/config; nothing done locally)
+## Still open (source/config)
 Done on this branch: stance params overridable; spread/hip/smoothness metrics. Still open: hip-splay term (only after the metrics show where the spread occurs), early-rise rerun, continuous fall runner (M2), reference tracking (blocked, see research).
 
 ## Publication notes

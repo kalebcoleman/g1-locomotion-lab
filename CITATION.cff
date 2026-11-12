@@ -1,0 +1,10 @@
+cff-version: 1.2.0
+message: "If you use this repository, please cite it as below."
+title: "G1 Locomotion Lab"
+type: software
+authors:
+  - family-names: Coleman
+    given-names: Kaleb
+license: BSD-3-Clause
+repository-code: "https://github.com/kalebcoleman/g1-locomotion-lab"
+abstract: "Reinforcement-learning walking, push recovery and get-up policies for a simulated Unitree G1 humanoid in Isaac Lab (simulation only)."

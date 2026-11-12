@@ -1,20 +1,14 @@
 # G1 recovery (get-up) project: STATUS
 
 > **Historical snapshot (2026-11-06).** For the current project status see [the root STATUS.md](../STATUS.md).
-_Last updated: 2026-11-06 18:45 MST (lead agent)_
+_Last updated: 2026-11-06 18:45 MST_
 
 ## Goal
 Train and compare two fall-recovery (get-up) approaches for the simulated Unitree G1 (Isaac Lab 3.0.0, Newton/MJWarp), in parallel on the shared GPU:
 - **Lane A**: task-reward policy with a progressive fallen-pose curriculum (rewards for upright + stable standing).
 - **Lane B**: reference-guided if a suitable, licensed get-up reference exists; otherwise a clearly different curriculum/reward design.
 Then pick the stronger, chain it with the existing walking policy (fall -> get up -> stand -> walk), save screenshots/videos of successes and failures.
-Original projects (`projects/g1-tasks`, `projects/g1-locomotion-lab`) are read-only inputs. Nothing is pushed or published (user rule: branches + PR only, never main; none pushed so far).
-
-## Standing rules from the user (leaving the PC; follows from phone)
-- Keep working autonomously; ask only if truly blocked.
-- Capture screenshots + short videos even for headless runs; save in `media/` with timestamped names.
-- Post an update with an embedded image (abs path) every milestone / ~20-30 min.
-- Don't stop other users' or agents' jobs.
+Original projects (`projects/g1-tasks`, `projects/g1-locomotion-lab`) are read-only inputs. Nothing was pushed or published at this point (rule: branches and pull requests only, never main).
 
 ## Resources (16:45, before any of our jobs)
 GPU RTX PRO 6000 Blackwell 98 GB: 1.2 GB used, 1% util (Jenga diag just starting). CPU 32 cores, load ~3-5. RAM 125 GB (112 free). Disk 1.5 TB free.
@@ -65,7 +59,7 @@ User guidance adopted (18:57): APEX not a training lane (reference only); v7 = c
 - New primary metric = PLAUSIBLE recovery: strict supported stand 2 s AND joint-velocity-limit violations <=2% of steps AND peak pelvis upward speed <=2.0 m/s (eval JSON `plausibility`).
 - v9 (launched 19:16): single change vs control = joint velocity-limit penalty (`G1R_VELPEN=10`, soft ratio 0.9, Lab `joint_vel_limits`, HoST/APEX-style). Runs: `A9v_velpen_s2`, `A9v_velpen_s3` vs control replicate `A8c_contA6_legacy_s3` (control seed 2 = A8c). All from A6 model_599, level start 1, 4096 envs x 600 its, lr 3e-4.
 
-## 2026-11-06 20:10: restart after server restart; mission update (no push/publish; no GPU coordination gate; cheap subagents only)
+## 2026-11-06 20:10: restart after server restart; mission update (no push/publish; no GPU coordination gate; cheap helper jobs only)
 - Criteria frozen in `CRITERIA.md` (v1) + Amendment 1 (post-hoc free-flight criterion).
 - v9 results (A6 init + velocity-limit penalty 10): A9v_s2 0/256 under every criterion (never_rose 125, rose_not_upright 131); A9v_s3 was killed by the server restart at iteration 526 (not evaluated).
 - Control replicate A8c seed 3 reproduces the launch exploit (legacy 256/256, strict 240); v1-plausible 52/256, **v1.1-plausible 0/256 for A6, A8c (both seeds), A9v** (flight 3-12% of steps, peak pelvis vz 3-4 m/s). **No plausible recovery exists yet.** The earlier A6 chain (4/256) is retracted: A6's stands are launches.

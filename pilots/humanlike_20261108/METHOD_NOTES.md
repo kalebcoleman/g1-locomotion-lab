@@ -1,5 +1,5 @@
 # Human-like floor-to-stand pilot (SIMULATION ONLY), 2026-11-08
-Coordinator: G1 bot (Grok Bot). Authorised by Kaleb. No hardware, no cloud, nothing pushed/merged/published.
+Simulation only: no hardware, no cloud, nothing pushed, merged or published at the time of this pilot.
 
 ## Method label: REWARD-ONLY constrained / style-regularised warm-start from R9hg it1100. NOT imitation, NOT AMP.
 Why not imitation: no G1-retargeted, licensed human floor-getup reference exists in the workspace (research/lane_b_references.md,
@@ -24,7 +24,7 @@ Training cap (set before start): <= 150 PPO iterations @ 16384 envs warm-start, 
 Early stop: nonfinite loss/reward, persistent hard-limit/self-collision rise, DEV/HELDOUT success regression at the it+50 check.
 Decision rule: candidate only if full-v3 success >= baseline - noise (3-8/256) AND hard-limit steps not worse AND peak/final spread lower.
 
-## Known missing capabilities (for the parent's cloud coding agent; I did not edit source)
+## Known missing capabilities (no source was edited during this pilot)
 1. Reference-tracking / AMP: no reference loader, no discriminator, no tracking reward, no motion data.
 2. Hip-roll/hip-yaw style reward term (HoST-like) - only a foot-distance term (stance_excess, free 0.45 m) exists.
 3. eval_recovery.py does not report peak/final foot spread or hip roll/yaw per step; diag_trace.py saves stance width per step and q_end only.

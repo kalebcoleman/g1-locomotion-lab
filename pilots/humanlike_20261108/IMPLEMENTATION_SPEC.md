@@ -24,7 +24,7 @@ Acceptance: 3-iteration smoke (256 envs, as in the pilot's `train_pilot.sh`) acc
 Add an optional reward `sum over hip roll/yaw joints of relu(|q - q_default| - deadzone)^2`, same gating params as item 2, deadzone and weight configurable, default weight 0 (no behaviour change). Justification so far is weak: final hip roll/yaw are small (mean |roll| 0.14 rad, |yaw| 0.25 rad at the end), the early-rise values are unmeasured. Do not add before item 1.
 Acceptance: weight 0 reproduces baseline eval; smoke run logs the term.
 
-## 4. Pilot rerun gate (parent decides; not authorised yet)
+## 4. Pilot rerun gate (not authorised yet)
 One bounded run only after 1 and 2: same warm start, same seed 21, 100 iterations, DEV for tuning and the early-stop check, HELDOUT once at the pre-declared checkpoints. Fix the driver glob that failed in the pilot (run folder is `<timestamp>_<run_name>`). Success rule stated up front: v3 within baseline range (122 to 131) AND peak spread after rise below 1.0 m AND soft-limit rule fails not above baseline.
 
 ## 5. Reference tracking (blocked on data; see `REFERENCE_DATA_RESEARCH.md`)
@@ -33,7 +33,7 @@ Minimal scope once a clip is approved and re-targeted to this 37-joint morpholog
 - Reward: DeepMimic-style tracking terms (joint position, root height/orientation, optionally foot position) with a phase variable, added to the existing getup rewards at a configurable weight; weight 0 = current behaviour.
 - Start states from the clip's first frames in addition to the existing pose bank.
 - Metrics: tracking error per direction next to v3.
-Acceptance: loader unit test (frame count, order, quaternion convention, 30 to 50 Hz resample); a replay script that sets the reference pose and renders one clip (visual check); a 3-iteration smoke with the tracking term on. No training run until the parent confirms the bounded run.
+Acceptance: loader unit test (frame count, order, quaternion convention, 30 to 50 Hz resample); a replay script that sets the reference pose and renders one clip (visual check); a 3-iteration smoke with the tracking term on. No training run until the bounded run is approved.
 
 ## 6. Isaac MCP gap
 `isaaclab__envs_list` / `isaaclab__train` cannot see `g1_recovery` tasks (needs `PYTHONPATH=<recovery>` and `--external_callback=g1_recovery.register.register`). Ask: a way to pass env vars or a Python path to MCP jobs, or a registered entry point.

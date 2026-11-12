@@ -2,51 +2,54 @@
 
 # G1 Locomotion Lab
 
-**A Unitree G1 humanoid learning to walk, and to get back up after a fall, in simulation.**
+**Teaching a simulated Unitree G1 humanoid to walk, survive pushes, and get back up after a fall, with reinforcement learning in Isaac Lab.**
 
-![Isaac Lab 3.0.0](https://img.shields.io/badge/Isaac%20Lab-3.0.0-76B900)
-![Physics](https://img.shields.io/badge/physics-Newton%20%2F%20MuJoCo--Warp-1f6feb)
-![Robot](https://img.shields.io/badge/robot-Unitree%20G1-555)
-![RL](https://img.shields.io/badge/RL-PPO%20(rsl__rl)-8250df)
-![Scope](https://img.shields.io/badge/scope-simulation%20only-lightgrey)
-![License](https://img.shields.io/badge/license-BSD--3--Clause-blue)
 [![Tests](https://github.com/kalebcoleman/g1-locomotion-lab/actions/workflows/tests.yml/badge.svg)](https://github.com/kalebcoleman/g1-locomotion-lab/actions/workflows/tests.yml)
+![Isaac Lab 3.0.0](https://img.shields.io/badge/Isaac%20Lab-3.0.0-76B900)
+![Unitree G1](https://img.shields.io/badge/robot-Unitree%20G1-555)
+![Simulation only](https://img.shields.io/badge/scope-simulation%20only-lightgrey)
+![BSD-3](https://img.shields.io/badge/license-BSD--3--Clause-blue)
 
-![A pushed G1 falls, gets up with the recC policy, and walks away with the walking policy](pilots/m2c_handover_recC_20261110/media/demo_fall_getup_walk.gif)
+<img src="pilots/m2c_handover_recC_20261110/media/demo_fall_getup_walk.gif" width="560" alt="A simulated humanoid is pushed over, gets up on its own, and walks away">
 
-<sub>One continuous run, no resets: a push knocks the robot over, the get-up policy stands it up, the upper body is blended to the walking stance, and the walking policy takes over.</sub>
+<sub>One continuous simulated run, no resets: a push knocks the robot over, a learned get-up policy stands it up, and the walking policy takes over.</sub>
 
-![Unitree G1 policies at training iteration 0 (left) and 1499 (right), same scripted commands](walking/media/hero_before_after.gif)
-
-<sub>16 robots per side, same scripted stand, walk, turn and stop commands. Left: untrained. Right: final walking policy. Fallen robots are reset in place.</sub>
+[Results](docs/RESULTS.md) · [How it works](#how-it-works) · [Quickstart](#quickstart) · [Experiment write-ups](pilots/README.md) · [Glossary](docs/README.md#glossary)
 
 </div>
 
-## Highlights
+## At a glance
 
-- **237 / 256 robots (93%)** stay up through a 24 s stand, walk, turn and stop test with random pushes.
-- **Get-up success 50.5% → 68.2%** on held-out lying poses, after diagnosing a joint-limit training collapse.
-- **Pushes ≈4× larger than training**: half the robots fall at 2.16 m/s of added speed (M50), vs 0.5 m/s pushes in training.
-- **Fall → get up → walk: 51.6%** of pushed-over robots complete the full sequence under the criteria-v3 stand gate (387 of 750), up from 2.5%, by adding an upper-body blend before the hand-over and the better get-up policy.
+| Task | Result |
+|---|---|
+| Walk, stop and turn under random pushes (24 s test) | **237 of 256** robots stay up (93%) |
+| Get up from the back, front or side | **68%** of 256 unseen poses pass every check (was 50%) |
+| Pushed over, get up, walk away | **52%** of 750 induced falls (was 2.5%) |
+| Withstand a shove | Half fall only at **2.2 m/s**, about 3x the largest training push |
+| Untrained terrain, blind | At least 80% survival on 19° downhill, 9° uphill and about 6 cm step-downs; fails on step-ups of 4.3 cm and higher |
+
+"Passes every check" means a 2 s stand on the feet with no launch or flight, joint and torque limits respected, a normal stance, and checks frozen before scoring ([EVAL_PROTOCOL.md](EVAL_PROTOCOL.md), [docs/RESULTS.md](docs/RESULTS.md)). **These are single-training-seed results in simulation only.**
 
 ## Walking and getting up
 
 <table>
 <tr>
-<td width="50%" align="center"><img src="walking/media/newton_best_single_robot.gif" alt="Final walking policy, one robot"></td>
-<td width="50%" align="center"><img src="recovery/media/recovery_best_close.gif" alt="Best get-up policy, four lying starts"></td>
+<td width="50%" align="center"><img src="walking/media/newton_best_single_robot.gif" alt="The final walking policy, one robot"></td>
+<td width="50%" align="center"><img src="recovery/media/recovery_recC_getup_16poses.gif" alt="The current get-up policy standing up 16 robots from lying poses, at half speed"></td>
 </tr>
 <tr>
 <td valign="top"><b>Walking.</b> 237 of 256 robots stayed up through a 24 s stand, walk, turn and stop test with random pushes (231 and 233 in reruns). Most falls happen while turning.</td>
-<td valign="top"><b>Getting up</b> <i>(work in progress)</i>. From lying on the back, front or side, with no help, in about a second. The current baseline passes strict validity checks on 68% of held-out starting poses.</td>
+<td valign="top"><b>Getting up</b> <i>(work in progress)</i>. 16 of the unseen lying poses, half speed, no help. The current policy passes every check on 68% of 256 unseen poses.</td>
 </tr>
 </table>
 
-## From a fold to a stand
+![Untrained policy (left) and final walking policy (right) on the same scripted commands](walking/media/hero_before_after.gif)
 
-![Earlier policy stuck in a forward fold (left) and the current best policy standing (right), same 16 starting poses](recovery/media/recovery_before_after.gif)
+<sub>Walking, before and after training: 16 robots per side, same scripted stand, walk, turn and stop commands. Left: untrained. Right: final walking policy. Fallen robots are reset in place.</sub>
 
-<sub>Same 16 lying starts, same camera, no assist. Left: an earlier reward settled into a forward fold, pelvis high and torso upside down. Right: a get-up policy standing up.</sub>
+![An earlier policy settling into a forward fold (left) and the first stand-up policy standing (right), same 16 starting poses](recovery/media/recovery_before_after.gif)
+
+<sub>Where the get-up started: the same 16 lying poses, same camera, no assist. Left: an earlier reward settled into a forward fold. Right: the first stand-up policy, which passed 50%; the current policy above reaches 68%.</sub>
 
 ## What I built
 
@@ -73,22 +76,18 @@ Two policies share one interface: the same 123-value observation in, the same 37
 - **Getting up works; handing over is the weak link.** The get-up policy ends with arms, fingers and waist about 1.2 to 1.3 rad away from the pose the walking policy expects, against 0.03 to 0.07 rad of normal variation, and feet 0.44 m apart against 0.24 m. Blending the upper body before the switch and waiting for a readiness check recover most of the loss ([M2](pilots/m2_fall_handover_20261108/README.md), [M2b](pilots/m2b_handover_fixes_20261108/README.md)).
 - **Friction in this solver is a maximum, not a product.** Lowering only the floor friction does nothing, since contacts use the larger of the two materials. The first friction sweep was invalid for this reason and was discarded; the fixed one lowers both together.
 
-## Results
+## Quickstart
 
-| | Result |
-|---|---|
-| Walking, 24 s pushed test | 237 / 256 robots stay up (reruns 231, 233) |
-| Get-up, 256 held-out poses | 68.2% pass all checks, up from 50.5% |
-| Fall → get up → walk, criteria-v3 stand gate | 51.6% (387 / 750), up from 2.5%; 49.4% on fresh seeds |
-| Push robustness | half fall at 2.16 m/s added speed (M50), ~4× the training push |
-| Friction 0.3 | M50 falls from 2.16 to 1.45 m/s |
-| Terrain, blind on flat-trained policy | ≥80% survival to 19° downhill, 9° uphill, 5.8 cm steps down, 2.8 cm up, 8 cm noise |
+```
+git clone https://github.com/kalebcoleman/g1-locomotion-lab && cd g1-locomotion-lab
+pip install torch==2.11.0 --index-url https://download.pytorch.org/whl/cpu && pip install -r requirements-dev.txt
+make test
+```
 
-**These are single-training-seed results in simulation only.** Seeds, held-out vs TEST notes, per-direction breakdowns, confidence intervals and pilot write-ups: [docs/RESULTS.md](docs/RESULTS.md).
+`make test` runs the CPU unit tests (metrics, hand-over state machine, robustness statistics); it needs no GPU or Isaac Lab. Training and evaluation need Isaac Lab 3.0.0: see [docs/SETUP.md](docs/SETUP.md).
 
 ## Reproduce
 
-- `make test` — CPU tests (metrics, hand-over state machine), no Isaac Lab needed. Isaac Lab setup: [docs/SETUP.md](docs/SETUP.md).
 - Walking: [train and evaluate](docs/WALKING.md#reproducing). Get-up: [recovery](recovery/README.md). Each pilot ([M2](pilots/m2_fall_handover_20261108/README.md), [M2b](pilots/m2b_handover_fixes_20261108/README.md), [M3](pilots/m3_terrain_baseline_20261108/README.md), [M4](pilots/m4_robustness_20261108/README.md), [M2c](pilots/m2c_handover_recC_20261110/README.md), [G4](pilots/g4_humanlike_getup_20261108/README.md)) ends with its own Reproduce section.
 
 ## Explore

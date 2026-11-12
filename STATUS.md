@@ -14,14 +14,14 @@ every number is one seed and one training run, and the held-out set was not used
   steps fell from 1.16% to 0.12%; self-penetration passes on 236 of 236 robots examined
   ([`recovery/checkpoints/README.md`](recovery/checkpoints/README.md)).
 - **Hand-over, get-up then walking.** Measured with the **previous** baseline `R9hg_it1100`, the policy the runs
-  used: **6 of 250** induced falls complete the sequence under the v3 gate, **28.7%** (pooled over three repeats) with the arms and fingers
+  used: **2.5% (19 of 746)** of induced falls complete the sequence under the v3 gate when handed straight over, **28.7%** (pooled over three repeats) with the arms and fingers
   blended to the stance, **99.9%** when the hand-over also waits for a readiness check (a looser check than v3)
   ([M2](pilots/m2_fall_handover_20261108/README.md), [M2b](pilots/m2b_handover_fixes_20261108/README.md)).
   Rerun with **`recC`** (M2c, same protocol): the blended v3 variant reaches **387 of 750 (51.6%, 95% CI 48.0-55.2)**,
   49.4% on fresh seeds; without the blend success drops to 0.4% because 98% of the extra hand-overs re-fall
   ([M2c](pilots/m2c_handover_recC_20261110/README.md)).
-- **Pushes.** Half the robots fall at about **2.2 m/s** of added speed (M50 2.16 m/s, 95% CI 2.08-2.24), about four
-  times the largest training push. Left and rear-left pushes are weakest (about 1.4 m/s).
+- **Pushes.** Half the robots fall at about **2.2 m/s** of added speed (M50 2.16 m/s, 95% CI 2.08-2.24), about three
+  times the largest training push (0.5 m/s per axis, about 0.71 m/s combined). Left and rear-left pushes are weakest (about 1.4 m/s).
 - **Friction.** M50 falls from 2.16 m/s at friction 1.0 to 1.45 m/s at 0.3. Without pushes the policy still walks
   the first 3 s in 98-99% of cases down to friction 0.4, and in 56% at 0.2.
 - **Terrain.** Blind walking, no height scan, trained on flat ground: at least 80% survival on **19 degree downhill,

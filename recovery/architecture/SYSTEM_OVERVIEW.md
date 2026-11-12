@@ -1,5 +1,7 @@
 # G1 Locomotion Lab: system overview
 
+> **Historical snapshot.** This document describes the project as of early November 2026. Current results are in [docs/RESULTS.md](../../docs/RESULTS.md).
+
 Written 2026-11-06 for discussing the project with Dr. Zhang, updated 2026-11-07. Simulation only (Isaac Lab 3.0.0, Newton/MuJoCo-Warp, Unitree G1). The experiment log, protocol and code live in the private working project; this public copy covers the architecture.
 
 **Current result (2026-11-07):** walking is verified. Recovery: the best policy so far (R9hg, iteration 1100) passes criteria v3 on 127-129 of 256 HELDOUT poses (49.6-50.4%) over three evaluations, with assist off and the self-penetration check included. One seed, a warm-start chain; prone about 78%, side A about 50%, supine about 46%, side B about 27%. TEST is untouched and the hand-over to walking is not yet tested. See `../README.md` for the videos.

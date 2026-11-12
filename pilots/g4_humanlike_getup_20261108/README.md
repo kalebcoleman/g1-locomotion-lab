@@ -17,7 +17,7 @@ Training used 6.29 of the 8.00 GPU-hours, counted conservatively as the sum of e
 - Baseline: this table shows its last three HELDOUT evaluations (125 / 131 / 132); earlier ones this run were 123 / 131 / 128, and the historical figure is 127-129.
 - 3b (self-penetration): `recA` 238 of 238 and `recC` 236 of 236 robots examined are within the 3% rule (median worst depth 4.5 and 3.4 mm); the sim runs with self-collision on. So full v3 equals the figure above.
 - **Best: `recC`**, 174.7 of 256 (68.2%) against 129.3 (50.5%). Hard-limit steps 0.12% (baseline 1.16%), soft-limit steps 1.0% (baseline 3.9%). It was trained with hip roll and yaw targets clipped to +-1.2 rad in the last stage and is evaluated here **without** the clip. The weakest direction is still supine (35 of 64).
-- Checkpoint committed: `ckpt/g4j1_b1p2_it1425.pt` (sha256 `a518419e3474...`); `recA` `07d47ddcd32e...`, `recB` `4c6ff0b1423b...` stay local.
+- Checkpoint: the recC file is `recovery/checkpoints/getup_baseline_recC_it1425.pt` (sha256 `a518419e3474...`; the same bytes were first committed here as `ckpt/g4j1_b1p2_it1425.pt` and removed as a duplicate; result JSON files still record the original path); `recA` `07d47ddcd32e...`, `recB` `4c6ff0b1423b...` stay local.
 - Movement during the rise, all candidates: peak foot spread 1.39-1.40 m at about 0.4 s with the pelvis at 0.33 m (baseline 1.38 m), final spread 0.42-0.48 m, joint-acceleration RMS 136-171 rad/s^2 (baseline 168). Video and contact sheet (first 16 HELDOUT poses, same camera): baseline and `recA` show the same wide straddle at 0.5 s.
 
 ## What was found, in order
