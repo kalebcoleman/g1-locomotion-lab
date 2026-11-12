@@ -65,6 +65,9 @@ Left and rear-left pushes are the weakest (M50 about 1.4 m/s, 11 of 12 fall at 2
 - In the videos a robot that falls is reset by the environment's termination, so later frames show it standing again at its start position; the statistics use each robot's first fall only.
 - Video: one 16-robot run (seed 5; magnitudes 0, 1.5, 2.5, 3.5 m/s x 4 directions), uncut. One of the four no-push robots fell during its first 3 s (a start-up fall); the 1.5 m/s robots survived and the 2.5 and 3.5 m/s robots mostly fell.
 
+## Media recorded for the README
+`media/push_2ms.gif` (with `media/portfolio_push2_sheet.png`): one illustrative 8-robot run, friction 1.0, seed 1, a single 2.0 m/s push (one per direction, 45 degrees apart) at 3 s after 3 s of walking: 5 of 8 fell. The pooled evaluation above is the result (52% survive at 2 m/s); this is a single run, with fallen robots reset by the environment. Command: `--mags 2 --n_dirs 8 --reps 1 --record_dir <dir> --label portfolio_push2`.
+
 ## Reproduce
 ```
 ./scripts/run.sh eval_robustness.py --task Isaac-Velocity-Flat-G1 --walk_checkpoint <walking_newton_it1499.pt> --seed 1 --reps 4 --friction 1.0 --out <out.json> physics=newton_mjwarp

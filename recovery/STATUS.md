@@ -18,13 +18,13 @@ GPU RTX PRO 6000 Blackwell 98 GB: 1.2 GB used, 1% util (Jenga diag just starting
 - No existing get-up task or G1 reference motion exists locally or in Isaac Lab 3.0.0 tasks.
 
 ## Current task
-Lane A run #1 training (1024 envs x 1000 iters, seed 1). Lane B implementer agent writing `g1_recovery/lane_b.py` (HoST-style assist-force curriculum + staged rewards; research found no licensed G1 get-up reference, see `research/lane_b_references.md`).
+Lane A run #1 training (1024 envs x 1000 iters, seed 1). Lane B implementation writing `g1_recovery/lane_b.py` (HoST-style assist-force curriculum + staged rewards; research found no licensed G1 get-up reference, see `research/lane_b_references.md`).
 
 ## Done
 - Shared base package `g1_recovery/` (env, held-out poses `heldout_poses.npz`, success tracker), `scripts/{train,eval,record}_recovery.py`, `scripts/gpu_run.py` (lead's GPU launch coordinator: flock + free-memory check + memory sampling -> logs/runs.jsonl). Smoke tests of Lane A (train 256 envs ~13.9k steps/s; eval 256 held-out poses; 16-env video) pass.
 - Held-out pose rendering checked: `media/20261106_165529_heldout_poses_t0.3s.png` (16 lying robots: supine/prone/sides, resting on floor, no explosions).
 - Resource inspection; collision-shape inspection (`logs/inspect_shapes.log`).
-- Lane B research agent launched (writes `research/lane_b_references.md`).
+- Lane B literature review started (writes `research/lane_b_references.md`).
 
 ## External reference check (18:20)
 - APEX-humanoid `Isaac-StandUp-G1` / `standup.pt` assessed statically: `research/apex_standup_assessment.md` (PhysX Isaac Lab 1.3.0 fork, 29-DoF modified G1 USD, 558-d obs with 6-step history, 23-d actions, trained only from a prone tucked start; no authors/CITATION, checkpoint/USD have no separate licence). Not directly evaluable on our Newton env; port plan and risks written. No runs started.
@@ -120,4 +120,4 @@ None.
 - `media/20261106_175750_A5_it150_level1_t9s.png`: A5 at iteration 150, level-1 (sitting-bank) starts after 10 s: robots recline/lie back, not standing yet (policy early in training).
 - `media/20261106_171247_A_v1_failure_t9s.png` (A v1 final: 16 held-out poses, robots sitting up, none standing)
 - `media/20261106_165529_heldout_poses_t0.3s.png`
-- Lane B implementer agent running (status file lanes\/b\/STATUS_lane_b.md); research agent finished (no licensed G1 get-up reference; Lane B = HoST-style assist-force + staged-height rewards).
+- Lane B implementation running (status file lanes\/b\/STATUS_lane_b.md); literature review finished (no licensed G1 get-up reference; Lane B = HoST-style assist-force + staged-height rewards).

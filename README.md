@@ -12,7 +12,7 @@
 
 <img src="pilots/m2c_handover_recC_20261110/media/demo_fall_getup_walk.gif" width="560" alt="A simulated humanoid is pushed over, gets up on its own, and walks away">
 
-<sub>One continuous simulated run, no resets: a push knocks the robot over, a learned get-up policy stands it up, and the walking policy takes over.</sub>
+<sub>One illustrative run (single robot, seed 5, 3.5 m/s push, no resets): a push knocks the robot over, the current get-up policy (recC) stands it up, and after the stand check passes the walking policy takes over. Not a measurement; the batch result is 52% of 750 induced falls.</sub>
 
 [Results](docs/RESULTS.md) · [How it works](#how-it-works) · [Quickstart](#quickstart) · [Experiment write-ups](pilots/README.md) · [Glossary](docs/README.md#glossary)
 
@@ -25,7 +25,7 @@
 | Walk, stop and turn under random pushes (24 s test) | **237 of 256** robots stay up (93%) |
 | Get up from the back, front or side | **68%** of 256 unseen poses pass every check (was 50%) |
 | Pushed over, get up, walk away | **52%** of 750 induced falls (was 2.5%) |
-| Withstand a shove | Half fall only at **2.2 m/s**, about 3x the largest training push |
+| Withstand a shove | Half the robots fall only at a **2.2 m/s** shove, about 3x the largest training push |
 | Untrained terrain, blind | At least 80% survival on 19° downhill, 9° uphill and about 6 cm step-downs; fails on step-ups of 4.3 cm and higher |
 
 "Passes every check" means a 2 s stand on the feet with no launch or flight, joint and torque limits respected, a normal stance, and checks frozen before scoring ([EVAL_PROTOCOL.md](EVAL_PROTOCOL.md), [docs/RESULTS.md](docs/RESULTS.md)). **These are single-training-seed results in simulation only.**
@@ -47,9 +47,26 @@
 
 <sub>Walking, before and after training: 16 robots per side, same scripted stand, walk, turn and stop commands. Left: untrained. Right: final walking policy. Fallen robots are reset in place.</sub>
 
-![An earlier policy settling into a forward fold (left) and the first stand-up policy standing (right), same 16 starting poses](recovery/media/recovery_before_after.gif)
+![An earlier policy settling into a forward fold (left) and the previous best policy standing (right), same 16 starting poses](recovery/media/recovery_before_after.gif)
 
-<sub>Where the get-up started: the same 16 lying poses, same camera, no assist. Left: an earlier reward settled into a forward fold. Right: the first stand-up policy, which passed 50%; the current policy above reaches 68%.</sub>
+<sub>Where the get-up started: the same 16 lying poses, same camera, no assist. Left: an earlier reward settled into a forward fold. Right: the previous best policy (R9hg), which passed 50%; the current policy above reaches 68%.</sub>
+
+## Stress tests
+
+<table>
+<tr>
+<td width="33%" align="center"><img src="pilots/m3_terrain_baseline_20261108/media/slope_down_19deg.gif" alt="Eight simulated humanoids walking down a 19 degree slope"></td>
+<td width="33%" align="center"><img src="pilots/m3_terrain_baseline_20261108/media/steps_up_4cm.gif" alt="Eight simulated humanoids walking onto 4.3 cm step-ups; most fall"></td>
+<td width="33%" align="center"><img src="pilots/m4_robustness_20261108/media/push_2ms.gif" alt="Eight simulated humanoids pushed at 2 metres per second; about half fall"></td>
+</tr>
+<tr>
+<td valign="top"><b>19° downslope.</b> The walking policy, blind, on terrain it never trained on: 8 of 8 robots walked in this run (seed 5; 20 of 24 across the full evaluation, 83%).</td>
+<td valign="top"><b>A limitation: 4.3 cm step-ups.</b> 7 of 8 fell in this run (seed 5); across the evaluation 0 of 24 survived at this height. Fallen robots are reset by the environment.</td>
+<td valign="top"><b>A 2 m/s shove</b> at 3 s, 8 directions (seed 1): 5 of 8 fell here. Half fall at about 2.2 m/s overall (M50); weakest to the left and rear-left.</td>
+</tr>
+</table>
+
+<sub>Illustrative single runs of the walking policy (`walking_newton_it1499`), 8 robots each, recorded for this page; the evaluation numbers are in [docs/RESULTS.md](docs/RESULTS.md).</sub>
 
 ## What I built
 
