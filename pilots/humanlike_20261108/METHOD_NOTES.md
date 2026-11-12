@@ -4,7 +4,7 @@ Simulation only: no hardware, no cloud, nothing pushed, merged or published at t
 ## Method label: REWARD-ONLY constrained / style-regularised warm-start from R9hg it1100. NOT imitation, NOT AMP.
 Why not imitation: no G1-retargeted, licensed human floor-getup reference exists in the workspace (research/lane_b_references.md,
 STATUS.md: "No existing get-up task or G1 reference motion exists locally or in Isaac Lab 3.0.0 tasks"); the repo has no tracking/AMP
-reward, discriminator or reference loader (missing capability, reported to parent). I did not download any motion dataset.
+reward, discriminator or reference loader (missing capability). I did not download any motion dataset.
 
 ## References (primary; used as design guidance only, nothing transplanted)
 - HoST, Huang et al., arXiv:2502.08378 (https://arxiv.org/html/2502.08378), code https://github.com/InternRobotics/HoST (MIT, per repo research notes; licence not re-verified here):
