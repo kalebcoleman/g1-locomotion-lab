@@ -39,12 +39,12 @@ The wrapper is deliberately small and expects one directory layout:
 ```bash
 ROOT=$(cd "$(dirname "$0")/.." && pwd)       # <repo>/recovery
 export PYTHONPATH=$ROOT:$PYTHONPATH          # makes g1_recovery importable
-cd $HOME/isaac-workspace/envs/lab-3.0.0-src  # Isaac Lab source checkout
+cd $HOME/robotics-workspace/envs/lab-3.0.0-src  # Isaac Lab source checkout
 exec ../lab-3.0.0/bin/python "$ROOT/scripts/$1" "${@:2}"
 ```
 
-So it expects a **source checkout** at `~/isaac-workspace/envs/lab-3.0.0-src` and its **Python environment** at
-`~/isaac-workspace/envs/lab-3.0.0` (the two are siblings; the interpreter is `../lab-3.0.0/bin/python`). If your
+So it expects a **source checkout** at `~/robotics-workspace/envs/lab-3.0.0-src` and its **Python environment** at
+`~/robotics-workspace/envs/lab-3.0.0` (the two are siblings; the interpreter is `../lab-3.0.0/bin/python`). If your
 checkout lives elsewhere, edit those two paths in `recovery/scripts/run.sh`, or create the same layout with a symlink.
 All arguments after the script name are passed through.
 
