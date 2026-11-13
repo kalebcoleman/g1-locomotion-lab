@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 from tensorboard.backend.event_processing.event_accumulator import EventAccumulator
 PAL = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4", "#008300", "#6250d6"]   # dataviz reference categorical order, fixed per entity
 INK, MUTED, GRID, SURF = "#0b0b0b", "#52514e", "#e6e5e0", "#fcfcfb"
-LOGS = os.path.expanduser("~/.local/share/isaac-mcp/jobs/")
+LOGS = os.path.join(os.path.expanduser(os.environ.get("TWINSMITH_JOBS_DIR") or "~/.local/share/twinsmith/jobs"), "")
 plt.rcParams.update({"font.size": 10, "axes.edgecolor": MUTED, "axes.labelcolor": MUTED, "xtick.color": MUTED, "ytick.color": MUTED, "text.color": INK, "axes.spines.top": False, "axes.spines.right": False, "figure.facecolor": SURF, "axes.facecolor": SURF})
 out = sys.argv[1]; runs = []
 for a in sys.argv[2:]:

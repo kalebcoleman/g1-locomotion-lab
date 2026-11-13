@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Status of running/finished MCP training jobs from their stdout logs: mon.py [jobdir-suffix ...]; default: today's G1-Recovery jobs."""
+"""Status of running/finished twinsmith training jobs (TWINSMITH_JOBS_DIR) from their stdout logs: mon.py [jobdir-suffix ...]; default: today's G1-Recovery jobs."""
 import glob, os, re, sys, numpy as np
-J = os.path.expanduser("~/.local/share/isaac-mcp/jobs/")
+J = os.path.join(os.path.expanduser(os.environ.get("TWINSMITH_JOBS_DIR") or "~/.local/share/twinsmith/jobs"), "")
 dirs = sorted(d for d in glob.glob(J + "*G1-Recovery*") if os.path.getsize(d + "/stdout.log") > 20000)
 if len(sys.argv) > 1: dirs = [d for d in dirs if any(a in d for a in sys.argv[1:])]
 tot = 0
