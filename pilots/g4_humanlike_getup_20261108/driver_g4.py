@@ -7,7 +7,7 @@ import sys, os, json, glob, subprocess, time, re, shutil
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from selection import pick_stage_best, target_met      # refactored after the runs to make the rule unit-testable; behaviour unchanged
 HERE = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.abspath(HERE + '/../..'); REC = ROOT + '/recovery'
-LABLOGS = os.path.expanduser('~/isaac-workspace/envs/lab-3.0.0-src/logs/rsl_rl/g1_recovery_r')
+LABLOGS = os.path.expanduser('~/robotics-workspace/envs/lab-3.0.0-src/logs/rsl_rl/g1_recovery_r')
 plan = json.load(open(sys.argv[1])); NAME = plan['name']; LOG = HERE + f'/results/{NAME}_driver.jsonl'
 def log(**k):
     k['t'] = time.strftime('%H:%M:%S'); open(LOG, 'a').write(json.dumps(k) + '\n'); print(json.dumps(k), flush=True)
