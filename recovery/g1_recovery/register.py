@@ -1,4 +1,4 @@
-"""Entry for Isaac Lab's `--external_callback g1_recovery.register.register` (used by the Isaac MCP jobs): importing the package registers the tasks."""
+"""Entry for Isaac Lab's `--external_callback g1_recovery.register.register` (used by the twinsmith Isaac Lab jobs): importing the package registers the tasks."""
 
 
 def register():
