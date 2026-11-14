@@ -6,7 +6,7 @@ import sys, os, json, hashlib, subprocess, glob, re, argparse, torch
 ap = argparse.ArgumentParser(); ap.add_argument('run'); ap.add_argument('start'); ap.add_argument('out'); ap.add_argument('--overrides'); a = ap.parse_args()
 sh = lambda p: hashlib.sha256(open(p, 'rb').read()).hexdigest()
 ld = lambda p: torch.load(p, map_location='cpu', weights_only=True)
-root = os.path.expanduser('~/isaac-workspace/projects/g1-locomotion-lab-integrated')
+root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))  # repo root
 g = lambda *c: subprocess.run(['git', '-C', root, *c], capture_output=True, text=True).stdout.strip()
 env = open(a.run + '/params/env.yaml').read(); ag = open(a.run + '/params/agent.yaml').read()
 cks = sorted(glob.glob(a.run + '/model_*.pt'), key=lambda p: int(re.findall(r'model_(\d+)', p)[0]))

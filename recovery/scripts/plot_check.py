@@ -18,7 +18,7 @@ for a in sys.argv[2:]:
 def run_dir(job):
     t = open(glob.glob(LOGS + job + "*/stdout.log")[0], errors="ignore").read().replace("\x00", "")
     ts = re.search(r"Exact experiment name requested from command line: (\S+)", t).group(1)
-    return os.path.expanduser("~/isaac-workspace/envs/lab-3.0.0-src/logs/rsl_rl/g1_recovery_r/" + ts)
+    return os.path.expanduser("~/robotics-workspace/envs/lab-3.0.0-src/logs/rsl_rl/g1_recovery_r/" + ts)
 panels = [("Curriculum/lying_max_h", "Peak pelvis height from lying (m)", 0.74), ("Curriculum/lying_ever_supported", "Fraction reaching a supported stand", None), ("Episode_Reward/upright", "Upright reward per episode", None), ("Episode_Reward/height", "Height reward per episode", None)]
 fig, axs = plt.subplots(2, 2, figsize=(11, 6.4), constrained_layout=True)
 for ax, (tag, title, ref) in zip(axs.flat, panels):

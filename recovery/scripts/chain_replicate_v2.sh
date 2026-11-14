@@ -2,7 +2,7 @@
 # Exact replication of the seed-3 chain that produced R9hg it1100, on another seed. Hand-over iterations are fixed in advance
 # (no DEV look between stages): R7h scratch -> model_650 -> R9h -> model_900 -> R9hc -> model_1000 -> R9hg -> model_1100.
 # usage: chain_replicate.sh <seed>
-S=$1; LAB=~/isaac-workspace/envs/lab-3.0.0-src; PY=~/isaac-workspace/envs/lab-3.0.0/bin/python; L=$LAB/logs/rsl_rl/g1_recovery_r; ROOT=~/isaac-workspace/projects/g1-locomotion-lab-integrated
+S=$1; LAB=~/robotics-workspace/envs/lab-3.0.0-src; PY=~/robotics-workspace/envs/lab-3.0.0/bin/python; L=$LAB/logs/rsl_rl/g1_recovery_r; ROOT=$(cd "$(dirname "$0")/../.." && pwd)
 export PYTHONUNBUFFERED=1 OMNI_KIT_ACCEPT_EULA=YES
 export PYTHONPATH=$ROOT/recovery${PYTHONPATH:+:$PYTHONPATH}
 stage(){ # task max_its want_iteration [resume_ckpt]
